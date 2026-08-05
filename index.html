@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Daily Income Zone</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Monetag SDK -->
+  <script src='//libtl.com/sdk.js' data-zone='11341986' data-sdk='show_11341986'></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ===== ALL EXISTING STYLES ===== */
+    body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; }
+    .dark-bg { background-color: #121212; }
+    .card-bg { background-color: #1e1e1e; }
+    .border-accent { border-color: #ff8c00; }
+    .text-accent { color: #ff8c00; }
+    .btn, .btn-accent, .btn-outline-accent { transition: all 0.2s ease-in-out; transform: scale(1); }
+    .btn:active, .btn-accent:active, .btn-outline-accent:active { transform: scale(0.95); }
+    .btn-accent { background-color: #ff8c00; color: #121212; font-weight: bold; }
+    .btn-accent:hover { background-color: #e67e00; }
+    .btn-outline-accent { border: 1px solid #ff8c00; color: #ff8c00; }
+    .btn-outline-accent:hover { background-color: #ff8c00; color: #121212; }
+    .input-field { background-color: #2c2c2c; border: 1px solid #444; color: white; }
+    .main-page { display: none; }
+    .main-page.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
+    .sub-page { display: none; }
+    .sub-page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+    .bottom-nav a.active { color: #ff8c00; }
+    .notification-dot {
+      position: absolute; top: -2px; right: -2px; width: 10px; height: 10px;
+      background-color: #ef4444; border-radius: 50%; border: 2px solid #121212; display: none;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .ip-warning { background-color: #dc2626; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; display: none; }
+
+    .game-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(18, 18, 18, 0.98);
+      z-index: 1000;
+      flex-direction: column;
+    }
+    .game-modal.active { display: flex; }
+    .game-list-scroll { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .game-list-scroll::-webkit-scrollbar { display: none; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* Monetag Ad Container - Fullscreen overlay for ad */
+    #ad-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+      background: rgba(0,0,0,0.95); display: none; flex-direction: column;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #ad-container.active { display: flex; }
+    #ad-container iframe { width: 100%; max-width: 400px; height: 80vh; border: none; border-radius: 12px; background: #1a1a1a; }
+    .ad-loading { color: #ff8c00; font-size: 18px; text-align: center; padding: 20px; }
+
+    .coin-earn-toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: #1e1e1e; border: 1px solid #ff8c00; color: #ff8c00;
+      padding: 12px 24px; border-radius: 12px; font-weight: bold; z-index: 9998;
+      opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
+      box-shadow: 0 10px 30px rgba(255, 140, 0, 0.2);
+    }
+    .coin-earn-toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+    #website-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); z-index: 10000; flex-direction: column;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #website-overlay.active { display: flex; }
+    #website-overlay .overlay-content {
+      background: #1e1e1e; border-radius: 16px; padding: 30px; max-width: 400px;
+      width: 100%; text-align: center; border: 1px solid #ff8c00;
+    }
+    #website-overlay .timer-circle {
+      width: 100px; height: 100px; border-radius: 50%; border: 4px solid #ff8c00;
+      display: flex; align-items: center; justify-content: center; margin: 20px auto;
+      font-size: 36px; font-weight: bold; color: #ff8c00;
+    }
+    #website-overlay .back-btn {
+      background: #ff8c00; color: #121212; font-weight: bold; padding: 12px 40px;
+      border-radius: 12px; border: none; font-size: 16px; cursor: pointer; margin-top: 15px; display: none;
+    }
+    #website-overlay .back-btn.show { display: inline-block; }
+    #website-overlay .status-text { color: #aaa; font-size: 14px; margin-top: 10px; }
+    
+    .loading-spinner {
+      display: inline-block; width: 20px; height: 20px;
+      border: 3px solid #f3f3f3; border-top: 3px solid #ff8c00; border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* ===== TOURNAMENT STYLES ===== */
+    .tournament-card {
+      background: linear-gradient(145deg, #1a1a2e, #16213e);
+      border-radius: 16px; border: 1px solid rgba(255, 140, 0, 0.2);
+      transition: all 0.3s ease; overflow: hidden; cursor: pointer;
+    }
+    .tournament-card:hover { border-color: #ff8c00; transform: translateY(-3px); }
+    .tournament-card img { width: 100%; height: 160px; object-fit: cover; }
+    .tournament-rank-badge {
+      position: absolute; top: 10px; right: 10px; background: #ff8c00;
+      color: #000; font-weight: 900; padding: 4px 12px; border-radius: 20px; font-size: 14px;
+    }
+    .tournament-leaderboard-item {
+      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 15px;
+      margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+      border-left: 3px solid transparent;
+    }
+    .tournament-leaderboard-item.top1 { border-left-color: #ffd700; background: rgba(255,215,0,0.1); }
+    .tournament-leaderboard-item.top2 { border-left-color: #c0c0c0; background: rgba(192,192,192,0.08); }
+    .tournament-leaderboard-item.top3 { border-left-color: #cd7f32; background: rgba(205,127,50,0.08); }
+    .tournament-leaderboard-item .rank-num { font-weight: 900; font-size: 18px; width: 40px; }
+    .tournament-leaderboard-item .score-num { font-weight: 700; color: #ff8c00; }
+    
+    .tournament-prize-pool {
+      background: linear-gradient(135deg, #1a1a2e, #2d1b69);
+      border-radius: 12px; border: 1px solid #ff8c00; padding: 15px;
+    }
+    .tournament-btn-gold {
+      background: linear-gradient(135deg, #ff8c00, #ff6a00);
+      color: #000; font-weight: 700; padding: 12px 30px; border-radius: 12px;
+      border: none; transition: all 0.3s; cursor: pointer;
+    }
+    .tournament-btn-gold:hover { transform: scale(1.05); box-shadow: 0 5px 25px rgba(255, 140, 0, 0.4); }
+    .tournament-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+      z-index: 2000; padding: 20px; overflow-y: auto;
+    }
+    .tournament-modal.active { display: flex; align-items: center; justify-content: center; }
+    .tournament-modal-content {
+      background: #1a1a2e; border-radius: 20px; max-width: 600px; width: 100%;
+      padding: 30px; border: 1px solid #ff8c00; max-height: 90vh; overflow-y: auto;
+    }
+    .tournament-user-tag {
+      background: #ff8c00; color: #000; font-weight: 700;
+      padding: 2px 10px; border-radius: 12px; font-size: 11px;
+    }
+
+    /* ===== NEW FEATURES STYLES ===== */
+    .feature-card {
+      background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #333;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .feature-card:hover {
+      border-color: #ff8c00;
+      transform: translateY(-2px);
+    }
+    .feature-card .icon { font-size: 32px; }
+    .feature-card .title { font-size: 14px; font-weight: 600; color: #fff; }
+    .feature-card .desc { font-size: 11px; color: #888; }
+
+    /* Daily Bonus */
+    .streak-day {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      background: #333;
+      color: #666;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .streak-day.active {
+      background: #ff8c00;
+      color: #000;
+      border-color: #ff8c00;
+    }
+    .streak-day.claimed {
+      background: #22c55e;
+      color: #000;
+      border-color: #22c55e;
+    }
+    .streak-day.today {
+      border-color: #ff8c00;
+      animation: pulse-border 1.5s infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: #ff8c00; }
+      50% { border-color: #ff8c0066; }
+    }
+
+    /* Spin Wheel */
+    .wheel-segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      transform-origin: 100% 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    /* Level */
+    .level-progress {
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .level-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff8c00, #ff6a00);
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    /* Achievement */
+    .achievement-badge {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: #2a2a2a;
+      border: 2px solid #444;
+      transition: all 0.3s;
+    }
+    .achievement-badge.unlocked {
+      border-color: #ff8c00;
+      background: #1a1a2e;
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.2);
+    }
+    .achievement-badge.locked {
+      filter: grayscale(1);
+      opacity: 0.5;
+    }
+
+    /* VIP */
+    .vip-badge {
+      background: linear-gradient(135deg, #ffd700, #ff6a00);
+      color: #000;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    /* Mission */
+    .mission-card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 12px 16px;
+      border-left: 3px solid #ff8c00;
+      margin-bottom: 8px;
+    }
+    .mission-card.completed {
+      border-left-color: #22c55e;
+      opacity: 0.7;
+    }
+    .mission-card .progress-text {
+      font-size: 11px;
+      color: #888;
+    }
+
+    /* Coin History */
+    .coin-history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #222;
+    }
+    .coin-history-item .amount.positive { color: #22c55e; }
+    .coin-history-item .amount.negative { color: #ef4444; }
+
+    /* Withdraw Progress */
+    .withdraw-progress-bar {
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .withdraw-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff8c00, #ff6a00);
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    /* Check-in Calendar */
+    .checkin-day {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      font-size: 10px;
+      color: #888;
+      transition: all 0.3s;
+    }
+    .checkin-day.checked {
+      background: #22c55e;
+      border-color: #22c55e;
+      color: #000;
+    }
+    .checkin-day.today {
+      border-color: #ff8c00;
+    }
+    .checkin-day .day-num { font-size: 16px; font-weight: bold; }
+
+    /* ============================================================ */
+    /* ========== PROFESSIONAL UI ADD-ON STYLES ================== */
+    /* ============================================================ */
+    
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, #ff8c00, #ff6a00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glass Effect */
+    .glass {
+      background: rgba(30, 30, 30, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Glow Effects */
+    .glow-primary {
+      box-shadow: 0 0 40px rgba(255, 140, 0, 0.2);
+    }
+
+    .glow-gold {
+      box-shadow: 0 0 40px rgba(255, 217, 61, 0.2);
+    }
+
+    /* Pro Card - Enhanced */
+    .pro-card {
+      background: #1e1e1e;
+      border-radius: 16px;
+      border: 1px solid #2a2a3e;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .pro-card:hover {
+      border-color: #ff8c00;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255, 140, 0, 0.15);
+    }
+
+    /* Balance Card - Enhanced */
+    .balance-card-enhanced {
+      background: linear-gradient(135deg, #ff8c00, #ff6a00);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-card-enhanced::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+    }
+
+    .balance-card-enhanced .amount {
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .balance-card-enhanced .label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Feature Grid - Enhanced */
+    .feature-grid-enhanced {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .feature-grid-enhanced .feature-item {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      border: 1px solid #2a2a3e;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .feature-grid-enhanced .feature-item:hover {
+      border-color: #ff8c00;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(255, 140, 0, 0.15);
+    }
+
+    .feature-grid-enhanced .feature-item .icon {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .feature-grid-enhanced .feature-item .title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a0a0b8;
+    }
+
+    /* Task Items - Enhanced */
+    .task-item-enhanced {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #2a2a3e;
+      transition: all 0.3s ease;
+    }
+
+    .task-item-enhanced:hover {
+      border-color: #ff8c00;
+    }
+
+    .task-item-enhanced .task-icon {
+      font-size: 28px;
+      margin-right: 12px;
+    }
+
+    .task-item-enhanced .task-info {
+      flex: 1;
+    }
+
+    .task-item-enhanced .task-info .task-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .task-item-enhanced .task-info .task-desc {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .task-item-enhanced .task-reward {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ff8c00;
+      margin-right: 12px;
+    }
+
+    /* Enhanced Bottom Nav */
+    .bottom-nav-enhanced {
+      background: #1a1a1a;
+      border-top: 1px solid #2a2a3e;
+      padding: 8px 0 12px 0;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+    }
+
+    .bottom-nav-enhanced .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #666;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 10px;
+    }
+
+    .bottom-nav-enhanced .nav-item i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .bottom-nav-enhanced .nav-item.active {
+      color: #ff8c00;
+    }
+
+    .bottom-nav-enhanced .nav-item:hover {
+      color: #ff8c00;
+    }
+
+    /* Premium Badge */
+    .premium-badge {
+      background: linear-gradient(135deg, #ffd700, #ff6a00);
+      color: #000;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Animated Border */
+    .animated-border {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .animated-border::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff8c00, #ff6a00, #ffd700, #ff8c00);
+      background-size: 400% 400%;
+      border-radius: 18px;
+      z-index: -1;
+      animation: gradientMove 4s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Stats Card */
+    .stats-card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #2a2a3e;
+    }
+
+    .stats-card .number {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ff8c00;
+    }
+
+    .stats-card .label {
+      font-size: 12px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 420px) {
+      .feature-grid-enhanced {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+      }
+      .feature-grid-enhanced .feature-item {
+        padding: 10px 6px;
+      }
+      .feature-grid-enhanced .feature-item .icon {
+        font-size: 22px;
+      }
+      .feature-grid-enhanced .feature-item .title {
+        font-size: 9px;
+      }
+      .balance-card-enhanced .amount {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body class="max-w-md mx-auto">
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzglxyiGH4kptZtq5U45vMb5jat7XPbAw",
+      authDomain: "daily-income-zone.firebaseapp.com",
+      projectId: "daily-income-zone",
+      storageBucket: "daily-income-zone.firebasestorage.app",
+      messagingSenderId: "744535360580",
+      appId: "1:744535360580:web:6aa14f64f1952a0b082811",
+      measurementId: "G-RG6H88R3L9"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <!-- ===== LOADER ===== -->
+  <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- ===== IP WARNING ===== -->
+  <div id="ip-warning" class="ip-warning">
+    ⚠️ Warning: Multiple device detected! You can only use one device per account.
+  </div>
+
+  <!-- ===== TIMER MODAL ===== -->
+  <div id="timer-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-6">
+    <div class="bg-gray-800 rounded-lg p-8 w-full max-w-sm text-center">
+      <h3 class="text-xl font-bold mb-4 text-accent">Please Wait</h3>
+      <div class="text-4xl font-bold mb-4" id="countdown-display">0</div>
+      <p class="text-gray-400 text-sm">কাজটি সম্পন্ন করতে অপেক্ষা করুন। ব্রাউজার বা অ্যাপ বন্ধ করবেন না।</p>
+    </div>
+  </div>
+
+  <!-- ===== AD CONTAINER (Monetag) ===== -->
+  <div id="ad-container">
+    <div id="ad-content" class="ad-loading">
+      Loading ad...<br><span style="font-size:14px;color:#666;">Please wait a moment</span>
+    </div>
+  </div>
+
+  <!-- ===== WEBSITE OVERLAY ===== -->
+  <div id="website-overlay">
+    <div class="overlay-content">
+      <div style="font-size: 48px; margin-bottom: 10px;">🌐</div>
+      <h3 class="text-xl font-bold text-white mb-2">Visiting Website</h3>
+      <p class="text-gray-400 text-sm mb-2">Please wait <span id="website-timer-display">15</span> seconds</p>
+      <div class="timer-circle" id="website-timer-circle">15</div>
+      <p class="status-text" id="website-status-text">⏳ Please wait...</p>
+      <button class="back-btn" id="website-back-btn" onclick="closeWebsiteOverlay()">⬅️ Back to Home</button>
+      <p class="text-xs text-gray-500 mt-3">আপনি ১৫ সেকেন্ড পর Back বাটন পাবেন</p>
+    </div>
+  </div>
+
+  <!-- ===== COIN TOAST ===== -->
+  <div id="coin-toast" class="coin-earn-toast">✨ +10 Coins Earned!</div>
+
+  <!-- ============================================================ -->
+  <!-- ========== NEW FEATURES MODALS ============================= -->
+  <!-- ============================================================ -->
+
+  <!-- Daily Login Bonus Modal -->
+  <div id="daily-bonus-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent max-h-[90vh] overflow-y-auto">
+      <div class="text-6xl mb-3">🎁</div>
+      <h3 class="text-2xl font-bold text-white mb-2">Daily Login Bonus</h3>
+      <p class="text-gray-400 text-sm mb-4">Login daily to earn rewards!</p>
+      <div id="bonus-streak-display" class="flex justify-center gap-2 mb-4 flex-wrap"></div>
+      <div class="bg-gray-700/50 rounded-lg p-4 mb-4">
+        <p class="text-sm text-gray-400">Today's Bonus</p>
+        <p class="text-3xl font-bold text-accent" id="today-bonus-amount">+10 Coins</p>
+      </div>
+      <button onclick="claimDailyBonus()" id="claim-bonus-btn" class="w-full py-3 rounded-lg btn-accent text-lg">Claim Now</button>
+      <p class="text-xs text-gray-500 mt-3" id="bonus-timer-display">Next bonus in 23:59:59</p>
+      <button onclick="closeDailyBonus()" class="mt-3 text-gray-400 text-sm">Close</button>
+    </div>
+  </div>
+
+  <!-- Spin & Win Modal -->
+  <div id="spin-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent max-h-[90vh] overflow-y-auto">
+      <div class="text-6xl mb-3">🎡</div>
+      <h3 class="text-2xl font-bold text-white mb-2">Spin & Win</h3>
+      <p class="text-gray-400 text-sm mb-4">Spin the wheel to win coins!</p>
+      <div class="relative w-64 h-64 mx-auto mb-6">
+        <div id="wheel-container" class="w-full h-full rounded-full border-4 border-accent relative overflow-hidden">
+          <canvas id="wheel-canvas" width="256" height="256" class="w-full h-full"></canvas>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-accent rounded-full flex items-center justify-center text-black font-bold text-xl z-10 shadow-lg">GO</div>
+        </div>
+      </div>
+      <button onclick="spinWheel()" id="spin-btn" class="w-full py-3 rounded-lg btn-accent text-lg">🎰 Spin (Free)</button>
+      <p class="text-xs text-gray-500 mt-3" id="spin-timer">Next spin in 23:59:59</p>
+      <button onclick="closeSpinModal()" class="mt-3 text-gray-400 text-sm">Close</button>
+    </div>
+  </div>
+
+  <!-- Scratch Card Modal -->
+  <div id="scratch-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent">
+      <div class="text-6xl mb-3">🪙</div>
+      <h3 class="text-2xl font-bold text-white mb-2">Scratch Card</h3>
+      <p class="text-gray-400 text-sm mb-4">Scratch to reveal your prize!</p>
+      <div id="scratch-card" class="w-full aspect-square bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden mb-4">
+        <div id="scratch-reveal" class="absolute inset-0 flex items-center justify-center text-6xl opacity-0 transition-opacity duration-500"></div>
+        <div id="scratch-cover" class="absolute inset-0 flex items-center justify-center text-white font-bold text-xl">🖐️ Tap to Scratch</div>
+      </div>
+      <button onclick="closeScratchModal()" class="w-full py-3 rounded-lg bg-gray-600 text-white font-bold">Close</button>
+    </div>
+  </div>
+
+  <!-- Mystery Box Modal -->
+  <div id="mystery-box-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent">
+      <div class="text-6xl mb-3">📦</div>
+      <h3 class="text-2xl font-bold text-white mb-2">Mystery Box</h3>
+      <p class="text-gray-400 text-sm mb-4">Open the box to find your surprise!</p>
+      <div id="mystery-box" class="w-full aspect-square bg-gradient-to-br from-purple-600 to-purple-900 rounded-xl flex items-center justify-center cursor-pointer mb-4 text-6xl hover:scale-105 transition-transform" onclick="openMysteryBox()">
+        📦
+      </div>
+      <button onclick="closeMysteryBoxModal()" class="w-full py-3 rounded-lg bg-gray-600 text-white font-bold">Close</button>
+    </div>
+  </div>
+
+  <!-- Level & XP Modal -->
+  <div id="level-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent">
+      <div class="text-6xl mb-3">⭐</div>
+      <h3 class="text-2xl font-bold text-white mb-2">Your Level</h3>
+      <div class="mb-4">
+        <p class="text-5xl font-bold text-accent" id="level-display">1</p>
+        <p class="text-gray-400 text-sm">Level</p>
+      </div>
+      <div class="mb-2 flex justify-between text-sm">
+        <span id="xp-current">0</span>
+        <span id="xp-next">100</span>
+      </div>
+      <div class="level-progress">
+        <div class="level-progress-fill" id="xp-progress" style="width:0%"></div>
+      </div>
+      <button onclick="closeLevelModal()" class="w-full mt-4 py-3 rounded-lg bg-gray-600 text-white font-bold">Close</button>
+    </div>
+  </div>
+
+  <!-- Achievement Modal -->
+  <div id="achievement-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent max-h-[90vh] overflow-y-auto">
+      <h3 class="text-2xl font-bold text-white mb-4">🏅 Achievements</h3>
+      <div id="achievement-list" class="space-y-3"></div>
+      <button onclick="closeAchievementModal()" class="w-full mt-4 py-3 rounded-lg bg-gray-600 text-white font-bold">Close</button>
+    </div>
+  </div>
+
+  <!-- VIP Modal -->
+  <div id="vip-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[1000] p-4">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-sm text-center border border-accent">
+      <div class="text-6xl mb-3">👑</div>
+      <h3 class="text-2xl font-bold text-white mb-2">VIP Membership</h3>
+      <div class="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg p-4 mb-4">
+        <p class="text-black font-bold text-lg" id="vip-status">Free Member</p>
+        <p class="text-black/70 text-sm" id="vip-benefits">Earn 2x coins on all tasks</p>
+      </div>
+      <button onclick="closeVIPModal()" class="w-full py-3 rounded-lg bg-gray-600 text-white font-bold">Close</button>
+    </div>
+  </div>
+
+  <!-- ===== AUTH SECTION ===== -->
+  <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page">
+    <h1 class="text-3xl font-bold text-center mb-2 text-accent">Daily Income Zone</h1>
+    <p class="text-center text-gray-400 mb-8">Enter your username to continue</p>
+    <div id="auth-container">
+      <div id="login-view">
+        <div id="login-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
+        <input id="login-username" type="text" placeholder="Enter Username" class="w-full p-3 rounded-lg input-field mb-4">
+        <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Login / Signup</button>
+        <p class="text-center text-gray-400 text-xs">No password needed. Just enter your username!</p>
+        <div class="mt-4 text-center">
+          <button onclick="showForgotUsername()" class="text-xs text-accent">Forgot Username?</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APP CONTAINER ===== -->
+  <div id="app-container" class="min-h-screen flex-col main-page">
+    
+    <!-- ===== HEADER ===== -->
+    <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg">
+      <h1 class="text-xl font-bold gradient-text">Daily Income Zone</h1>
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-accent" id="level-badge">Lv.1</span>
+        </div>
+        <div id="notification-bell" class="relative cursor-pointer">
+          <i data-lucide="bell" class="w-6 h-6"></i>
+          <div id="notification-dot" class="notification-dot"></div>
+        </div>
+        <i data-lucide="user" class="w-6 h-6 cursor-pointer" onclick="navigateTo('profile-page')"></i>
+      </div>
+    </header>
+
+    <main class="flex-grow">
+      
+      <!-- ===== HOME PAGE ===== -->
+      <div id="home-page" class="p-4 space-y-4 sub-page">
+        
+        <!-- Balance Card - Enhanced -->
+        <div class="balance-card-enhanced">
+          <div class="relative z-10">
+            <p class="label">Your Balance</p>
+            <p class="amount"><span id="coin-balance">0</span> Coins</p>
+            <div class="flex justify-between items-center mt-2">
+              <p class="text-xs text-white/60">Level: <span id="home-level">1</span></p>
+              <button onclick="navigateTo('wallet-page')" class="bg-white/20 backdrop-blur-sm text-white font-semibold px-4 py-1.5 rounded-full text-sm hover:bg-white/30 transition">Withdraw</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features Grid - Enhanced -->
+        <div class="feature-grid-enhanced">
+          <div class="feature-item" onclick="openDailyBonus()">
+            <span class="icon">🎁</span>
+            <span class="title">Daily Bonus</span>
+          </div>
+          <div class="feature-item" onclick="openSpinModal()">
+            <span class="icon">🎡</span>
+            <span class="title">Spin & Win</span>
+          </div>
+          <div class="feature-item" onclick="openScratchModal()">
+            <span class="icon">🪙</span>
+            <span class="title">Scratch</span>
+          </div>
+          <div class="feature-item" onclick="openMysteryBoxModal()">
+            <span class="icon">📦</span>
+            <span class="title">Mystery Box</span>
+          </div>
+          <div class="feature-item" onclick="openLevelModal()">
+            <span class="icon">⭐</span>
+            <span class="title">Level</span>
+          </div>
+          <div class="feature-item" onclick="openAchievementModal()">
+            <span class="icon">🏅</span>
+            <span class="title">Achievements</span>
+          </div>
+          <div class="feature-item" onclick="openVIPModal()">
+            <span class="icon">👑</span>
+            <span class="title">VIP</span>
+          </div>
+          <div class="feature-item" onclick="navigateTo('mission-page')">
+            <span class="icon">🎯</span>
+            <span class="title">Missions</span>
+          </div>
+        </div>
+
+        <!-- Daily Check-in -->
+        <div class="pro-card">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="font-semibold">📅 Daily Check-in</h3>
+            <span class="text-xs text-accent" id="checkin-streak">🔥 0 days</span>
+          </div>
+          <div id="checkin-calendar" class="grid grid-cols-7 gap-1"></div>
+        </div>
+
+        <!-- Tournament Section -->
+        <section>
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-lg font-semibold">🏆 Game Tournament</h2>
+            <span class="text-xs text-gray-400" id="tournament-rank-display">Rank: -</span>
+          </div>
+          <div id="tournament-games-container" class="grid grid-cols-1 gap-4"></div>
+        </section>
+
+        <!-- Daily Tasks -->
+        <section>
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-lg font-semibold">Daily Tasks</h2>
+              <p class="text-sm text-gray-400 mb-4">কয়েন আয় করতে নিচের টাস্কগুলো সম্পন্ন করুন।</p>
+            </div>
+            <p class="text-sm text-gray-400">Tasks Left: <span id="ads-left-count">5</span></p>
+          </div>
+
+          <div class="space-y-3">
+            <!-- Watch Video Ad - Enhanced (Monetag integrated) -->
+            <div class="task-item-enhanced bg-orange-500/10 border-orange-500/30" id="task-ad">
+              <div class="flex items-center flex-1">
+                <span class="task-icon">🤩</span>
+                <div class="task-info">
+                  <p class="task-title text-black dark:text-white">Watch Video Ad</p>
+                  <p class="task-desc">Watch & Earn 10 Coins</p>
+                  <p class="text-[10px] text-black/70 dark:text-white/70" id="ad-status-text">✅ Ready to watch</p>
+                </div>
+              </div>
+              <button class="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg text-sm btn" id="watch-ad-btn" onclick="showMonetagAd()">Watch</button>
+            </div>
+
+            <!-- Website Visit 1 - Enhanced -->
+            <div class="task-item-enhanced" id="task-website1">
+              <div class="flex items-center flex-1">
+                <span class="task-icon">🌐</span>
+                <div class="task-info">
+                  <p class="task-title">Website Visit 1</p>
+                  <p class="task-desc">Wait 15 Seconds</p>
+                </div>
+              </div>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="visitWebsite('https://adsfly.in/daily_1income', 'task-website1', this)">Visit</button>
+            </div>
+
+            <!-- Website Visit 2 - Enhanced -->
+            <div class="task-item-enhanced" id="task-website2">
+              <div class="flex items-center flex-1">
+                <span class="task-icon">🌐</span>
+                <div class="task-info">
+                  <p class="task-title">Website Visit 2</p>
+                  <p class="task-desc">Wait 15 Seconds</p>
+                </div>
+              </div>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="visitWebsite('https://adsfly.in/daily_1income11', 'task-website2', this)">Visit</button>
+            </div>
+
+            <!-- Website Visit 3 - Enhanced -->
+            <div class="task-item-enhanced" id="task-website3">
+              <div class="flex items-center flex-1">
+                <span class="task-icon">🌐</span>
+                <div class="task-info">
+                  <p class="task-title">Website Visit 3</p>
+                  <p class="task-desc">Wait 15 Seconds</p>
+                </div>
+              </div>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="visitWebsite('https://adsfly.in/dlz_zone', 'task-website3', this)">Visit</button>
+            </div>
+
+            <!-- Special Task - Enhanced -->
+            <div class="task-item-enhanced" id="task-special">
+              <div class="flex items-center flex-1">
+                <span class="task-icon">⏳</span>
+                <div class="task-info">
+                  <p class="task-title">Special Task Click</p>
+                  <p class="task-desc">Wait 15 Seconds</p>
+                </div>
+              </div>
+              <button class="bg-white text-black font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="claimReward('dailyClick', this)">Start</button>
+            </div>
+
+            <!-- Play Mini Game - Enhanced -->
+            <div class="task-item-enhanced" id="task-game">
+              <div class="flex items-center flex-1">
+                <span class="task-icon">🎮</span>
+                <div class="task-info">
+                  <p class="task-title">Play Mini Game</p>
+                  <p class="task-desc">Earn 10 Coins</p>
+                </div>
+              </div>
+              <button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="window.openGameModal(this)">Play</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== WALLET PAGE ===== -->
+      <div id="wallet-page" class="p-4 space-y-4 sub-page">
+        <h2 class="text-xl font-bold text-center">My Wallet</h2>
+        
+        <div class="pro-card">
+          <p class="text-sm text-gray-400 mb-1">Available Balance:</p>
+          <p class="text-3xl font-bold text-accent mb-2"><span id="wallet-coin-balance">0</span> Coins</p>
+          
+          <!-- Withdraw Progress -->
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-400">
+              <span>Progress to withdraw</span>
+              <span id="withdraw-progress-text">0%</span>
+            </div>
+            <div class="withdraw-progress-bar">
+              <div class="withdraw-progress-fill" id="withdraw-progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+          
+          <input id="withdraw-amount" type="number" placeholder="Enter amount" class="w-full p-3 rounded-lg input-field mb-3">
+          <select id="withdraw-method" class="w-full p-3 rounded-lg input-field mb-3">
+            <option value="Bkash">Bkash</option>
+            <option value="Nagad">Nagad</option>
+            <option value="Rocket">Rocket</option>
+          </select>
+          <input id="payment-number" type="number" placeholder="Account Number" class="w-full p-3 rounded-lg input-field mb-3">
+          <button id="withdraw-btn" class="w-full p-3 rounded-lg btn-accent">Request Withdrawal</button>
+          <p class="text-xs text-gray-400 mt-4 text-center" id="min-withdrawal-info">Minimum: 50,000 Coins</p>
+        </div>
+
+        <!-- Coin History -->
+        <div>
+          <h3 class="font-semibold mb-3">Coin History</h3>
+          <div id="coin-history-list" class="space-y-1 max-h-48 overflow-y-auto"></div>
+        </div>
+
+        <!-- Withdrawal History -->
+        <div>
+          <h3 class="font-semibold mb-3">Withdrawal History</h3>
+          <div id="withdrawal-history-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <!-- ===== REFER PAGE ===== -->
+      <div id="refer-page" class="p-4 space-y-4 sub-page">
+        <h2 class="text-xl font-bold text-center">Refer & Earn</h2>
+        
+        <div class="pro-card">
+          <p class="text-gray-400 mb-2">Your Referral Code</p>
+          <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-center mb-4 border border-accent border-dashed">
+            <span id="referral-code" class="text-2xl font-bold tracking-widest text-accent">LOADING...</span>
+            <button id="copy-code-btn" class="ml-4"><i data-lucide="copy" class="w-5 h-5 text-gray-400"></i></button>
+          </div>
+          <button id="share-btn" class="w-full p-3 rounded-lg btn-accent">Share With Friends</button>
+        </div>
+
+        <!-- Referral Stats -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="stats-card">
+            <p class="number" id="referral-count">0</p>
+            <p class="label">Total Referrals</p>
+          </div>
+          <div class="stats-card">
+            <p class="number" id="referral-earnings">0</p>
+            <p class="label">Coins Earned</p>
+          </div>
+        </div>
+
+        <!-- Referral Leaderboard -->
+        <div>
+          <h3 class="font-semibold mb-3">🏆 Referral Leaderboard</h3>
+          <div id="referral-leaderboard" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <!-- ===== PROFILE PAGE ===== -->
+      <div id="profile-page" class="p-4 space-y-4 sub-page text-center">
+        <div class="flex flex-col items-center">
+          <div class="w-20 h-20 bg-accent rounded-full flex items-center justify-center mb-2 relative">
+            <i data-lucide="user" class="w-10 h-10 text-black"></i>
+            <button onclick="changeProfilePic()" class="absolute bottom-0 right-0 bg-gray-800 rounded-full p-1 text-xs">📷</button>
+          </div>
+          <h2 id="profile-name" class="text-xl font-bold">Loading...</h2>
+          <p id="profile-username" class="text-gray-400">@username</p>
+          <p id="profile-email" class="text-gray-500 text-sm">...</p>
+          <p class="text-xs text-accent mt-1" id="profile-level">Level: 1</p>
+        </div>
+        
+        <div class="pro-card text-left">
+          <h3 class="font-semibold mb-3 text-center">Account Settings</h3>
+          <button onclick="showChangePassword()" class="w-full text-left py-2 px-3 bg-gray-700/30 rounded-lg mb-2 flex justify-between">
+            <span>🔑 Change Password</span>
+            <span class="text-gray-400">→</span>
+          </button>
+          <button onclick="showChangeUsername()" class="w-full text-left py-2 px-3 bg-gray-700/30 rounded-lg mb-2 flex justify-between">
+            <span>✏️ Change Username</span>
+            <span class="text-gray-400">→</span>
+          </button>
+          <button onclick="showEmailVerification()" class="w-full text-left py-2 px-3 bg-gray-700/30 rounded-lg flex justify-between">
+            <span>📧 Verify Email</span>
+            <span class="text-gray-400" id="email-verify-status">Not Verified</span>
+          </button>
+        </div>
+        
+        <div class="pro-card text-left">
+          <h3 class="font-semibold mb-3 text-center">Device Security</h3>
+          <p class="text-sm text-gray-400 mb-2">Current Device/IP:</p>
+          <p id="current-device-info" class="text-xs font-mono p-2 bg-gray-800 rounded"></p>
+          <p class="text-xs text-gray-400 mt-2">Only one device per account is allowed</p>
+        </div>
+        
+        <button id="logout-btn" class="w-full mt-4 p-3 rounded-lg bg-red-600 text-white font-bold">Logout</button>
+      </div>
+
+      <!-- ===== MISSIONS PAGE ===== -->
+      <div id="mission-page" class="p-4 space-y-4 sub-page">
+        <h2 class="text-xl font-bold text-center">🎯 Missions</h2>
+        
+        <div>
+          <h3 class="font-semibold mb-2">📅 Daily Missions</h3>
+          <div id="daily-missions" class="space-y-2"></div>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold mb-2">📆 Weekly Missions</h3>
+          <div id="weekly-missions" class="space-y-2"></div>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold mb-2">📅 Monthly Missions</h3>
+          <div id="monthly-missions" class="space-y-2"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ===== BOTTOM NAV - ENHANCED ===== -->
+    <nav class="bottom-nav-enhanced grid grid-cols-5 items-center text-center">
+      <a href="#" class="nav-item active" data-page="home-page" onclick="navigateTo('home-page'); return false;">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="nav-item" data-page="wallet-page" onclick="navigateTo('wallet-page'); return false;">
+        <i data-lucide="wallet" class="w-5 h-5"></i>
+        <span>Wallet</span>
+      </a>
+      <a href="#" class="nav-item" data-page="refer-page" onclick="navigateTo('refer-page'); return false;">
+        <i data-lucide="users" class="w-5 h-5"></i>
+        <span>Refer</span>
+      </a>
+      <a href="#" class="nav-item" data-page="mission-page" onclick="navigateTo('mission-page'); return false;">
+        <i data-lucide="target" class="w-5 h-5"></i>
+        <span>Missions</span>
+      </a>
+      <a href="#" class="nav-item" data-page="profile-page" onclick="navigateTo('profile-page'); return false;">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ===== CUSTOM ALERT ===== -->
+  <div id="custom-alert" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-xs text-center border border-accent">
+      <p id="alert-message" class="mb-4 font-medium text-sm"></p>
+      <button id="alert-ok-btn" class="btn-accent px-8 py-2 rounded-lg text-sm">OK</button>
+    </div>
+  </div>
+
+  <!-- ===== TOURNAMENT MODAL ===== -->
+  <div id="tournament-modal" class="tournament-modal">
+    <div class="tournament-modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 id="t-modal-title" class="text-2xl font-bold text-white">Game Title</h2>
+        <button onclick="closeTournamentModal()" class="text-gray-400 hover:text-white text-2xl">✕</button>
+      </div>
+      <img id="t-modal-image" src="" alt="" class="w-full h-48 object-cover rounded-xl mb-4">
+      <div class="tournament-prize-pool mb-4">
+        <h3 class="font-bold text-orange-400 mb-2">🏆 Prize Pool</h3>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-black/30 rounded-lg p-2">
+            <p class="text-yellow-400 font-bold text-lg" id="t-prize-1">0</p>
+            <p class="text-xs text-gray-400">🥇 1st</p>
+          </div>
+          <div class="bg-black/30 rounded-lg p-2">
+            <p class="text-gray-300 font-bold text-lg" id="t-prize-2">0</p>
+            <p class="text-xs text-gray-400">🥈 2nd</p>
+          </div>
+          <div class="bg-black/30 rounded-lg p-2">
+            <p class="text-amber-600 font-bold text-lg" id="t-prize-3">0</p>
+            <p class="text-xs text-gray-400">🥉 3rd</p>
+          </div>
+        </div>
+      </div>
+      <div class="mb-4">
+        <h3 class="font-bold text-white mb-2">📊 Leaderboard</h3>
+        <div id="t-leaderboard" class="space-y-1 max-h-60 overflow-y-auto"></div>
+      </div>
+      <button onclick="playTournamentGame()" class="tournament-btn-gold w-full text-center">🎮 Play & Earn Coins</button>
+    </div>
+  </div>
+
+  <!-- ===== GAME MODAL ===== -->
+  <div id="gameZoneModal" class="game-modal max-w-md mx-auto">
+    <header class="flex items-center justify-between p-4 bg-opacity-95 backdrop-blur-md sticky top-0 dark-bg border-b border-gray-800 z-20">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="gamepad-2" class="w-6 h-6 text-accent"></i>
+        <h2 class="text-xl font-bold">Mini Game Zone</h2>
+      </div>
+      <button onclick="window.closeGameModal()" class="p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition">
+        <i data-lucide="x" class="w-6 h-6 text-red-500"></i>
+      </button>
+    </header>
+    <div class="p-4 dark-bg sticky top-[69px] z-20 shadow-lg">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+          <i data-lucide="search" class="w-5 h-5"></i>
+        </span>
+        <input id="game-search-input" type="text" placeholder="Search your game here..." class="w-full pl-10 pr-4 p-3 rounded-xl input-field focus:outline-none focus:border-accent transition text-sm">
+      </div>
+    </div>
+    <div class="flex-grow overflow-y-auto p-4 space-y-3 game-list-scroll pb-24 relative">
+      <div id="game-inner-loader" class="hidden flex flex-col items-center justify-center py-12 space-y-3">
+        <div class="loading-spinner"></div>
+        <p class="text-sm text-gray-400">Loading Games Assets...</p>
+      </div>
+      <div id="no-games-msg" class="hidden text-center text-gray-400 py-12">
+        <i data-lucide="frown" class="w-12 h-12 mx-auto mb-2 text-gray-500"></i>
+        <p class="font-medium">No Games Found!</p>
+      </div>
+      <div id="game-cards-wrapper" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- ========== MAIN JAVASCRIPT ================================== -->
+  <!-- ============================================================ -->
+  
+  <script>
+    // ============================================================
+    // ========== SAFE DOM ELEMENT ACCESS ==========================
+    // ============================================================
+    function safeGetElement(id) {
+      const el = document.getElementById(id);
+      if (!el) {
+        console.warn('Element not found, creating fallback:', id);
+        const fallback = document.createElement('div');
+        fallback.id = id;
+        fallback.style.display = 'none';
+        document.body.appendChild(fallback);
+        return fallback;
+      }
+      return el;
+    }
+
+    function safeAddClass(el, className) {
+      if (el && el.classList) el.classList.add(className);
+    }
+
+    function safeRemoveClass(el, className) {
+      if (el && el.classList) el.classList.remove(className);
+    }
+
+    function safeToggleClass(el, className) {
+      if (el && el.classList) el.classList.toggle(className);
+    }
+
+    // ============================================================
+    // ========== NO PASSWORD LOGIN SYSTEM =========================
+    // ============================================================
+    
+    async function loginWithUsername(username) {
+      if (!username || username.trim().length < 3) {
+        showLoginErrorMsg('Username must be at least 3 characters.');
+        return false;
+      }
+      
+      username = username.trim();
+      
+      try {
+        const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+        
+        if (usernameDoc.exists) {
+          const data = usernameDoc.data();
+          const email = data.email;
+          const tempPassword = Math.random().toString(36).slice(-8) + 'Abc123!';
+          
+          try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, tempPassword);
+            return userCredential.user;
+          } catch (loginError) {
+            if (loginError.code === 'auth/wrong-password' || loginError.code === 'auth/user-not-found') {
+              return await createAccountWithUsername(username, email);
+            }
+            throw loginError;
+          }
+        } else {
+          const email = username.toLowerCase() + '@dailyincomezone.temp';
+          return await createAccountWithUsername(username, email);
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showLoginErrorMsg('Error logging in. Please try again.');
+        return false;
+      }
+    }
+    
+    async function createAccountWithUsername(username, email) {
+      try {
+        const tempPassword = Math.random().toString(36).slice(-8) + 'Abc123!';
+        const userCredential = await auth.createUserWithEmailAndPassword(email, tempPassword);
+        const user = userCredential.user;
+        
+        const referralCode = generateReferralCode();
+        await db.collection("users").doc(user.uid).set({
+          name: username,
+          username: username,
+          email: email,
+          balance: 0,
+          referralCode: referralCode,
+          isBlocked: false,
+          completedTasks: {},
+          level: 1,
+          xp: 0,
+          streak: 0,
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+          dailyBonusClaimed: false,
+          spinAvailable: true,
+          lastSpin: null,
+          vip: false,
+          achievements: [],
+          referrals: [],
+          referralEarnings: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        await db.collection("usernames").doc(username.toLowerCase()).set({
+          uid: user.uid,
+          email: email,
+          username: username,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        await db.collection("user_passwords").doc(user.uid).set({
+          password: tempPassword,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        return user;
+      } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+          const tempPassword = Math.random().toString(36).slice(-8) + 'Abc123!';
+          try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, tempPassword);
+            return userCredential.user;
+          } catch (loginError) {
+            try {
+              await auth.sendPasswordResetEmail(email);
+              showLoginErrorMsg('Please check your email to reset password.');
+            } catch (resetError) {
+              showLoginErrorMsg('Account exists but login failed. Please try again.');
+            }
+            return false;
+          }
+        }
+        throw error;
+      }
+    }
+
+    // ============================================================
+    // ========== TOURNAMENT SYSTEM ================================
+    // ============================================================
+    const TOURNAMENT_KEY = 'tournament_data';
+    let tournamentData = null;
+
+    function loadTournamentData() {
+      try {
+        const saved = localStorage.getItem(TOURNAMENT_KEY);
+        if (saved) {
+          tournamentData = JSON.parse(saved);
+        } else {
+          tournamentData = {
+            game: {
+              id: 'bubble-pop-tournament',
+              title: 'Bubble Pop Master',
+              image: 'https://play-lh.googleusercontent.com/1kq2O2nCBh6GBfF2Q9LwGZ7L8ZjQjKxQWzNQJqX9L9vQ',
+              url: 'https://playgama.com/export/game/bubble-pop-legend?clid=p_884d80fd-3275-47c8-8420-377ca8205874',
+              prizes: { 1: 1000000, 2: 500000, 3: 300000 },
+              scores: {}
+            }
+          };
+          saveTournamentData();
+        }
+      } catch(e) {
+        tournamentData = {
+          game: {
+            id: 'bubble-pop-tournament',
+            title: 'Bubble Pop Master',
+            image: 'https://play-lh.googleusercontent.com/1kq2O2nCBh6GBfF2Q9LwGZ7L8ZjQjKxQWzNQJqX9L9vQ',
+            url: 'https://playgama.com/export/game/bubble-pop-legend?clid=p_884d80fd-3275-47c8-8420-377ca8205874',
+            prizes: { 1: 1000000, 2: 500000, 3: 300000 },
+            scores: {}
+          }
+        };
+        saveTournamentData();
+      }
+    }
+    
+    function saveTournamentData() {
+      localStorage.setItem(TOURNAMENT_KEY, JSON.stringify(tournamentData));
+    }
+    
+    function getTournamentScores() {
+      if (!tournamentData || !tournamentData.game) return [];
+      const scores = Object.entries(tournamentData.game.scores || {})
+        .map(([user, score]) => ({ user, score }))
+        .sort((a, b) => b.score - a.score);
+      return scores;
+    }
+    
+    function renderTournament() {
+      const container = safeGetElement('tournament-games-container');
+      
+      if (!tournamentData || !tournamentData.game) {
+        container.innerHTML = `
+          <div class="text-center py-6 text-gray-400">
+            <p class="text-2xl mb-2">🎮</p>
+            <p class="text-sm">No tournament available</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const game = tournamentData.game;
+      const scores = getTournamentScores();
+      const totalPlayers = scores.length;
+      const topScore = scores[0]?.score || 0;
+      const usernameEl = safeGetElement('profile-username');
+      const username = usernameEl?.textContent?.replace('@', '') || 'Guest';
+      const userRank = scores.findIndex(s => s.user === username) + 1;
+      
+      const rankDisplay = safeGetElement('tournament-rank-display');
+      if (rankDisplay) {
+        rankDisplay.textContent = userRank > 0 ? `Rank: #${userRank}` : 'Rank: -';
+      }
+      
+      container.innerHTML = `
+        <div class="tournament-card" onclick="openTournament()">
+          <div class="relative">
+            <img src="${game.image || 'https://placehold.co/400x200/1a1a2e/ff8c00?text=Game'}" 
+                 alt="${game.title}" 
+                 onerror="this.src='https://placehold.co/400x200/1a1a2e/ff8c00?text=${game.title}'">
+            <span class="tournament-rank-badge">🏆</span>
+          </div>
+          <div class="p-3">
+            <h3 class="font-bold text-white text-sm">${game.title}</h3>
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+              <span>👥 ${totalPlayers} players</span>
+              <span>🏆 ${topScore}</span>
+            </div>
+            ${userRank > 0 ? `<span class="tournament-user-tag text-xs">Your Rank: #${userRank}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }
+    
+    function openTournament() {
+      if (!tournamentData || !tournamentData.game) return;
+      
+      const game = tournamentData.game;
+      const modal = safeGetElement('tournament-modal');
+      
+      const titleEl = safeGetElement('t-modal-title');
+      const imageEl = safeGetElement('t-modal-image');
+      const prize1El = safeGetElement('t-prize-1');
+      const prize2El = safeGetElement('t-prize-2');
+      const prize3El = safeGetElement('t-prize-3');
+      const lbContainer = safeGetElement('t-leaderboard');
+      
+      if (titleEl) titleEl.textContent = game.title;
+      if (imageEl) {
+        imageEl.src = game.image || 'https://placehold.co/400x200/1a1a2e/ff8c00?text=Game';
+        imageEl.onerror = function() {
+          this.src = 'https://placehold.co/400x200/1a1a2e/ff8c00?text=' + game.title;
+        };
+      }
+      if (prize1El) prize1El.textContent = (game.prizes[1] || 0).toLocaleString();
+      if (prize2El) prize2El.textContent = (game.prizes[2] || 0).toLocaleString();
+      if (prize3El) prize3El.textContent = (game.prizes[3] || 0).toLocaleString();
+      
+      const scores = getTournamentScores();
+      const usernameEl = safeGetElement('profile-username');
+      const username = usernameEl?.textContent?.replace('@', '') || 'Guest';
+      
+      if (scores.length === 0) {
+        if (lbContainer) lbContainer.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">No scores yet. Be the first!</p>';
+      } else {
+        if (lbContainer) {
+          lbContainer.innerHTML = scores.map((s, i) => {
+            const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+            const isUser = s.user === username;
+            return `
+              <div class="tournament-leaderboard-item ${rankClass} ${isUser ? 'border border-orange-500' : ''}">
+                <div class="flex items-center gap-3">
+                  <span class="rank-num text-gray-400">#${i+1}</span>
+                  <span class="font-medium ${isUser ? 'text-orange-400' : ''}">${s.user} ${isUser ? '👤' : ''}</span>
+                </div>
+                <span class="score-num font-bold">${s.score}</span>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+      
+      if (modal) safeAddClass(modal, 'active');
+    }
+    
+    function closeTournamentModal() {
+      const modal = safeGetElement('tournament-modal');
+      if (modal) safeRemoveClass(modal, 'active');
+    }
+    
+    function playTournamentGame() {
+      if (!tournamentData || !tournamentData.game) return;
+      const game = tournamentData.game;
+      if (!game.url) return;
+      
+      window.open(game.url, '_blank');
+      
+      const usernameEl = safeGetElement('profile-username');
+      const username = usernameEl?.textContent?.replace('@', '') || 'Guest';
+      if (username && username !== 'Guest' && username !== 'Loading...') {
+        if (!game.scores) game.scores = {};
+        const currentScore = game.scores[username] || 0;
+        const newScore = currentScore + Math.floor(Math.random() * 100) + 10;
+        game.scores[username] = newScore;
+        saveTournamentData();
+        renderTournament();
+        const modal = safeGetElement('tournament-modal');
+        if (modal && modal.classList.contains('active')) {
+          openTournament();
+        }
+        showToast('🎮 Score updated! +' + (newScore - currentScore) + ' points');
+        addXP(5);
+      } else {
+        showToast('👤 Please login to save your score!');
+      }
+    }
+
+    // ============================================================
+    // ========== GAME DATA ========================================
+    // ============================================================
+    const gameData = {
+      "hits": [
+        { "title": "Hidden Object: Street Of Secrets", "url": "https://playgama.com/export/game/hidden-object-street-of-secrets?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "120105" },
+        { "title": "Hidden Object: Clues and Mysteries", "url": "https://playgama.com/export/game/hidden-object-clues-and-mysteries?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99671" },
+        { "title": "Hidden Objects: Island Secrets", "url": "https://playgama.com/export/game/hidden-objects-island-secrets?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116495" },
+        { "title": "Idol Livestream: Doll Dress Up", "url": "https://playgama.com/export/game/idol-livestream-doll-dress-up?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116800" },
+        { "title": "Good Sort Master: Triple Match", "url": "https://playgama.com/export/game/good-sort-master?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "46" },
+        { "title": "Nuts Puzzle: Sort By Color", "url": "https://playgama.com/export/game/nuts-puzzle-sort-by-color?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118123" },
+        { "title": "Paper Doll Diary: Dress Up DIY", "url": "https://playgama.com/export/game/paper-doll-diary-dress-up-diy?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116926" },
+        { "title": "Fruit Merge: Juicy Drop Game", "url": "https://playgama.com/export/game/fruit-merge-playgama?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "59" },
+        { "title": "Numicolor", "url": "https://numicolor.com/export?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123250" },
+        { "title": "Soccer Random", "url": "https://playgama.com/export/game/soccer-random?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122769" },
+        { "title": "PLAYMUSIC", "url": "https://playgama.com/export/game/playmusic?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122780" },
+        { "title": "Hidden Object: My Hotel", "url": "https://playgama.com/export/game/hidden-object-my-hotel?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "109352" },
+        { "title": "Playground Man! Ragdoll Show!", "url": "https://playgama.com/export/game/playground-man-ragdoll-show?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "98048" },
+        { "title": "Sprunki", "url": "https://playgama.com/export/game/sprunki-2c27-1?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "86451" },
+        { "title": "ASMR Girl: Livestream Mukbang", "url": "https://playgama.com/export/game/asmr-girl-livestream-mukbang?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116704" },
+        { "title": "Master Chess", "url": "https://playgama.com/export/game/master-chess?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "86262" },
+        { "title": "Word Finder", "url": "https://playgama.com/export/game/word-finder?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118618" },
+        { "title": "Mahjong Lines", "url": "https://playgama.com/export/game/mahjong-lines?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118432" },
+        { "title": "Bubble Pop Legend", "url": "https://playgama.com/export/game/bubble-pop-legend?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117896" },
+        { "title": "Epic Sword Battle! Fight in the Ragdoll Arena!", "url": "https://playgama.com/export/game/epic-sword-battle-fight-in-the-ragdoll-arena?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "115055" },
+        { "title": "Chess Online Playing", "url": "https://playgama.com/export/game/chess-online-playing?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118817" },
+        { "title": "Wild Love", "url": "https://playgama.com/export/game/wild-love?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "115951" },
+        { "title": "Basketball Stars", "url": "https://playgama.com/export/game/basketball-stars?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "114034" },
+        { "title": "The Tall Man", "url": "https://playgama.com/export/game/the-tall-man?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123229" },
+        { "title": "Yarn Fever! Unravel Puzzle", "url": "https://playgama.com/export/game/yarn-fever-unravel-puzzle?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116925" },
+        { "title": "Arrow Exit Puzzle", "url": "https://playgama.com/export/game/arrow-exit-puzzle?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123316" },
+        { "title": "Bubble Shooter: Tap & Pop", "url": "https://playgama.com/export/game/bubble-shooter-tap--pop?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99633" },
+        { "title": "DIY Phone Case Maker", "url": "https://playgama.com/export/game/diy-phone-case-maker?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117063" },
+        { "title": "Age of Tanks Warriors: TD War", "url": "https://playgama.com/export/game/age-of-tanks-warriors-td-war?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "106324" },
+        { "title": "Mystery Squishy Dumpling Blind Box", "url": "https://playgama.com/export/game/mystery-squishy-dumpling-blind-box?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123286" },
+        { "title": "Tap 3D Wood Block Away", "url": "https://playgama.com/export/game/tap-3d-wood-block-away?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "95758" },
+        { "title": "Find the Frog - Hidden Objects", "url": "https://playgama.com/export/game/find-the-frog--hidden-objects?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99734" },
+        { "title": "Millionaire Life", "url": "https://playgama.com/export/game/millionaire-life?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "111970" },
+        { "title": "Mahjong Puzzle: Tile Match", "url": "https://playgama.com/export/game/mahjong-puzzle-tile-match?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122429" },
+        { "title": "Bubble Blast", "url": "https://playgama.com/export/game/bubble-blast?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "72" },
+        { "title": "Fun Ragdoll Challenge! Mini Games Collection!", "url": "https://playgama.com/export/game/fun-ragdoll-challenge-mini-games-collection?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "119970" },
+        { "title": "Mahjong Unlimited", "url": "https://playgama.com/export/game/mahjong-unlimited?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117101" },
+        { "title": "Favorite Puzzles", "url": "https://playgama.com/export/game/favorite-puzzles?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117768" },
+        { "title": "Block Blast 2048", "url": "https://playgama.com/export/game/block-blast-2048?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118589" },
+        { "title": "Screw Match", "url": "https://playgama.com/export/game/screw-match?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "111955" },
+        { "title": "Arrows Out!", "url": "https://playgama.com/export/game/arrows-out?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "119381" },
+        { "title": "Weapon Upgrade", "url": "https://playgama.com/export/game/weapon-upgrade?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99437" },
+        { "title": "Ragdoll Racing: Extreme Downhill!", "url": "https://playgama.com/export/game/ragdoll-racing-extreme-downhill?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "119972" },
+        { "title": "Color Pixels - Coloring by Numbers", "url": "https://playgama.com/export/game/color-pixels-coloring-by-numbers?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "94837" },
+        { "title": "Find Out Hidden Object", "url": "https://playgama.com/export/game/find-out-hidden-object?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "110785" },
+        { "title": "Moto X3M", "url": "https://playgama.com/export/game/moto-x3m?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "106346" },
+        { "title": "Fashion Princess - Dress Up for Girls", "url": "https://playgama.com/export/game/fashion-princess--dress-up-for-girls-e00c-1?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "96760" },
+        { "title": "Basket Random", "url": "https://playgama.com/export/game/basket-random?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122770" },
+        { "title": "Chess Online Multiplayer", "url": "https://playgama.com/export/game/chess-online-multiplayer?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "111579" },
+        { "title": "Gym Boss", "url": "https://playgama.com/export/game/gym-boss?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "121780" },
+        { "title": "Hexa Master 3D: Sort Puzzle", "url": "https://playgama.com/export/game/hexa-master-3d-sort-puzzle?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "121523" }
+      ]
+    };
+
+    // ============================================================
+    // ========== APP STATE ========================================
+    // ============================================================
+    let currentUser = null;
+    let userData = null;
+    let completedTasks = {};
+    let coinBalance = 0;
+    let userLevel = 1;
+    let userXP = 0;
+    let userStreak = 0;
+    let userVIP = false;
+    let userAchievements = [];
+    let userReferrals = [];
+    let userReferralEarnings = 0;
+    let coinHistory = [];
+    let checkinData = {};
+
+    // ============================================================
+    // ========== DOM REFERENCES (Safe) ============================
+    // ============================================================
+    const authSection = safeGetElement('auth-section');
+    const appContainer = safeGetElement('app-container');
+    const loginView = safeGetElement('login-view');
+    const signupView = safeGetElement('signup-view');
+    const loginBtn = safeGetElement('login-btn');
+    const logoutBtn = safeGetElement('logout-btn');
+    const loginError = safeGetElement('login-error');
+    const coinBalanceEl = safeGetElement('coin-balance');
+    const walletBalanceEl = safeGetElement('wallet-coin-balance');
+    const profileNameEl = safeGetElement('profile-name');
+    const profileUsernameEl = safeGetElement('profile-username');
+    const profileEmailEl = safeGetElement('profile-email');
+    const referralCodeEl = safeGetElement('referral-code');
+    const adsLeftCountEl = safeGetElement('ads-left-count');
+    const withdrawBtn = safeGetElement('withdraw-btn');
+
+    // ============================================================
+    // ========== UTILITY FUNCTIONS ================================
+    // ============================================================
+    function showAlert(message) {
+      const alertMsg = safeGetElement('alert-message');
+      const alertBox = safeGetElement('custom-alert');
+      const okBtn = safeGetElement('alert-ok-btn');
+      if (alertMsg) alertMsg.textContent = message;
+      if (alertBox) alertBox.classList.remove('hidden');
+      if (okBtn) {
+        okBtn.onclick = function() {
+          if (alertBox) alertBox.classList.add('hidden');
+        };
+      }
+    }
+
+    function showToast(message, type) {
+      type = type || 'success';
+      var toast = document.getElementById('coin-toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = 'coin-earn-toast show';
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function showLoginErrorMsg(message) {
+      if (!loginError) return;
+      loginError.textContent = message;
+      loginError.classList.remove('hidden');
+      setTimeout(function() {
+        loginError.classList.add('hidden');
+      }, 5000);
+    }
+
+    function generateReferralCode() {
+      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      var code = '';
+      for (var i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    // --- Navigation ---
+    function navigateTo(pageId) {
+      document.querySelectorAll('.sub-page').forEach(function(page) {
+        page.classList.remove('active');
+      });
+      var target = document.getElementById(pageId);
+      if (target) target.classList.add('active');
+      
+      document.querySelectorAll('.nav-item').forEach(function(link) {
+        link.classList.remove('active');
+        if (link.dataset.page === pageId) {
+          link.classList.add('active');
+        }
+      });
+    }
+    window.navigateTo = navigateTo;
+
+    // --- Update UI ---
+    function updateUI() {
+      if (coinBalanceEl) coinBalanceEl.textContent = coinBalance;
+      if (walletBalanceEl) walletBalanceEl.textContent = coinBalance;
+      if (profileNameEl && userData) profileNameEl.textContent = userData.name || 'User';
+      if (profileUsernameEl && userData) profileUsernameEl.textContent = '@' + (userData.username || 'username');
+      if (profileEmailEl && currentUser) profileEmailEl.textContent = currentUser.email;
+      if (referralCodeEl && userData) referralCodeEl.textContent = userData.referralCode || 'N/A';
+      
+      const levelBadge = safeGetElement('level-badge');
+      if (levelBadge) levelBadge.textContent = 'Lv.' + userLevel;
+      
+      const homeLevel = safeGetElement('home-level');
+      if (homeLevel) homeLevel.textContent = userLevel;
+      
+      const profileLevel = safeGetElement('profile-level');
+      if (profileLevel) profileLevel.textContent = 'Level: ' + userLevel;
+      
+      const refCount = safeGetElement('referral-count');
+      if (refCount) refCount.textContent = userReferrals ? userReferrals.length : 0;
+      
+      const refEarnings = safeGetElement('referral-earnings');
+      if (refEarnings) refEarnings.textContent = userReferralEarnings || 0;
+      
+      var totalTasks = 5;
+      var completedCount = Object.keys(completedTasks).length;
+      var left = totalTasks - completedCount;
+      if (adsLeftCountEl) adsLeftCountEl.textContent = left > 0 ? left : '0';
+      
+      renderTournament();
+      updateCheckinCalendar();
+      updateWithdrawProgress();
+      loadCoinHistory();
+      loadReferralLeaderboard();
+      renderMissions();
+    }
+
+    // ============================================================
+    // ========== XP & LEVEL SYSTEM ================================
+    // ============================================================
+    function getXPForLevel(level) {
+      return level * 100;
+    }
+
+    async function addXP(amount) {
+      if (!currentUser) return;
+      const xpNeeded = getXPForLevel(userLevel);
+      let newXP = userXP + amount;
+      let newLevel = userLevel;
+      let leveledUp = false;
+      
+      while (newXP >= xpNeeded) {
+        newXP -= xpNeeded;
+        newLevel++;
+        leveledUp = true;
+      }
+      
+      if (leveledUp) {
+        userLevel = newLevel;
+        showToast('🎉 Level Up! You are now Level ' + newLevel + '!');
+        await updateUserData({ level: newLevel, xp: newXP });
+        checkAchievements();
+      } else {
+        userXP = newXP;
+        await updateUserData({ xp: newXP });
+      }
+      
+      updateUI();
+    }
+
+    // ============================================================
+    // ========== DAILY BONUS ======================================
+    // ============================================================
+    const BONUS_AMOUNTS = [10, 15, 20, 25, 30, 40, 50];
+
+    function openDailyBonus() {
+      const modal = safeGetElement('daily-bonus-modal');
+      if (modal) modal.classList.remove('hidden');
+      renderBonusStreak();
+    }
+
+    function closeDailyBonus() {
+      const modal = safeGetElement('daily-bonus-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderBonusStreak() {
+      const container = safeGetElement('bonus-streak-display');
+      if (!container) return;
+      
+      const today = new Date().getDate();
+      const streak = userStreak || 0;
+      const claimed = userData?.dailyBonusClaimed || false;
+      
+      let html = '';
+      for (let i = 0; i < 7; i++) {
+        const dayNum = i + 1;
+        let cls = 'streak-day';
+        if (i < streak) cls += ' claimed';
+        else if (i === streak && !claimed) cls += ' today active';
+        else if (i === streak && claimed) cls += ' claimed';
+        else cls += ' active';
+        
+        html += `<div class="${cls}">${dayNum}</div>`;
+      }
+      container.innerHTML = html;
+      
+      const bonusAmt = BONUS_AMOUNTS[Math.min(streak, 6)] || 10;
+      const bonusEl = safeGetElement('today-bonus-amount');
+      if (bonusEl) bonusEl.textContent = '+ ' + bonusAmt + ' Coins';
+      
+      const claimBtn = safeGetElement('claim-bonus-btn');
+      if (claimBtn) {
+        claimBtn.disabled = claimed;
+        claimBtn.textContent = claimed ? '✅ Claimed Today' : 'Claim Now';
+        claimBtn.style.opacity = claimed ? '0.5' : '1';
+      }
+      
+      updateBonusTimer();
+    }
+
+    async function claimDailyBonus() {
+      if (!currentUser) {
+        showAlert('Please login first!');
+        return;
+      }
+      
+      if (userData?.dailyBonusClaimed) {
+        showAlert('You already claimed today\'s bonus!');
+        return;
+      }
+      
+      const streak = userStreak || 0;
+      const bonusAmt = BONUS_AMOUNTS[Math.min(streak, 6)] || 10;
+      const newStreak = streak + 1;
+      
+      await addCoins(bonusAmt);
+      await updateUserData({
+        dailyBonusClaimed: true,
+        streak: newStreak,
+        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      userStreak = newStreak;
+      userData.dailyBonusClaimed = true;
+      updateUI();
+      renderBonusStreak();
+      showToast('🎁 +' + bonusAmt + ' Coins Daily Bonus!');
+      
+      if (newStreak >= 7) {
+        checkAchievements();
+      }
+    }
+
+    function updateBonusTimer() {
+      const timerEl = safeGetElement('bonus-timer-display');
+      if (!timerEl) return;
+      
+      if (userData?.dailyBonusClaimed) {
+        timerEl.textContent = '⏳ Come back tomorrow for more!';
+      } else {
+        timerEl.textContent = '🔥 Claim your daily bonus now!';
+      }
+    }
+
+    // ============================================================
+    // ========== SPIN & WIN =======================================
+    // ============================================================
+    const SPIN_REWARDS = [5, 10, 15, 20, 25, 50, 100, 0];
+
+    function openSpinModal() {
+      const modal = safeGetElement('spin-modal');
+      if (modal) modal.classList.remove('hidden');
+      drawWheel();
+      updateSpinTimer();
+    }
+
+    function closeSpinModal() {
+      const modal = safeGetElement('spin-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function drawWheel() {
+      const canvas = document.getElementById('wheel-canvas');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2 - 10;
+      const segments = SPIN_REWARDS.length;
+      const colors = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff'];
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let i = 0; i < segments; i++) {
+        const startAngle = (i / segments) * 2 * Math.PI;
+        const endAngle = ((i + 1) / segments) * 2 * Math.PI;
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        const midAngle = startAngle + (endAngle - startAngle) / 2;
+        const textRadius = radius * 0.65;
+        const x = centerX + Math.cos(midAngle) * textRadius;
+        const y = centerY + Math.sin(midAngle) * textRadius;
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(SPIN_REWARDS[i] + 'c', x, y);
+      }
+    }
+
+    async function spinWheel() {
+      if (!currentUser) {
+        showAlert('Please login first!');
+        return;
+      }
+      
+      if (userData?.spinAvailable === false) {
+        showAlert('You already used your free spin today!');
+        return;
+      }
+      
+      const btn = safeGetElement('spin-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '🔄 Spinning...';
+      }
+      
+      const spinResult = SPIN_REWARDS[Math.floor(Math.random() * SPIN_REWARDS.length)];
+      
+      const canvas = document.getElementById('wheel-canvas');
+      if (canvas) {
+        canvas.style.transition = 'transform 3s ease-out';
+        const randomRotation = 360 * 5 + Math.random() * 360;
+        canvas.style.transform = 'rotate(' + randomRotation + 'deg)';
+      }
+      
+      setTimeout(async () => {
+        if (spinResult > 0) {
+          await addCoins(spinResult);
+          await addXP(2);
+          showToast('🎡 You won ' + spinResult + ' coins!');
+        } else {
+          showToast('😅 Better luck next time!');
+        }
+        
+        await updateUserData({
+          spinAvailable: false,
+          lastSpin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        userData.spinAvailable = false;
+        updateSpinTimer();
+        
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🎰 Spin (Used)';
+        }
+      }, 3500);
+    }
+
+    function updateSpinTimer() {
+      const timerEl = safeGetElement('spin-timer');
+      if (!timerEl) return;
+      
+      if (userData?.spinAvailable === false) {
+        timerEl.textContent = '⏳ Next spin in 24 hours';
+      } else {
+        timerEl.textContent = '🎰 Free spin available!';
+      }
+    }
+
+    // ============================================================
+    // ========== SCRATCH CARD =====================================
+    // ============================================================
+    const SCRATCH_REWARDS = [5, 10, 15, 20, 25, 50, 0, 0];
+
+    function openScratchModal() {
+      const modal = safeGetElement('scratch-modal');
+      if (modal) modal.classList.remove('hidden');
+      resetScratch();
+    }
+
+    function closeScratchModal() {
+      const modal = safeGetElement('scratch-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function resetScratch() {
+      const cover = safeGetElement('scratch-cover');
+      const reveal = safeGetElement('scratch-reveal');
+      const card = safeGetElement('scratch-card');
+      
+      if (cover) cover.style.opacity = '1';
+      if (reveal) {
+        reveal.style.opacity = '0';
+        reveal.textContent = '';
+      }
+      if (card) {
+        card.onclick = scratchCard;
+      }
+    }
+
+    function scratchCard() {
+      const cover = safeGetElement('scratch-cover');
+      const reveal = safeGetElement('scratch-reveal');
+      const card = safeGetElement('scratch-card');
+      
+      if (!cover || !reveal) return;
+      
+      const prize = SCRATCH_REWARDS[Math.floor(Math.random() * SCRATCH_REWARDS.length)];
+      
+      cover.style.opacity = '0';
+      reveal.textContent = prize > 0 ? '🎉 ' + prize + ' Coins' : '😅 Try Again';
+      reveal.style.opacity = '1';
+      
+      if (card) card.onclick = null;
+      
+      if (prize > 0) {
+        setTimeout(async () => {
+          await addCoins(prize);
+          await addXP(1);
+          showToast('🪙 You got ' + prize + ' coins!');
+        }, 500);
+      }
+    }
+
+    // ============================================================
+    // ========== MYSTERY BOX ======================================
+    // ============================================================
+    const MYSTERY_REWARDS = [10, 15, 20, 30, 50, 100, 0, 0, 0];
+
+    function openMysteryBoxModal() {
+      const modal = safeGetElement('mystery-box-modal');
+      if (modal) modal.classList.remove('hidden');
+      resetMysteryBox();
+    }
+
+    function closeMysteryBoxModal() {
+      const modal = safeGetElement('mystery-box-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function resetMysteryBox() {
+      const box = safeGetElement('mystery-box');
+      if (box) {
+        box.textContent = '📦';
+        box.onclick = openMysteryBox;
+      }
+    }
+
+    async function openMysteryBox() {
+      const box = safeGetElement('mystery-box');
+      if (!box) return;
+      
+      const prize = MYSTERY_REWARDS[Math.floor(Math.random() * MYSTERY_REWARDS.length)];
+      
+      const emojis = ['🎁', '💎', '🌟', '🎉', '✨', '🔥'];
+      let count = 0;
+      const interval = setInterval(() => {
+        box.textContent = emojis[count % emojis.length];
+        count++;
+      }, 100);
+      
+      setTimeout(() => {
+        clearInterval(interval);
+        if (prize > 0) {
+          box.textContent = '🎉 ' + prize + ' Coins!';
+          addCoins(prize);
+          addXP(2);
+          showToast('📦 You found ' + prize + ' coins in the mystery box!');
+        } else {
+          box.textContent = '😅 Better luck next time!';
+        }
+        box.onclick = null;
+      }, 2000);
+    }
+
+    // ============================================================
+    // ========== ACHIEVEMENT SYSTEM ===============================
+    // ============================================================
+    const ACHIEVEMENTS = [
+      { id: 'first_login', name: 'First Login', icon: '👋', desc: 'Login for the first time', check: () => true },
+      { id: 'streak_7', name: '7 Day Streak', icon: '🔥', desc: 'Login for 7 days in a row', check: () => userStreak >= 7 },
+      { id: 'streak_30', name: '30 Day Streak', icon: '⚡', desc: 'Login for 30 days in a row', check: () => userStreak >= 30 },
+      { id: 'coins_100', name: '100 Coins', icon: '🪙', desc: 'Earn 100 total coins', check: () => coinBalance >= 100 },
+      { id: 'coins_1000', name: '1000 Coins', icon: '💰', desc: 'Earn 1000 total coins', check: () => coinBalance >= 1000 },
+      { id: 'level_5', name: 'Level 5', icon: '⭐', desc: 'Reach level 5', check: () => userLevel >= 5 },
+      { id: 'level_10', name: 'Level 10', icon: '🌟', desc: 'Reach level 10', check: () => userLevel >= 10 },
+      { id: 'referral_1', name: 'First Referral', icon: '👥', desc: 'Refer your first friend', check: () => (userReferrals?.length || 0) >= 1 },
+      { id: 'referral_5', name: 'Popular', icon: '🌟', desc: 'Refer 5 friends', check: () => (userReferrals?.length || 0) >= 5 },
+      { id: 'vip_member', name: 'VIP Member', icon: '👑', desc: 'Become a VIP member', check: () => userVIP === true },
+      { id: 'spin_win', name: 'Lucky Spin', icon: '🎡', desc: 'Win 50+ coins from spin', check: () => false },
+    ];
+
+    function openAchievementModal() {
+      const modal = safeGetElement('achievement-modal');
+      if (modal) modal.classList.remove('hidden');
+      renderAchievements();
+    }
+
+    function closeAchievementModal() {
+      const modal = safeGetElement('achievement-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderAchievements() {
+      const container = safeGetElement('achievement-list');
+      if (!container) return;
+      
+      const unlocked = userAchievements || [];
+      
+      container.innerHTML = ACHIEVEMENTS.map(a => {
+        const isUnlocked = unlocked.includes(a.id) || a.check();
+        return `
+          <div class="flex items-center gap-3 p-3 rounded-lg ${isUnlocked ? 'bg-gray-700/30 border border-accent' : 'bg-gray-800/30 opacity-60'}">
+            <div class="achievement-badge ${isUnlocked ? 'unlocked' : 'locked'}">${a.icon}</div>
+            <div class="flex-1 text-left">
+              <p class="font-semibold text-sm ${isUnlocked ? 'text-white' : 'text-gray-400'}">${a.name}</p>
+              <p class="text-xs text-gray-400">${a.desc}</p>
+            </div>
+            ${isUnlocked ? '<span class="text-green-400 text-xs">✅</span>' : '<span class="text-gray-500 text-xs">🔒</span>'}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function checkAchievements() {
+      if (!currentUser) return;
+      
+      const unlocked = userAchievements || [];
+      let newUnlocked = [...unlocked];
+      let changed = false;
+      
+      ACHIEVEMENTS.forEach(a => {
+        if (!unlocked.includes(a.id) && a.check()) {
+          newUnlocked.push(a.id);
+          changed = true;
+          showToast('🏅 Achievement Unlocked: ' + a.name);
+        }
+      });
+      
+      if (changed) {
+        userAchievements = newUnlocked;
+        await updateUserData({ achievements: newUnlocked });
+        renderAchievements();
+      }
+    }
+
+    // ============================================================
+    // ========== VIP SYSTEM =======================================
+    // ============================================================
+    function openVIPModal() {
+      const modal = safeGetElement('vip-modal');
+      if (modal) modal.classList.remove('hidden');
+      
+      const status = safeGetElement('vip-status');
+      const benefits = safeGetElement('vip-benefits');
+      
+      if (status) status.textContent = userVIP ? '👑 VIP Member' : '🆓 Free Member';
+      if (benefits) benefits.textContent = userVIP ? '2x coins on all tasks!' : 'Upgrade to VIP for 2x rewards!';
+    }
+
+    function closeVIPModal() {
+      const modal = safeGetElement('vip-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // ============================================================
+    // ========== MISSIONS SYSTEM ==================================
+    // ============================================================
+    const MISSIONS = {
+      daily: [
+        { id: 'daily_1', name: 'Watch 1 Ad', desc: 'Watch 1 video ad', target: 1, reward: 10 },
+        { id: 'daily_2', name: 'Complete 3 Tasks', desc: 'Complete 3 daily tasks', target: 3, reward: 15 },
+        { id: 'daily_3', name: 'Earn 50 Coins', desc: 'Earn 50 coins today', target: 50, reward: 20 },
+        { id: 'daily_4', name: 'Play 1 Game', desc: 'Play 1 mini game', target: 1, reward: 10 },
+      ],
+      weekly: [
+        { id: 'weekly_1', name: 'Watch 7 Ads', desc: 'Watch 7 video ads this week', target: 7, reward: 50 },
+        { id: 'weekly_2', name: 'Complete 20 Tasks', desc: 'Complete 20 tasks this week', target: 20, reward: 75 },
+        { id: 'weekly_3', name: 'Earn 500 Coins', desc: 'Earn 500 coins this week', target: 500, reward: 100 },
+      ],
+      monthly: [
+        { id: 'monthly_1', name: 'Watch 30 Ads', desc: 'Watch 30 video ads this month', target: 30, reward: 200 },
+        { id: 'monthly_2', name: 'Complete 100 Tasks', desc: 'Complete 100 tasks this month', target: 100, reward: 300 },
+        { id: 'monthly_3', name: 'Earn 2000 Coins', desc: 'Earn 2000 coins this month', target: 2000, reward: 500 },
+      ]
+    };
+
+    function renderMissions() {
+      const dailyContainer = safeGetElement('daily-missions');
+      const weeklyContainer = safeGetElement('weekly-missions');
+      const monthlyContainer = safeGetElement('monthly-missions');
+      
+      if (dailyContainer) {
+        dailyContainer.innerHTML = MISSIONS.daily.map(m => `
+          <div class="mission-card">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-semibold">${m.name}</p>
+                <p class="text-xs text-gray-400">${m.desc}</p>
+              </div>
+              <span class="text-accent text-sm font-bold">+${m.reward} 🪙</span>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      if (weeklyContainer) {
+        weeklyContainer.innerHTML = MISSIONS.weekly.map(m => `
+          <div class="mission-card">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-semibold">${m.name}</p>
+                <p class="text-xs text-gray-400">${m.desc}</p>
+              </div>
+              <span class="text-accent text-sm font-bold">+${m.reward} 🪙</span>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      if (monthlyContainer) {
+        monthlyContainer.innerHTML = MISSIONS.monthly.map(m => `
+          <div class="mission-card">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-semibold">${m.name}</p>
+                <p class="text-xs text-gray-400">${m.desc}</p>
+              </div>
+              <span class="text-accent text-sm font-bold">+${m.reward} 🪙</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ============================================================
+    // ========== CHECK-IN CALENDAR ================================
+    // ============================================================
+    function updateCheckinCalendar() {
+      const container = safeGetElement('checkin-calendar');
+      if (!container) return;
+      
+      const today = new Date().getDate();
+      const month = new Date().getMonth();
+      const year = new Date().getFullYear();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = new Date(year, month, 1).getDay();
+      
+      const checkedDays = userData?.checkedDays || [];
+      
+      let html = '';
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div class="checkin-day"></div>`;
+      }
+      
+      for (let d = 1; d <= daysInMonth; d++) {
+        const isChecked = checkedDays.includes(d);
+        const isToday = d === today;
+        let cls = 'checkin-day';
+        if (isChecked) cls += ' checked';
+        if (isToday) cls += ' today';
+        
+        html += `
+          <div class="${cls}" onclick="checkInDay(${d})">
+            <span class="day-num">${d}</span>
+            ${isChecked ? '✅' : ''}
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+      
+      const streakEl = safeGetElement('checkin-streak');
+      if (streakEl) streakEl.textContent = '🔥 ' + (userStreak || 0) + ' days';
+    }
+
+    async function checkInDay(day) {
+      if (!currentUser) {
+        showAlert('Please login first!');
+        return;
+      }
+      
+      const today = new Date().getDate();
+      if (day !== today) {
+        showAlert('You can only check in for today!');
+        return;
+      }
+      
+      const checkedDays = userData?.checkedDays || [];
+      if (checkedDays.includes(day)) {
+        showAlert('Already checked in today!');
+        return;
+      }
+      
+      checkedDays.push(day);
+      await updateUserData({ checkedDays: checkedDays });
+      
+      const bonus = 5 + Math.floor((userStreak || 0) / 7) * 5;
+      await addCoins(bonus);
+      await addXP(1);
+      
+      const newStreak = (userStreak || 0) + 1;
+      await updateUserData({ streak: newStreak });
+      userStreak = newStreak;
+      
+      updateUI();
+      updateCheckinCalendar();
+      showToast('📅 Check-in complete! +' + bonus + ' coins!');
+    }
+
+    // ============================================================
+    // ========== LOAD USER DATA ===================================
+    // ============================================================
+    async function loadUserData(userId) {
+      try {
+        var doc = await db.collection("users").doc(userId).get();
+        if (doc.exists) {
+          userData = doc.data();
+          coinBalance = userData.balance || 0;
+          completedTasks = userData.completedTasks || {};
+          userLevel = userData.level || 1;
+          userXP = userData.xp || 0;
+          userStreak = userData.streak || 0;
+          userVIP = userData.vip || false;
+          userAchievements = userData.achievements || [];
+          userReferrals = userData.referrals || [];
+          userReferralEarnings = userData.referralEarnings || 0;
+          checkinData = userData.checkedDays || [];
+          
+          updateUI();
+          
+          const lastLogin = userData.lastLogin?.toDate?.() || new Date(0);
+          const today = new Date();
+          const isToday = lastLogin.getDate() === today.getDate() &&
+                         lastLogin.getMonth() === today.getMonth() &&
+                         lastLogin.getFullYear() === today.getFullYear();
+          
+          if (!isToday) {
+            await updateUserData({
+              dailyBonusClaimed: false,
+              lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            userData.dailyBonusClaimed = false;
+          }
+          
+          const lastSpin = userData.lastSpin?.toDate?.() || new Date(0);
+          const spinDiff = (today - lastSpin) / (1000 * 60 * 60 * 24);
+          if (spinDiff >= 1) {
+            await updateUserData({ spinAvailable: true });
+            userData.spinAvailable = true;
+          }
+          
+          db.collection("users").doc(userId).onSnapshot(function(snap) {
+            if (snap.exists) {
+              userData = snap.data();
+              coinBalance = userData.balance || 0;
+              completedTasks = userData.completedTasks || {};
+              userLevel = userData.level || 1;
+              userXP = userData.xp || 0;
+              userStreak = userData.streak || 0;
+              userVIP = userData.vip || false;
+              userAchievements = userData.achievements || [];
+              userReferrals = userData.referrals || [];
+              userReferralEarnings = userData.referralEarnings || 0;
+              checkinData = userData.checkedDays || [];
+              updateUI();
+            }
+          });
+          
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        return false;
+      }
+    }
+
+    // ============================================================
+    // ========== UPDATE USER DATA =================================
+    // ============================================================
+    async function updateUserData(updates) {
+      if (!currentUser) return false;
+      try {
+        await db.collection("users").doc(currentUser.uid).update(updates);
+        return true;
+      } catch (error) {
+        console.error('Error updating user data:', error);
+        return false;
+      }
+    }
+
+    // ============================================================
+    // ========== COIN MANAGEMENT ==================================
+    // ============================================================
+    async function addCoins(amount) {
+      if (!currentUser) return false;
+      
+      if (userVIP) {
+        amount = Math.floor(amount * 1.5);
+      }
+      
+      var newBalance = coinBalance + amount;
+      var success = await updateUserData({ balance: newBalance });
+      if (success) {
+        coinBalance = newBalance;
+        updateUI();
+        showToast('✨ +' + amount + ' Coins Earned!');
+        addCoinHistory('+', amount, 'Earned');
+        return true;
+      }
+      return false;
+    }
+
+    async function removeCoins(amount) {
+      if (!currentUser) return false;
+      var newBalance = Math.max(0, coinBalance - amount);
+      var success = await updateUserData({ balance: newBalance });
+      if (success) {
+        coinBalance = newBalance;
+        updateUI();
+        addCoinHistory('-', amount, 'Spent');
+        return true;
+      }
+      return false;
+    }
+
+    function addCoinHistory(type, amount, reason) {
+      const history = JSON.parse(localStorage.getItem('coin_history_' + currentUser?.uid) || '[]');
+      history.unshift({ type, amount, reason, time: new Date().toLocaleString() });
+      if (history.length > 50) history.pop();
+      localStorage.setItem('coin_history_' + currentUser?.uid, JSON.stringify(history));
+      loadCoinHistory();
+    }
+
+    function loadCoinHistory() {
+      const container = safeGetElement('coin-history-list');
+      if (!container) return;
+      
+      const history = JSON.parse(localStorage.getItem('coin_history_' + currentUser?.uid) || '[]');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-sm text-center">No coin history yet.</p>';
+        return;
+      }
+      
+      container.innerHTML = history.map(h => `
+        <div class="coin-history-item">
+          <span class="text-sm">${h.reason}</span>
+          <span class="text-sm font-bold ${h.type === '+' ? 'positive' : 'negative'}">${h.type}${h.amount}</span>
+          <span class="text-xs text-gray-500">${h.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // ============================================================
+    // ========== WITHDRAW PROGRESS ================================
+    // ============================================================
+    const MIN_WITHDRAW = 50000;
+
+    function updateWithdrawProgress() {
+      const progress = Math.min((coinBalance / MIN_WITHDRAW) * 100, 100);
+      const fill = safeGetElement('withdraw-progress-fill');
+      const text = safeGetElement('withdraw-progress-text');
+      
+      if (fill) fill.style.width = progress + '%';
+      if (text) text.textContent = Math.floor(progress) + '%';
+    }
+
+    // ============================================================
+    // ========== REFERRAL LEADERBOARD =============================
+    // ============================================================
+    async function loadReferralLeaderboard() {
+      const container = safeGetElement('referral-leaderboard');
+      if (!container) return;
+      
+      try {
+        const snapshot = await db.collection('users')
+          .orderBy('referralEarnings', 'desc')
+          .limit(10)
+          .get();
+        
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-gray-400 text-sm text-center">No referrals yet.</p>';
+          return;
+        }
+        
+        let html = '';
+        let rank = 1;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const isUser = doc.id === currentUser?.uid;
+          html += `
+            <div class="flex items-center justify-between p-2 rounded-lg ${isUser ? 'bg-gray-700/30 border border-accent' : 'bg-gray-800/30'}">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-gray-400">#${rank}</span>
+                <span class="text-sm ${isUser ? 'text-accent' : 'text-white'}">${data.username || 'User'}</span>
+                ${isUser ? '<span class="text-xs text-accent">👤 You</span>' : ''}
+              </div>
+              <span class="text-sm text-accent">${data.referralEarnings || 0} coins</span>
+            </div>
+          `;
+          rank++;
+        });
+        
+        container.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading referral leaderboard:', error);
+      }
+    }
+
+    // ============================================================
+    // ========== TASK FUNCTIONS ===================================
+    // ============================================================
+    function markTaskCompleted(taskId) {
+      if (!completedTasks[taskId]) {
+        completedTasks[taskId] = true;
+        updateUserData({ completedTasks: completedTasks });
+        updateUI();
+        addXP(2);
+      }
+    }
+
+    function isTaskCompleted(taskId) {
+      return completedTasks[taskId] || false;
+    }
+
+    function disableButton(btn) {
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '✓ Done';
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // ============================================================
+    // ========== WEBSITE VISIT ====================================
+    // ============================================================
+    var websiteTimer = null;
+    var websiteTimeLeft = 15;
+    var currentTaskId = '';
+    var currentBtn = null;
+
+    window.visitWebsite = function(url, taskId, btn) {
+      window.open(url, '_blank');
+      
+      currentTaskId = taskId;
+      currentBtn = btn;
+      
+      var overlay = document.getElementById('website-overlay');
+      if (overlay) overlay.classList.add('active');
+      
+      websiteTimeLeft = 15;
+      var timerDisplay = document.getElementById('website-timer-display');
+      var timerCircle = document.getElementById('website-timer-circle');
+      var statusText = document.getElementById('website-status-text');
+      var backBtn = document.getElementById('website-back-btn');
+      
+      if (timerDisplay) timerDisplay.textContent = websiteTimeLeft;
+      if (timerCircle) timerCircle.textContent = websiteTimeLeft;
+      if (statusText) statusText.textContent = '⏳ Please wait...';
+      if (backBtn) backBtn.classList.remove('show');
+      
+      if (websiteTimer) clearInterval(websiteTimer);
+      websiteTimer = setInterval(function() {
+        websiteTimeLeft--;
+        if (timerDisplay) timerDisplay.textContent = websiteTimeLeft;
+        if (timerCircle) timerCircle.textContent = websiteTimeLeft;
+        
+        if (websiteTimeLeft <= 0) {
+          clearInterval(websiteTimer);
+          websiteTimer = null;
+          if (statusText) statusText.textContent = '✅ Time completed! Click Back button';
+          if (backBtn) backBtn.classList.add('show');
+          
+          addCoins(10);
+          if (!isTaskCompleted(currentTaskId)) {
+            markTaskCompleted(currentTaskId);
+            if (currentBtn) disableButton(currentBtn);
+          }
+        }
+      }, 1000);
+    };
+
+    window.closeWebsiteOverlay = function() {
+      if (websiteTimer) {
+        clearInterval(websiteTimer);
+        websiteTimer = null;
+      }
+      var overlay = document.getElementById('website-overlay');
+      if (overlay) overlay.classList.remove('active');
+      navigateTo('home-page');
+    };
+
+    // ============================================================
+    // ========== MONETAG AD SYSTEM (Replaces previous ad) =========
+    // ============================================================
+    let monetagAdLoaded = false;
+    let monetagAdTimer = null;
+    let monetagCountdown = 10;
+    let isMonetagAdWatching = false;
+
+    window.showMonetagAd = function() {
+      if (!currentUser) {
+        showAlert('Please login first to earn coins!');
+        return;
+      }
+
+      if (isMonetagAdWatching) {
+        showToast('⏳ Please wait, ad is already playing...');
+        return;
+      }
+
+      var adContainer = document.getElementById('ad-container');
+      var adContent = document.getElementById('ad-content');
+      var adBtn = document.getElementById('watch-ad-btn');
+      var adStatus = document.getElementById('ad-status-text');
+
+      if (!adContainer || !adContent) return;
+
+      if (adBtn) {
+        adBtn.disabled = true;
+        adBtn.textContent = '⏳ Loading...';
+      }
+      if (adStatus) adStatus.textContent = '⏳ Loading Monetag ad...';
+
+      isMonetagAdWatching = true;
+      adContainer.classList.add('active');
+
+      // Monetag ad iframe embedding
+      adContent.innerHTML = `
+        <div style="background: #1a1a1a; padding: 20px; border-radius: 16px; max-width: 400px; width: 100%; text-align: center; border: 1px solid #333;">
+          <div style="font-size: 48px; margin-bottom: 10px;">📺</div>
+          <h3 style="color: #ff8c00; font-size: 20px; font-weight: bold; margin-bottom: 8px;">Monetag Video Ad</h3>
+          <p style="color: #aaa; font-size: 14px; margin-bottom: 5px;">Watch this ad to earn <strong style="color: #ff8c00;">10 Coins</strong></p>
+          <p style="color: #666; font-size: 12px; margin-bottom: 15px;">Ad will auto-close in <span id="monetag-countdown">10</span> seconds</p>
+          
+          <div style="width: 100%; max-width: 350px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 10px auto;">
+            <div style="height: 100%; background: linear-gradient(90deg, #ff8c00, #ff6a00); width: 0%; transition: width 0.5s linear; border-radius: 3px;" id="monetag-progress-fill"></div>
+          </div>
+          
+          <div style="margin: 15px 0; min-height: 200px; background: #0a0a0a; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1" 
+                    style="width: 100%; height: 200px; border: none; border-radius: 8px;" 
+                    allow="autoplay; encrypted-media" 
+                    allowfullscreen></iframe>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <button style="background: #ff8c00; color: #121212; font-weight: bold; padding: 12px 40px; border-radius: 12px; border: none; font-size: 16px; cursor: pointer; display: none;" id="monetag-claim-btn" onclick="claimMonetagReward()">
+              ✅ Claim 10 Coins
+            </button>
+          </div>
+          
+          <p style="color: #555; font-size: 10px; margin-top: 12px;">⚠️ Don't close this window</p>
+        </div>
+      `;
+
+      // Start countdown for Monetag ad
+      monetagCountdown = 10;
+      const countdownEl = document.getElementById('monetag-countdown');
+      const progressFill = document.getElementById('monetag-progress-fill');
+      const claimBtn = document.getElementById('monetag-claim-btn');
+
+      if (monetagAdTimer) clearInterval(monetagAdTimer);
+
+      monetagAdTimer = setInterval(function() {
+        monetagCountdown--;
+        if (countdownEl) countdownEl.textContent = monetagCountdown;
+        if (progressFill) progressFill.style.width = ((10 - monetagCountdown) / 10 * 100) + '%';
+
+        if (monetagCountdown <= 0) {
+          clearInterval(monetagAdTimer);
+          monetagAdTimer = null;
+          if (countdownEl) countdownEl.textContent = '0';
+          if (progressFill) progressFill.style.width = '100%';
+          if (claimBtn) claimBtn.style.display = 'inline-block';
+          if (adStatus) adStatus.textContent = '✅ Ad completed! Claim your reward.';
+        }
+      }, 1000);
+
+      // Safety timeout
+      setTimeout(function() {
+        if (monetagAdTimer) {
+          clearInterval(monetagAdTimer);
+          monetagAdTimer = null;
+        }
+        if (claimBtn) claimBtn.style.display = 'inline-block';
+        if (adStatus) adStatus.textContent = '✅ Ad completed! Claim your reward.';
+      }, 12000);
+    };
+
+    window.claimMonetagReward = function() {
+      if (!isMonetagAdWatching) {
+        showToast('⏳ Please wait for ad to complete...');
+        return;
+      }
+
+      isMonetagAdWatching = false;
+      
+      var adContainer = document.getElementById('ad-container');
+      var adStatus = document.getElementById('ad-status-text');
+      var adBtn = document.getElementById('watch-ad-btn');
+
+      if (adContainer) adContainer.classList.remove('active');
+      if (adBtn) {
+        adBtn.disabled = false;
+        adBtn.textContent = 'Watch';
+      }
+
+      if (!isTaskCompleted('task-ad')) {
+        addCoins(10);
+        markTaskCompleted('task-ad');
+        if (adStatus) adStatus.textContent = '✅ Completed!';
+        showToast('🎉 +10 Coins from Monetag ad!');
+      } else {
+        if (adStatus) adStatus.textContent = '✅ Already done!';
+        showToast('You already completed this task.');
+      }
+
+      if (monetagAdTimer) {
+        clearInterval(monetagAdTimer);
+        monetagAdTimer = null;
+      }
+    };
+
+    window.closeMonetagAd = function() {
+      if (monetagAdTimer) {
+        clearInterval(monetagAdTimer);
+        monetagAdTimer = null;
+      }
+      
+      var adContainer = document.getElementById('ad-container');
+      if (adContainer) adContainer.classList.remove('active');
+      
+      var adBtn = document.getElementById('watch-ad-btn');
+      var adStatus = document.getElementById('ad-status-text');
+      
+      if (adBtn) {
+        adBtn.disabled = false;
+        adBtn.textContent = 'Watch';
+      }
+      
+      if (isMonetagAdWatching) {
+        isMonetagAdWatching = false;
+        if (adStatus) adStatus.textContent = '✅ Ready to watch';
+      }
+    };
+
+    // ============================================================
+    // ========== TIMER TASK =======================================
+    // ============================================================
+    function startTimerTask(seconds, reward, btn, taskId) {
+      var timerModal = document.getElementById('timer-modal');
+      var countdownDisplay = document.getElementById('countdown-display');
+      if (!timerModal || !countdownDisplay) return;
+      
+      timerModal.classList.remove('hidden');
+      var timeLeft = seconds;
+      countdownDisplay.textContent = timeLeft;
+
+      var interval = setInterval(async function() {
+        timeLeft--;
+        countdownDisplay.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          timerModal.classList.add('hidden');
+          await addCoins(reward);
+          if (!isTaskCompleted(taskId)) {
+            markTaskCompleted(taskId);
+            if (btn) disableButton(btn);
+          }
+        }
+      }, 1000);
+    }
+
+    window.claimReward = function(type, btn) {
+      if (type === 'dailyClick') {
+        return startTimerTask(15, 10, btn, 'task-special');
+      }
+      addCoins(10);
+    };
+
+    // ============================================================
+    // ========== GAME MODAL =======================================
+    // ============================================================
+    window.openGameModal = async function(btn) {
+      var modal = document.getElementById('gameZoneModal');
+      var innerLoader = document.getElementById('game-inner-loader');
+      var wrapper = document.getElementById('game-cards-wrapper');
+      var searchInput = document.getElementById('game-search-input');
+      
+      if (!modal) return;
+      
+      modal.classList.add('active');
+      if (searchInput) searchInput.value = ""; 
+      
+      if (innerLoader) innerLoader.classList.remove('hidden');
+      if (wrapper) wrapper.innerHTML = "";
+      
+      setTimeout(function() {
+        if (innerLoader) innerLoader.classList.add('hidden');
+        renderGameList(gameData.hits);
+      }, 300);
+    };
+
+    window.closeGameModal = function() {
+      var modal = document.getElementById('gameZoneModal');
+      if (modal) modal.classList.remove('active');
+    };
+
+    function renderGameList(games) {
+      var wrapper = document.getElementById('game-cards-wrapper');
+      var noGamesMsg = document.getElementById('no-games-msg');
+      if (!wrapper) return;
+      
+      wrapper.innerHTML = "";
+
+      if (games.length === 0) {
+        if (noGamesMsg) noGamesMsg.classList.remove('hidden');
+        return;
+      }
+      if (noGamesMsg) noGamesMsg.classList.add('hidden');
+
+      games.forEach(function(game) {
+        var gameCard = document.createElement('div');
+        gameCard.className = "card-bg p-3 rounded-xl flex items-center justify-between border border-gray-800 hover:border-accent transition duration-300";
+        
+        var imageUrl = 'https://img.gamedistribution.com/' + game.gameId + '-512x512.jpg';
+
+        gameCard.innerHTML = '<div class="flex items-center space-x-3"><img src="' + imageUrl + '" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/150x150/1e1e1e/ff8c00?text=Game\';" class="w-14 h-14 rounded-xl object-cover border border-gray-700 shadow-md" alt="' + game.title + '"><div><h4 class="font-bold text-sm text-white tracking-wide">' + game.title + '</h4><p class="text-[10px] text-gray-400 mt-0.5 flex items-center"><i data-lucide="zap" class="w-3 h-3 text-accent mr-1"></i> Play Now</p></div></div><button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-xs btn shadow-lg">Play</button>';
+
+        gameCard.querySelector('button').onclick = function() {
+          window.closeGameModal();
+          window.playSelectedGame(game.url);
+        };
+
+        wrapper.appendChild(gameCard);
+      });
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    window.playSelectedGame = function(gameUrl) {
+      window.open(gameUrl, '_blank');
+      addCoins(10);
+      var taskId = 'task-game';
+      if (!isTaskCompleted(taskId)) {
+        markTaskCompleted(taskId);
+        var btn = document.querySelector('#task-game .task-btn');
+        disableButton(btn);
+      }
+    };
+
+    // Game search input
+    var searchInput = document.getElementById('game-search-input');
+    if (searchInput) {
+      searchInput.oninput = function(e) {
+        var query = e.target.value.toLowerCase().trim();
+        var filtered = gameData.hits.filter(function(g) {
+          return g.title.toLowerCase().includes(query);
+        });
+        renderGameList(filtered);
+      };
+    }
+
+    // ============================================================
+    // ========== WITHDRAWAL =======================================
+    // ============================================================
+    if (withdrawBtn) {
+      withdrawBtn.addEventListener('click', async function() {
+        if (!currentUser) {
+          showAlert('Please login first.');
+          return;
+        }
+        
+        var amount = parseInt(document.getElementById('withdraw-amount')?.value || 0);
+        var method = document.getElementById('withdraw-method')?.value || 'Bkash';
+        var paymentDetail = document.getElementById('payment-number')?.value || '';
+        
+        if (!amount || amount <= 0) {
+          showAlert('Please enter a valid amount.');
+          return;
+        }
+        
+        var minWithdrawal = 50000;
+        
+        if (amount < minWithdrawal) {
+          showAlert('Minimum withdrawal is ' + minWithdrawal + ' coins.');
+          return;
+        }
+        
+        if (amount > coinBalance) {
+          showAlert('Insufficient balance.');
+          return;
+        }
+        
+        if (!paymentDetail) {
+          showAlert('Please enter your account number.');
+          return;
+        }
+        
+        try {
+          await db.collection("withdrawals").add({
+            userId: currentUser.uid,
+            userName: userData?.name || 'User',
+            username: userData?.username || '',
+            amount: amount,
+            method: method,
+            paymentDetail: paymentDetail,
+            status: 'pending',
+            requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          await removeCoins(amount);
+          showAlert('Withdrawal request submitted successfully!');
+          var amountInput = document.getElementById('withdraw-amount');
+          var paymentInput = document.getElementById('payment-number');
+          if (amountInput) amountInput.value = '';
+          if (paymentInput) paymentInput.value = '';
+          
+        } catch (error) {
+          showAlert('Error submitting withdrawal: ' + error.message);
+        }
+      });
+    }
+
+    // ============================================================
+    // ========== LOAD WITHDRAWAL HISTORY ==========================
+    // ============================================================
+    function loadWithdrawalHistory() {
+      if (!currentUser) {
+        console.log('No user logged in');
+        return;
+      }
+      
+      var historyList = document.getElementById('withdrawal-history-list');
+      if (!historyList) return;
+      
+      historyList.innerHTML = '<div class="text-center py-4"><div class="loading-spinner mx-auto"></div><p class="text-gray-400 text-sm mt-2">Loading history...</p></div>';
+      
+      db.collection("withdrawals")
+        .where("userId", "==", currentUser.uid)
+        .get()
+        .then(function(snapshot) {
+          if (snapshot.empty) {
+            historyList.innerHTML = '<p class="text-gray-400 text-sm text-center">No withdrawal history.</p>';
+            return;
+          }
+          
+          var docs = [];
+          snapshot.forEach(function(doc) {
+            docs.push({ id: doc.id });
+            Object.assign(docs[docs.length-1], doc.data());
+          });
+          docs.sort(function(a, b) {
+            var dateA = a.requestedAt && a.requestedAt.toDate ? a.requestedAt.toDate() : new Date(a.requestedAt);
+            var dateB = b.requestedAt && b.requestedAt.toDate ? b.requestedAt.toDate() : new Date(b.requestedAt);
+            return dateB - dateA;
+          });
+          
+          var html = '';
+          docs.forEach(function(w) {
+            var date = w.requestedAt && w.requestedAt.toDate ? w.requestedAt.toDate() : new Date(w.requestedAt);
+            var statusDisplay = '';
+            var statusColor = '';
+            if (w.status === 'pending') {
+              statusDisplay = 'Pending';
+              statusColor = 'text-yellow-400';
+            } else if (w.status === 'approved') {
+              statusDisplay = 'Approved ✅';
+              statusColor = 'text-green-400';
+            } else if (w.status === 'rejected') {
+              statusDisplay = 'Rejected ❌';
+              statusColor = 'text-red-400';
+            } else {
+              statusDisplay = w.status || 'Unknown';
+              statusColor = 'text-gray-400';
+            }
+            
+            html += '<div class="bg-gray-800 p-3 rounded-lg flex justify-between items-center"><div><p class="font-semibold">' + w.amount + ' Coins</p><p class="text-xs text-gray-400">' + w.method + ' - ' + w.paymentDetail + '</p><p class="text-xs text-gray-500">' + date.toLocaleString() + '</p></div><span class="text-sm font-semibold ' + statusColor + '">' + statusDisplay + '</span></div>';
+          });
+          historyList.innerHTML = html;
+        })
+        .catch(function(error) {
+          console.error('Error loading withdrawal history:', error);
+          historyList.innerHTML = '<p class="text-red-400 text-sm text-center">Error loading history</p>';
+        });
+    }
+
+    // ============================================================
+    // ========== LOAD NOTIFICATIONS ===============================
+    // ============================================================
+    function loadNotifications() {
+      if (!currentUser) return;
+      
+      var dot = document.getElementById('notification-dot');
+      if (!dot) return;
+      
+      db.collection("notifications")
+        .orderBy("createdAt", "desc")
+        .limit(5)
+        .onSnapshot(function(snap) {
+          if (!snap.empty) {
+            dot.style.display = 'block';
+          } else {
+            dot.style.display = 'none';
+          }
+        }, function(error) {
+          console.error('Error loading notifications:', error);
+        });
+    }
+
+    // ============================================================
+    // ========== AUTH STATE LISTENER ==============================
+    // ============================================================
+    auth.onAuthStateChanged(async function(user) {
+      if (user) {
+        currentUser = user;
+        
+        try {
+          var userDoc = await db.collection("users").doc(user.uid).get();
+          if (userDoc.exists) {
+            var data = userDoc.data();
+            if (data.isBlocked) {
+              showAlert('Your account has been blocked. Please contact support.');
+              await logoutUser();
+              return;
+            }
+          }
+        } catch (e) {}
+        
+        if (authSection) authSection.classList.remove('active');
+        if (appContainer) appContainer.classList.add('active');
+        if (loginView) loginView.classList.remove('hidden');
+        if (signupView) signupView.classList.add('hidden');
+        
+        await loadUserData(user.uid);
+        navigateTo('home-page');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        
+        loadTournamentData();
+        renderTournament();
+        
+        setTimeout(function() {
+          loadWithdrawalHistory();
+        }, 500);
+        
+        loadNotifications();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode && !userData?.referredBy) {
+          handleReferral(refCode);
+        }
+        
+      } else {
+        currentUser = null;
+        userData = null;
+        coinBalance = 0;
+        completedTasks = {};
+        userLevel = 1;
+        userXP = 0;
+        userStreak = 0;
+        userVIP = false;
+        userAchievements = [];
+        userReferrals = [];
+        userReferralEarnings = 0;
+        if (authSection) authSection.classList.add('active');
+        if (appContainer) appContainer.classList.remove('active');
+        if (loginView) loginView.classList.remove('hidden');
+        if (signupView) signupView.classList.add('hidden');
+        updateUI();
+        
+        loadTournamentData();
+        renderTournament();
+      }
+    });
+
+    // ============================================================
+    // ========== REFERRAL SYSTEM ==================================
+    // ============================================================
+    async function handleReferral(refCode) {
+      if (!currentUser) return;
+      
+      try {
+        const snapshot = await db.collection('users')
+          .where('referralCode', '==', refCode)
+          .get();
+        
+        if (!snapshot.empty) {
+          const referrerDoc = snapshot.docs[0];
+          const referrerData = referrerDoc.data();
+          
+          await updateUserData({ referredBy: referrerDoc.id });
+          
+          const referrerRef = db.collection('users').doc(referrerDoc.id);
+          await referrerRef.update({
+            referralEarnings: firebase.firestore.FieldValue.increment(10),
+            referrals: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+          });
+          
+          await addCoins(10);
+          
+          showToast('🎉 You joined with referral! +10 bonus coins!');
+        }
+      } catch (error) {
+        console.error('Error handling referral:', error);
+      }
+    }
+
+    // ============================================================
+    // ========== PROFILE FUNCTIONS ================================
+    // ============================================================
+    window.showForgotUsername = function() {
+      showAlert('Please contact support to recover your username.');
+    };
+
+    window.showChangePassword = function() {
+      if (!currentUser) {
+        showAlert('Please login first.');
+        return;
+      }
+      showAlert('Password reset link will be sent to your email.');
+      auth.sendPasswordResetEmail(currentUser.email)
+        .then(() => {
+          showAlert('Password reset email sent! Check your inbox.');
+        })
+        .catch((error) => {
+          showAlert('Error: ' + error.message);
+        });
+    };
+
+    window.showChangeUsername = function() {
+      if (!currentUser) {
+        showAlert('Please login first.');
+        return;
+      }
+      
+      const newUsername = prompt('Enter new username:');
+      if (newUsername && newUsername.trim().length >= 3) {
+        const username = newUsername.trim();
+        db.collection('usernames').doc(username.toLowerCase()).get()
+          .then(async (doc) => {
+            if (doc.exists) {
+              showAlert('Username already taken!');
+              return;
+            }
+            
+            await updateUserData({ username: username });
+            
+            const oldUsername = userData.username;
+            await db.collection('usernames').doc(oldUsername.toLowerCase()).delete();
+            await db.collection('usernames').doc(username.toLowerCase()).set({
+              uid: currentUser.uid,
+              email: currentUser.email,
+              username: username,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            showAlert('Username updated successfully!');
+            updateUI();
+          })
+          .catch((error) => {
+            showAlert('Error: ' + error.message);
+          });
+      } else if (newUsername !== null) {
+        showAlert('Username must be at least 3 characters.');
+      }
+    };
+
+    window.showEmailVerification = function() {
+      if (!currentUser) {
+        showAlert('Please login first.');
+        return;
+      }
+      
+      if (currentUser.emailVerified) {
+        showAlert('Your email is already verified!');
+        return;
+      }
+      
+      currentUser.sendEmailVerification()
+        .then(() => {
+          showAlert('Verification email sent! Check your inbox.');
+        })
+        .catch((error) => {
+          showAlert('Error: ' + error.message);
+        });
+    };
+
+    window.changeProfilePic = function() {
+      showAlert('Profile picture feature coming soon!');
+    };
+
+    // ============================================================
+    // ========== LEVEL MODAL ======================================
+    // ============================================================
+    function openLevelModal() {
+      const modal = safeGetElement('level-modal');
+      if (modal) modal.classList.remove('hidden');
+      
+      const levelEl = safeGetElement('level-display');
+      const xpCurrent = safeGetElement('xp-current');
+      const xpNext = safeGetElement('xp-next');
+      const xpProgress = safeGetElement('xp-progress');
+      
+      if (levelEl) levelEl.textContent = userLevel;
+      const xpNeeded = getXPForLevel(userLevel);
+      if (xpCurrent) xpCurrent.textContent = userXP;
+      if (xpNext) xpNext.textContent = xpNeeded;
+      if (xpProgress) xpProgress.style.width = (userXP / xpNeeded * 100) + '%';
+    }
+
+    function closeLevelModal() {
+      const modal = safeGetElement('level-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // ============================================================
+    // ========== EVENT LISTENERS ==================================
+    // ============================================================
+    if (loginBtn) {
+      loginBtn.addEventListener('click', async function() {
+        var username = document.getElementById('login-username')?.value?.trim() || '';
+        
+        if (!username) {
+          showLoginErrorMsg('Please enter your username.');
+          return;
+        }
+        
+        if (username.length < 3) {
+          showLoginErrorMsg('Username must be at least 3 characters.');
+          return;
+        }
+        
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Logging in...';
+        
+        try {
+          var user = await loginWithUsername(username);
+          if (user) {
+            loginBtn.textContent = 'Login / Signup';
+            loginBtn.disabled = false;
+          }
+        } catch (error) {
+          showLoginErrorMsg(error.message || 'Error logging in. Please try again.');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login / Signup';
+        }
+      });
+    }
+
+    // ========== LOGOUT FUNCTION ==========
+    window.logoutUser = async function() {
+      try {
+        await auth.signOut();
+        currentUser = null;
+        userData = null;
+        coinBalance = 0;
+        completedTasks = {};
+        userLevel = 1;
+        userXP = 0;
+        userStreak = 0;
+        userVIP = false;
+        userAchievements = [];
+        userReferrals = [];
+        userReferralEarnings = 0;
+        if (authSection) authSection.classList.add('active');
+        if (appContainer) appContainer.classList.remove('active');
+        if (loginView) loginView.classList.remove('hidden');
+        if (signupView) signupView.classList.add('hidden');
+        updateUI();
+        showToast('Logged out successfully');
+      } catch (error) {
+        showAlert('Error logging out: ' + error.message);
+      }
+    };
+
+    // Logout button event
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', window.logoutUser);
+    }
+
+    // ============================================================
+    // ========== COPY REFERRAL CODE ===============================
+    // ============================================================
+    var copyBtn = document.getElementById('copy-code-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        var code = referralCodeEl?.textContent || '';
+        if (code && code !== 'LOADING...') {
+          navigator.clipboard.writeText(code).then(function() {
+            showToast('Referral code copied!');
+          }).catch(function() {
+            var textArea = document.createElement('textarea');
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            textArea.remove();
+            showToast('Referral code copied!');
+          });
+        }
+      });
+    }
+
+    // ============================================================
+    // ========== SHARE REFERRAL CODE ==============================
+    // ============================================================
+    var shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', function() {
+        var code = referralCodeEl?.textContent || '';
+        if (code && code !== 'LOADING...') {
+          var text = 'Join Daily Income Zone and earn coins! Use my referral code: ' + code;
+          var url = window.location.origin + window.location.pathname + '?ref=' + code;
+          if (navigator.share) {
+            navigator.share({
+              title: 'Daily Income Zone',
+              text: text,
+              url: url
+            }).catch(function() {});
+          } else {
+            navigator.clipboard.writeText(text + '\n' + url).then(function() {
+              showToast('Referral link copied! Share with friends.');
+            });
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // ========== NOTIFICATION BELL ================================
+    // ============================================================
+    var bellBtn = document.getElementById('notification-bell');
+    if (bellBtn) {
+      bellBtn.addEventListener('click', function() {
+        var dot = document.getElementById('notification-dot');
+        if (dot) dot.style.display = 'none';
+        
+        db.collection("notifications")
+          .orderBy("createdAt", "desc")
+          .limit(5)
+          .get()
+          .then(function(snap) {
+            if (snap.empty) {
+              showAlert('No notifications.');
+              return;
+            }
+            var messages = snap.docs.map(function(doc) {
+              var n = doc.data();
+              return '📢 ' + n.title + '\n' + n.message;
+            });
+            showAlert(messages.join('\n\n'));
+          });
+      });
+    }
+
+    // ============================================================
+    // ========== INIT =============================================
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      if (authSection) authSection.classList.add('active');
+      
+      loadTournamentData();
+      renderTournament();
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      if (refCode) {
+        localStorage.setItem('pending_ref', refCode);
+      }
+    });
+
+    // ============================================================
+    // ========== KEYBOARD SHORTCUTS ===============================
+    // ============================================================
+    var loginUsername = document.getElementById('login-username');
+    if (loginUsername && loginBtn) {
+      loginUsername.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') loginBtn.click();
+      });
+    }
+
+    // Close ad container on background click (optional)
+    document.getElementById('ad-container')?.addEventListener('click', function(e) {
+      if (e.target === this) {
+        // Optionally close ad if clicked outside
+        // Uncomment if you want to allow closing by clicking background
+        // window.closeMonetagAd();
+      }
+    });
+  </script>
+</body>
+</html>)
