@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -769,19 +770,30 @@
     </div>
   </div>
 
-  <!-- ===== AUTH SECTION ===== -->
-  <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page">
+  <!-- ===== AUTH SECTION (Username + Password) ===== -->
+  <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page active">
     <h1 class="text-3xl font-bold text-center mb-2 text-accent">Daily Income Zone</h1>
-    <p class="text-center text-gray-400 mb-8">Enter your username to continue</p>
+    <p class="text-center text-gray-400 mb-6">Sign in to continue</p>
+    
     <div id="auth-container">
+      <!-- Login View -->
       <div id="login-view">
         <div id="login-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
-        <input id="login-username" type="text" placeholder="Enter Username" class="w-full p-3 rounded-lg input-field mb-4">
-        <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Login / Signup</button>
-        <p class="text-center text-gray-400 text-xs">No password needed. Just enter your username!</p>
-        <div class="mt-4 text-center">
-          <button onclick="showForgotUsername()" class="text-xs text-accent">Forgot Username?</button>
-        </div>
+        <input id="login-username" type="text" placeholder="Username" class="w-full p-3 rounded-lg input-field mb-3">
+        <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
+        <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-3">Login</button>
+        <p class="text-center text-gray-400 text-sm">New user? <button onclick="showSignup()" class="text-accent font-semibold">Create Account</button></p>
+      </div>
+
+      <!-- Signup View -->
+      <div id="signup-view" class="hidden">
+        <div id="signup-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
+        <input id="signup-username" type="text" placeholder="Choose Username" class="w-full p-3 rounded-lg input-field mb-3">
+        <input id="signup-email" type="email" placeholder="Your Email" class="w-full p-3 rounded-lg input-field mb-3">
+        <input id="signup-password" type="password" placeholder="Password (min 6 chars)" class="w-full p-3 rounded-lg input-field mb-3">
+        <input id="signup-referral" type="text" placeholder="Referral Code (optional)" class="w-full p-3 rounded-lg input-field mb-4">
+        <button id="signup-btn" class="w-full p-3 rounded-lg btn-accent mb-3">Create Account</button>
+        <p class="text-center text-gray-400 text-sm">Already have an account? <button onclick="showLogin()" class="text-accent font-semibold">Login</button></p>
       </div>
     </div>
   </div>
@@ -807,7 +819,7 @@
     <main class="flex-grow">
       
       <!-- ===== HOME PAGE ===== -->
-      <div id="home-page" class="p-4 space-y-4 sub-page">
+      <div id="home-page" class="p-4 space-y-4 sub-page active">
         
         <!-- Balance Card - Enhanced -->
         <div class="balance-card-enhanced">
@@ -892,7 +904,7 @@
                 <span class="task-icon">🤩</span>
                 <div class="task-info">
                   <p class="task-title text-black dark:text-white">Watch Video Ad</p>
-                  <p class="task-desc">Watch & Earn 10 Coins</p>
+                  <p class="task-desc">Watch & Earn 10 Coins (Unlimited)</p>
                   <p class="text-[10px] text-black/70 dark:text-white/70" id="ad-status-text">✅ Ready to watch</p>
                 </div>
               </div>
@@ -1229,108 +1241,6 @@
     }
 
     // ============================================================
-    // ========== NO PASSWORD LOGIN SYSTEM =========================
-    // ============================================================
-    
-    async function loginWithUsername(username) {
-      if (!username || username.trim().length < 3) {
-        showLoginErrorMsg('Username must be at least 3 characters.');
-        return false;
-      }
-      
-      username = username.trim();
-      
-      try {
-        const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
-        
-        if (usernameDoc.exists) {
-          const data = usernameDoc.data();
-          const email = data.email;
-          const tempPassword = Math.random().toString(36).slice(-8) + 'Abc123!';
-          
-          try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, tempPassword);
-            return userCredential.user;
-          } catch (loginError) {
-            if (loginError.code === 'auth/wrong-password' || loginError.code === 'auth/user-not-found') {
-              return await createAccountWithUsername(username, email);
-            }
-            throw loginError;
-          }
-        } else {
-          const email = username.toLowerCase() + '@dailyincomezone.temp';
-          return await createAccountWithUsername(username, email);
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        showLoginErrorMsg('Error logging in. Please try again.');
-        return false;
-      }
-    }
-    
-    async function createAccountWithUsername(username, email) {
-      try {
-        const tempPassword = Math.random().toString(36).slice(-8) + 'Abc123!';
-        const userCredential = await auth.createUserWithEmailAndPassword(email, tempPassword);
-        const user = userCredential.user;
-        
-        const referralCode = generateReferralCode();
-        await db.collection("users").doc(user.uid).set({
-          name: username,
-          username: username,
-          email: email,
-          balance: 0,
-          referralCode: referralCode,
-          isBlocked: false,
-          completedTasks: {},
-          level: 1,
-          xp: 0,
-          streak: 0,
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-          dailyBonusClaimed: false,
-          spinAvailable: true,
-          lastSpin: null,
-          vip: false,
-          achievements: [],
-          referrals: [],
-          referralEarnings: 0,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        await db.collection("usernames").doc(username.toLowerCase()).set({
-          uid: user.uid,
-          email: email,
-          username: username,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        await db.collection("user_passwords").doc(user.uid).set({
-          password: tempPassword,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        return user;
-      } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-          const tempPassword = Math.random().toString(36).slice(-8) + 'Abc123!';
-          try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, tempPassword);
-            return userCredential.user;
-          } catch (loginError) {
-            try {
-              await auth.sendPasswordResetEmail(email);
-              showLoginErrorMsg('Please check your email to reset password.');
-            } catch (resetError) {
-              showLoginErrorMsg('Account exists but login failed. Please try again.');
-            }
-            return false;
-          }
-        }
-        throw error;
-      }
-    }
-
-    // ============================================================
     // ========== TOURNAMENT SYSTEM ================================
     // ============================================================
     const TOURNAMENT_KEY = 'tournament_data';
@@ -1594,8 +1504,10 @@
     const loginView = safeGetElement('login-view');
     const signupView = safeGetElement('signup-view');
     const loginBtn = safeGetElement('login-btn');
+    const signupBtn = safeGetElement('signup-btn');
     const logoutBtn = safeGetElement('logout-btn');
     const loginError = safeGetElement('login-error');
+    const signupError = safeGetElement('signup-error');
     const coinBalanceEl = safeGetElement('coin-balance');
     const walletBalanceEl = safeGetElement('wallet-coin-balance');
     const profileNameEl = safeGetElement('profile-name');
@@ -1956,7 +1868,30 @@
     function openScratchModal() {
       const modal = safeGetElement('scratch-modal');
       if (modal) modal.classList.remove('hidden');
-      resetScratch();
+      
+      const lastScratch = userData?.lastScratch?.toDate?.() || new Date(0);
+      const hoursDiff = (new Date() - lastScratch) / (1000 * 60 * 60);
+      
+      const card = safeGetElement('scratch-card');
+      const cover = safeGetElement('scratch-cover');
+      const reveal = safeGetElement('scratch-reveal');
+      
+      if (hoursDiff < 24) {
+        const remaining = Math.ceil(24 - hoursDiff);
+        if (cover) {
+          cover.style.opacity = '1';
+          cover.textContent = '⏳ ' + remaining + 'h left';
+        }
+        if (card) card.onclick = null;
+        if (reveal) reveal.style.opacity = '0';
+      } else {
+        if (cover) {
+          cover.style.opacity = '1';
+          cover.textContent = '🖐️ Tap to Scratch';
+        }
+        if (card) card.onclick = scratchCard;
+        if (reveal) reveal.style.opacity = '0';
+      }
     }
 
     function closeScratchModal() {
@@ -1964,27 +1899,22 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    function resetScratch() {
-      const cover = safeGetElement('scratch-cover');
-      const reveal = safeGetElement('scratch-reveal');
-      const card = safeGetElement('scratch-card');
-      
-      if (cover) cover.style.opacity = '1';
-      if (reveal) {
-        reveal.style.opacity = '0';
-        reveal.textContent = '';
-      }
-      if (card) {
-        card.onclick = scratchCard;
-      }
-    }
-
-    function scratchCard() {
+    async function scratchCard() {
       const cover = safeGetElement('scratch-cover');
       const reveal = safeGetElement('scratch-reveal');
       const card = safeGetElement('scratch-card');
       
       if (!cover || !reveal) return;
+      
+      // Check again if 24 hours passed
+      const lastScratch = userData?.lastScratch?.toDate?.() || new Date(0);
+      const hoursDiff = (new Date() - lastScratch) / (1000 * 60 * 60);
+      
+      if (hoursDiff < 24) {
+        const remaining = Math.ceil(24 - hoursDiff);
+        showToast('⏳ Available in ' + remaining + ' hours!');
+        return;
+      }
       
       const prize = SCRATCH_REWARDS[Math.floor(Math.random() * SCRATCH_REWARDS.length)];
       
@@ -1994,24 +1924,46 @@
       
       if (card) card.onclick = null;
       
+      // Update last scratch time
+      await updateUserData({
+        lastScratch: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      userData.lastScratch = firebase.firestore.FieldValue.serverTimestamp();
+      
       if (prize > 0) {
-        setTimeout(async () => {
-          await addCoins(prize);
-          await addXP(1);
-          showToast('🪙 You got ' + prize + ' coins!');
-        }, 500);
+        await addCoins(prize);
+        await addXP(1);
+        showToast('🪙 You got ' + prize + ' coins from Scratch!');
       }
     }
 
     // ============================================================
-    // ========== MYSTERY BOX ======================================
+    // ========== MYSTERY BOX (24 hours once) =====================
     // ============================================================
     const MYSTERY_REWARDS = [10, 15, 20, 30, 50, 100, 0, 0, 0];
 
     function openMysteryBoxModal() {
       const modal = safeGetElement('mystery-box-modal');
       if (modal) modal.classList.remove('hidden');
-      resetMysteryBox();
+      
+      const last = userData?.lastMysteryBox?.toDate?.() || new Date(0);
+      const hours = (new Date() - last) / (1000 * 60 * 60);
+      const box = safeGetElement('mystery-box');
+      
+      if (hours < 24) {
+        const remaining = Math.ceil(24 - hours);
+        if (box) {
+          box.textContent = '⏳ ' + remaining + 'h left';
+          box.style.cursor = 'not-allowed';
+          box.onclick = null;
+        }
+      } else {
+        if (box) {
+          box.textContent = '📦';
+          box.style.cursor = 'pointer';
+          box.onclick = openMysteryBox;
+        }
+      }
     }
 
     function closeMysteryBoxModal() {
@@ -2019,17 +1971,16 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    function resetMysteryBox() {
-      const box = safeGetElement('mystery-box');
-      if (box) {
-        box.textContent = '📦';
-        box.onclick = openMysteryBox;
-      }
-    }
-
     async function openMysteryBox() {
       const box = safeGetElement('mystery-box');
       if (!box) return;
+      
+      // Check again
+      const last = userData?.lastMysteryBox?.toDate?.() || new Date(0);
+      if ((new Date() - last) / (1000 * 60 * 60) < 24) {
+        showToast('⏳ Available in 24 hours!');
+        return;
+      }
       
       const prize = MYSTERY_REWARDS[Math.floor(Math.random() * MYSTERY_REWARDS.length)];
       
@@ -2040,12 +1991,19 @@
         count++;
       }, 100);
       
-      setTimeout(() => {
+      setTimeout(async () => {
         clearInterval(interval);
+        
+        // Update last mystery box time
+        await updateUserData({
+          lastMysteryBox: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        userData.lastMysteryBox = firebase.firestore.FieldValue.serverTimestamp();
+        
         if (prize > 0) {
           box.textContent = '🎉 ' + prize + ' Coins!';
-          addCoins(prize);
-          addXP(2);
+          await addCoins(prize);
+          await addXP(2);
           showToast('📦 You found ' + prize + ' coins in the mystery box!');
         } else {
           box.textContent = '😅 Better luck next time!';
@@ -2574,7 +2532,7 @@
     };
 
     // ============================================================
-    // ========== MONETAG AD SYSTEM (Replaces previous ad) =========
+    // ========== MONETAG AD SYSTEM (Unlimited) ===================
     // ============================================================
     let monetagAdLoaded = false;
     let monetagAdTimer = null;
@@ -2992,69 +2950,245 @@
     }
 
     // ============================================================
-    // ========== AUTH STATE LISTENER ==============================
+    // ========== AUTH FUNCTIONS ===================================
     // ============================================================
-    auth.onAuthStateChanged(async function(user) {
-      if (user) {
-        currentUser = user;
-        
-        try {
-          var userDoc = await db.collection("users").doc(user.uid).get();
-          if (userDoc.exists) {
-            var data = userDoc.data();
-            if (data.isBlocked) {
-              showAlert('Your account has been blocked. Please contact support.');
-              await logoutUser();
-              return;
-            }
-          }
-        } catch (e) {}
-        
-        if (authSection) authSection.classList.remove('active');
-        if (appContainer) appContainer.classList.add('active');
-        if (loginView) loginView.classList.remove('hidden');
-        if (signupView) signupView.classList.add('hidden');
-        
-        await loadUserData(user.uid);
-        navigateTo('home-page');
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        
-        loadTournamentData();
-        renderTournament();
-        
-        setTimeout(function() {
-          loadWithdrawalHistory();
-        }, 500);
-        
-        loadNotifications();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const refCode = urlParams.get('ref');
-        if (refCode && !userData?.referredBy) {
-          handleReferral(refCode);
-        }
-        
-      } else {
-        currentUser = null;
-        userData = null;
-        coinBalance = 0;
-        completedTasks = {};
-        userLevel = 1;
-        userXP = 0;
-        userStreak = 0;
-        userVIP = false;
-        userAchievements = [];
-        userReferrals = [];
-        userReferralEarnings = 0;
-        if (authSection) authSection.classList.add('active');
-        if (appContainer) appContainer.classList.remove('active');
-        if (loginView) loginView.classList.remove('hidden');
-        if (signupView) signupView.classList.add('hidden');
-        updateUI();
-        
-        loadTournamentData();
-        renderTournament();
+
+    // Show/Hide Views
+    function showSignup() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('signup-view').classList.remove('hidden');
+    }
+
+    function showLogin() {
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('signup-view').classList.add('hidden');
+    }
+    window.showLogin = showLogin;
+    window.showSignup = showSignup;
+
+    // ============================================================
+    // ========== SIGNUP ===========================================
+    // ============================================================
+    signupBtn.addEventListener('click', async function() {
+      signupBtn.disabled = true;
+      signupBtn.textContent = 'Creating...';
+      signupError.classList.add('hidden');
+
+      const username = document.getElementById('signup-username').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const referral = document.getElementById('signup-referral').value.trim();
+
+      // Validation
+      if (!username || username.length < 3) {
+        signupError.textContent = 'Username must be at least 3 characters.';
+        signupError.classList.remove('hidden');
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
+        return;
       }
+
+      if (!email || !email.includes('@')) {
+        signupError.textContent = 'Please enter a valid email.';
+        signupError.classList.remove('hidden');
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
+        return;
+      }
+
+      if (!password || password.length < 6) {
+        signupError.textContent = 'Password must be at least 6 characters.';
+        signupError.classList.remove('hidden');
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
+        return;
+      }
+
+      try {
+        // Check if username exists
+        const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+        if (usernameDoc.exists) {
+          signupError.textContent = 'Username already taken. Please choose another.';
+          signupError.classList.remove('hidden');
+          signupBtn.disabled = false;
+          signupBtn.textContent = 'Create Account';
+          return;
+        }
+
+        // Create user with email/password
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Send email verification
+        await user.sendEmailVerification();
+
+        // Save user data to Firestore
+        const newReferralCode = generateReferralCode();
+        await db.collection("users").doc(user.uid).set({
+          name: username,
+          username: username,
+          email: email,
+          balance: 0,
+          referralCode: newReferralCode,
+          isBlocked: false,
+          completedTasks: {},
+          level: 1,
+          xp: 0,
+          streak: 0,
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+          dailyBonusClaimed: false,
+          spinAvailable: true,
+          lastSpin: null,
+          lastScratch: null,
+          lastMysteryBox: null,
+          vip: false,
+          achievements: [],
+          referrals: [],
+          referralEarnings: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          referredBy: null,
+          referralBonusClaimed: false,
+          checkedDays: []
+        });
+
+        // Save username mapping
+        await db.collection("usernames").doc(username.toLowerCase()).set({
+          uid: user.uid,
+          email: email,
+          username: username,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Handle referral if provided
+        if (referral) {
+          try {
+            const refSnapshot = await db.collection('users')
+              .where('referralCode', '==', referral.toUpperCase())
+              .get();
+
+            if (!refSnapshot.empty) {
+              const referrerDoc = refSnapshot.docs[0];
+              const referrerId = referrerDoc.id;
+
+              await db.collection("users").doc(user.uid).update({
+                referredBy: referrerId
+              });
+
+              await db.collection("users").doc(referrerId).update({
+                referrals: firebase.firestore.FieldValue.arrayUnion(user.uid)
+              });
+            }
+          } catch (refError) {
+            console.error('Referral error:', refError);
+          }
+        }
+
+        // Sign out so user must verify first
+        await auth.signOut();
+
+        showToast('📧 Verification email sent! Please check your inbox.');
+        showAlert('Please check your email to verify your account. Then login again.');
+
+        // Show login view
+        showLogin();
+
+      } catch (error) {
+        console.error('Signup error:', error);
+        signupError.textContent = error.message || 'Error creating account.';
+        signupError.classList.remove('hidden');
+        
+        if (error.code === 'auth/email-already-in-use') {
+          signupError.textContent = 'Email already registered. Please login.';
+        }
+      }
+
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Create Account';
+    });
+
+    // ============================================================
+    // ========== LOGIN (No email verification check) ==============
+    // ============================================================
+    loginBtn.addEventListener('click', async function() {
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+      loginError.classList.add('hidden');
+
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!username || !password) {
+        loginError.textContent = 'Please enter username and password.';
+        loginError.classList.remove('hidden');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+        return;
+      }
+
+      try {
+        // Find email by username
+        const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+        if (!usernameDoc.exists) {
+          loginError.textContent = 'Username not found. Please check and try again.';
+          loginError.classList.remove('hidden');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
+          return;
+        }
+
+        const email = usernameDoc.data().email;
+
+        // Sign in (NO email verification check)
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Check if account is blocked
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists && userDoc.data().isBlocked) {
+          await auth.signOut();
+          loginError.textContent = 'Your account has been blocked. Contact support.';
+          loginError.classList.remove('hidden');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
+          return;
+        }
+
+        await db.collection("users").doc(user.uid).update({
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showToast('✅ Welcome back, ' + username + '!');
+
+      } catch (error) {
+        console.error('Login error:', error);
+        if (error.code === 'auth/user-not-found') {
+          loginError.textContent = 'Username not found. Please check and try again.';
+        } else if (error.code === 'auth/wrong-password') {
+          loginError.textContent = 'Incorrect password. Please try again.';
+        } else if (error.code === 'auth/invalid-email') {
+          loginError.textContent = 'Invalid email format.';
+        } else {
+          loginError.textContent = error.message || 'Login failed. Please try again.';
+        }
+        loginError.classList.remove('hidden');
+      }
+
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Login';
+    });
+
+    // Enter key for login
+    document.getElementById('login-password').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    document.getElementById('login-username').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('login-password').focus();
+    });
+
+    // Enter key for signup
+    document.getElementById('signup-password').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') signupBtn.click();
     });
 
     // ============================================================
@@ -3087,6 +3221,174 @@
       } catch (error) {
         console.error('Error handling referral:', error);
       }
+    }
+
+    // ============================================================
+    // ========== AUTH STATE LISTENER ==============================
+    // ============================================================
+    auth.onAuthStateChanged(async function(user) {
+      if (user) {
+        currentUser = user;
+        
+        try {
+          var userDoc = await db.collection("users").doc(user.uid).get();
+          if (userDoc.exists) {
+            var data = userDoc.data();
+            if (data.isBlocked) {
+              showAlert('Your account has been blocked. Please contact support.');
+              await logoutUser();
+              return;
+            }
+          }
+        } catch (e) {}
+        
+        if (authSection) authSection.classList.remove('active');
+        authSection.style.display = 'none';
+        if (appContainer) appContainer.classList.add('active');
+        appContainer.style.display = 'flex';
+        
+        await loadUserData(user.uid);
+        navigateTo('home-page');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        
+        loadTournamentData();
+        renderTournament();
+        
+        setTimeout(function() {
+          loadWithdrawalHistory();
+        }, 500);
+        
+        loadNotifications();
+        
+        // Check referral bonus
+        if (userData && !userData.referralBonusClaimed && userData.referredBy) {
+          // Process referral bonus when user reaches 1000 coins
+          if (coinBalance >= 1000) {
+            processReferralBonus(user.uid);
+          }
+        }
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode && !userData?.referredBy) {
+          try {
+            const refSnapshot = await db.collection('users')
+              .where('referralCode', '==', refCode.toUpperCase())
+              .get();
+            
+            if (!refSnapshot.empty) {
+              const referrerDoc = refSnapshot.docs[0];
+              await db.collection("users").doc(user.uid).update({
+                referredBy: referrerDoc.id
+              });
+              userData.referredBy = referrerDoc.id;
+              showToast('🎉 Referral applied! You will get bonus when you reach 1000 coins.');
+            }
+          } catch (refError) {
+            console.error('Referral error:', refError);
+          }
+        }
+        
+      } else {
+        currentUser = null;
+        userData = null;
+        coinBalance = 0;
+        completedTasks = {};
+        userLevel = 1;
+        userXP = 0;
+        userStreak = 0;
+        userVIP = false;
+        userAchievements = [];
+        userReferrals = [];
+        userReferralEarnings = 0;
+        if (authSection) authSection.classList.add('active');
+        authSection.style.display = 'flex';
+        if (appContainer) appContainer.classList.remove('active');
+        appContainer.style.display = 'none';
+        if (loginView) loginView.classList.remove('hidden');
+        if (signupView) signupView.classList.add('hidden');
+        updateUI();
+        
+        loadTournamentData();
+        renderTournament();
+      }
+    });
+
+    // ============================================================
+    // ========== REFERRAL BONUS ===================================
+    // ============================================================
+    async function processReferralBonus(userId) {
+      try {
+        const userDoc = await db.collection("users").doc(userId).get();
+        if (!userDoc.exists) return;
+        const userData = userDoc.data();
+        
+        if (userData.referralBonusClaimed) return;
+        if (userData.balance < 1000) return;
+        
+        const referredBy = userData.referredBy;
+        if (!referredBy) return;
+        
+        const referrerDoc = await db.collection("users").doc(referredBy).get();
+        if (!referrerDoc.exists) return;
+        const referrerData = referrerDoc.data();
+        
+        if (referrerData.balance < 2000) return;
+        
+        const referralCount = referrerData.referrals?.length || 0;
+        if (referralCount >= 10) return;
+        
+        // Give 100 coins to new user
+        await db.collection("users").doc(userId).update({
+          balance: firebase.firestore.FieldValue.increment(100),
+          referralBonusClaimed: true
+        });
+        
+        // Give 200 coins to referrer
+        await db.collection("users").doc(referredBy).update({
+          balance: firebase.firestore.FieldValue.increment(200),
+          referralEarnings: firebase.firestore.FieldValue.increment(200)
+        });
+        
+        showToast('🎉 Referral bonus! You got 100 coins!');
+        
+      } catch (error) {
+        console.error('Error processing referral bonus:', error);
+      }
+    }
+
+    // ============================================================
+    // ========== LOGOUT ===========================================
+    // ============================================================
+    async function logoutUser() {
+      try {
+        await auth.signOut();
+        currentUser = null;
+        userData = null;
+        coinBalance = 0;
+        completedTasks = {};
+        userLevel = 1;
+        userXP = 0;
+        userStreak = 0;
+        userVIP = false;
+        userAchievements = [];
+        userReferrals = [];
+        userReferralEarnings = 0;
+        if (authSection) authSection.classList.add('active');
+        authSection.style.display = 'flex';
+        if (appContainer) appContainer.classList.remove('active');
+        appContainer.style.display = 'none';
+        if (loginView) loginView.classList.remove('hidden');
+        if (signupView) signupView.classList.add('hidden');
+        updateUI();
+        showToast('Logged out successfully');
+      } catch (error) {
+        showAlert('Error logging out: ' + error.message);
+      }
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', logoutUser);
     }
 
     // ============================================================
@@ -3198,71 +3500,6 @@
     }
 
     // ============================================================
-    // ========== EVENT LISTENERS ==================================
-    // ============================================================
-    if (loginBtn) {
-      loginBtn.addEventListener('click', async function() {
-        var username = document.getElementById('login-username')?.value?.trim() || '';
-        
-        if (!username) {
-          showLoginErrorMsg('Please enter your username.');
-          return;
-        }
-        
-        if (username.length < 3) {
-          showLoginErrorMsg('Username must be at least 3 characters.');
-          return;
-        }
-        
-        loginBtn.disabled = true;
-        loginBtn.textContent = 'Logging in...';
-        
-        try {
-          var user = await loginWithUsername(username);
-          if (user) {
-            loginBtn.textContent = 'Login / Signup';
-            loginBtn.disabled = false;
-          }
-        } catch (error) {
-          showLoginErrorMsg(error.message || 'Error logging in. Please try again.');
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'Login / Signup';
-        }
-      });
-    }
-
-    // ========== LOGOUT FUNCTION ==========
-    window.logoutUser = async function() {
-      try {
-        await auth.signOut();
-        currentUser = null;
-        userData = null;
-        coinBalance = 0;
-        completedTasks = {};
-        userLevel = 1;
-        userXP = 0;
-        userStreak = 0;
-        userVIP = false;
-        userAchievements = [];
-        userReferrals = [];
-        userReferralEarnings = 0;
-        if (authSection) authSection.classList.add('active');
-        if (appContainer) appContainer.classList.remove('active');
-        if (loginView) loginView.classList.remove('hidden');
-        if (signupView) signupView.classList.add('hidden');
-        updateUI();
-        showToast('Logged out successfully');
-      } catch (error) {
-        showAlert('Error logging out: ' + error.message);
-      }
-    };
-
-    // Logout button event
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', window.logoutUser);
-    }
-
-    // ============================================================
     // ========== COPY REFERRAL CODE ===============================
     // ============================================================
     var copyBtn = document.getElementById('copy-code-btn');
@@ -3343,6 +3580,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof lucide !== 'undefined') lucide.createIcons();
       if (authSection) authSection.classList.add('active');
+      authSection.style.display = 'flex';
       
       loadTournamentData();
       renderTournament();
@@ -3360,7 +3598,7 @@
     var loginUsername = document.getElementById('login-username');
     if (loginUsername && loginBtn) {
       loginUsername.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') loginBtn.click();
+        if (e.key === 'Enter') document.getElementById('login-password').focus();
       });
     }
 
@@ -3374,4 +3612,5 @@
     });
   </script>
 </body>
-</html>)
+</html>
+```
