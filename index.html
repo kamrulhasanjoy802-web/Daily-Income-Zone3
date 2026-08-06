@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2532,158 +2531,88 @@
     };
 
     // ============================================================
-    // ========== MONETAG AD SYSTEM (Unlimited) ===================
+    // ========== MONETAG REWARDED AD SYSTEM (Official) ============
     // ============================================================
-    let monetagAdLoaded = false;
-    let monetagAdTimer = null;
-    let monetagCountdown = 10;
+    
     let isMonetagAdWatching = false;
 
     window.showMonetagAd = function() {
-      if (!currentUser) {
-        showAlert('Please login first to earn coins!');
-        return;
-      }
-
-      if (isMonetagAdWatching) {
-        showToast('⏳ Please wait, ad is already playing...');
-        return;
-      }
-
-      var adContainer = document.getElementById('ad-container');
-      var adContent = document.getElementById('ad-content');
-      var adBtn = document.getElementById('watch-ad-btn');
-      var adStatus = document.getElementById('ad-status-text');
-
-      if (!adContainer || !adContent) return;
-
-      if (adBtn) {
-        adBtn.disabled = true;
-        adBtn.textContent = '⏳ Loading...';
-      }
-      if (adStatus) adStatus.textContent = '⏳ Loading Monetag ad...';
-
-      isMonetagAdWatching = true;
-      adContainer.classList.add('active');
-
-      // Monetag ad iframe embedding
-      adContent.innerHTML = `
-        <div style="background: #1a1a1a; padding: 20px; border-radius: 16px; max-width: 400px; width: 100%; text-align: center; border: 1px solid #333;">
-          <div style="font-size: 48px; margin-bottom: 10px;">📺</div>
-          <h3 style="color: #ff8c00; font-size: 20px; font-weight: bold; margin-bottom: 8px;">Monetag Video Ad</h3>
-          <p style="color: #aaa; font-size: 14px; margin-bottom: 5px;">Watch this ad to earn <strong style="color: #ff8c00;">10 Coins</strong></p>
-          <p style="color: #666; font-size: 12px; margin-bottom: 15px;">Ad will auto-close in <span id="monetag-countdown">10</span> seconds</p>
-          
-          <div style="width: 100%; max-width: 350px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 10px auto;">
-            <div style="height: 100%; background: linear-gradient(90deg, #ff8c00, #ff6a00); width: 0%; transition: width 0.5s linear; border-radius: 3px;" id="monetag-progress-fill"></div>
-          </div>
-          
-          <div style="margin: 15px 0; min-height: 200px; background: #0a0a0a; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1" 
-                    style="width: 100%; height: 200px; border: none; border-radius: 8px;" 
-                    allow="autoplay; encrypted-media" 
-                    allowfullscreen></iframe>
-          </div>
-          
-          <div style="margin-top: 12px;">
-            <button style="background: #ff8c00; color: #121212; font-weight: bold; padding: 12px 40px; border-radius: 12px; border: none; font-size: 16px; cursor: pointer; display: none;" id="monetag-claim-btn" onclick="claimMonetagReward()">
-              ✅ Claim 10 Coins
-            </button>
-          </div>
-          
-          <p style="color: #555; font-size: 10px; margin-top: 12px;">⚠️ Don't close this window</p>
-        </div>
-      `;
-
-      // Start countdown for Monetag ad
-      monetagCountdown = 10;
-      const countdownEl = document.getElementById('monetag-countdown');
-      const progressFill = document.getElementById('monetag-progress-fill');
-      const claimBtn = document.getElementById('monetag-claim-btn');
-
-      if (monetagAdTimer) clearInterval(monetagAdTimer);
-
-      monetagAdTimer = setInterval(function() {
-        monetagCountdown--;
-        if (countdownEl) countdownEl.textContent = monetagCountdown;
-        if (progressFill) progressFill.style.width = ((10 - monetagCountdown) / 10 * 100) + '%';
-
-        if (monetagCountdown <= 0) {
-          clearInterval(monetagAdTimer);
-          monetagAdTimer = null;
-          if (countdownEl) countdownEl.textContent = '0';
-          if (progressFill) progressFill.style.width = '100%';
-          if (claimBtn) claimBtn.style.display = 'inline-block';
-          if (adStatus) adStatus.textContent = '✅ Ad completed! Claim your reward.';
+        if (!currentUser) {
+            showAlert('Please login first to earn coins!');
+            return;
         }
-      }, 1000);
 
-      // Safety timeout
-      setTimeout(function() {
-        if (monetagAdTimer) {
-          clearInterval(monetagAdTimer);
-          monetagAdTimer = null;
+        if (isMonetagAdWatching) {
+            showToast('⏳ Please wait, ad is already playing...');
+            return;
         }
-        if (claimBtn) claimBtn.style.display = 'inline-block';
-        if (adStatus) adStatus.textContent = '✅ Ad completed! Claim your reward.';
-      }, 12000);
+
+        var adBtn = document.getElementById('watch-ad-btn');
+        var adStatus = document.getElementById('ad-status-text');
+
+        if (adBtn) {
+            adBtn.disabled = true;
+            adBtn.textContent = '⏳ Loading Ad...';
+        }
+        if (adStatus) adStatus.textContent = '⏳ Loading Monetag ad...';
+
+        isMonetagAdWatching = true;
+
+        // Call the official Monetag rewarded ad
+        // The SDK is loaded from: <script src="//libtl.com/sdk.js" data-zone="11341986" data-sdk="show_11341986"></script>
+        if (typeof show_11341986 === 'function') {
+            show_11341986()
+                .then(() => {
+                    // Ad completed successfully - reward the user
+                    if (adBtn) {
+                        adBtn.disabled = false;
+                        adBtn.textContent = 'Watch';
+                    }
+                    
+                    if (!isTaskCompleted('task-ad')) {
+                        addCoins(10);
+                        markTaskCompleted('task-ad');
+                        if (adStatus) adStatus.textContent = '✅ Completed!';
+                        showToast('🎉 +10 Coins from Monetag ad!');
+                    } else {
+                        if (adStatus) adStatus.textContent = '✅ Already done!';
+                        showToast('You already completed this task.');
+                    }
+                    
+                    isMonetagAdWatching = false;
+                })
+                .catch((error) => {
+                    // Ad failed to load
+                    if (adBtn) {
+                        adBtn.disabled = false;
+                        adBtn.textContent = 'Watch';
+                    }
+                    if (adStatus) adStatus.textContent = '❌ Ad not available';
+                    showToast('Ad not available. Please try again later.');
+                    isMonetagAdWatching = false;
+                });
+        } else {
+            // Monetag SDK not loaded
+            if (adBtn) {
+                adBtn.disabled = false;
+                adBtn.textContent = 'Watch';
+            }
+            if (adStatus) adStatus.textContent = '❌ SDK not loaded';
+            showToast('Monetag SDK not loaded. Refresh the page.');
+            isMonetagAdWatching = false;
+        }
     };
 
-    window.claimMonetagReward = function() {
-      if (!isMonetagAdWatching) {
-        showToast('⏳ Please wait for ad to complete...');
-        return;
-      }
-
-      isMonetagAdWatching = false;
-      
-      var adContainer = document.getElementById('ad-container');
-      var adStatus = document.getElementById('ad-status-text');
-      var adBtn = document.getElementById('watch-ad-btn');
-
-      if (adContainer) adContainer.classList.remove('active');
-      if (adBtn) {
-        adBtn.disabled = false;
-        adBtn.textContent = 'Watch';
-      }
-
-      if (!isTaskCompleted('task-ad')) {
-        addCoins(10);
-        markTaskCompleted('task-ad');
-        if (adStatus) adStatus.textContent = '✅ Completed!';
-        showToast('🎉 +10 Coins from Monetag ad!');
-      } else {
-        if (adStatus) adStatus.textContent = '✅ Already done!';
-        showToast('You already completed this task.');
-      }
-
-      if (monetagAdTimer) {
-        clearInterval(monetagAdTimer);
-        monetagAdTimer = null;
-      }
-    };
-
+    // Close ad (Monetag handles its own closing)
     window.closeMonetagAd = function() {
-      if (monetagAdTimer) {
-        clearInterval(monetagAdTimer);
-        monetagAdTimer = null;
-      }
-      
-      var adContainer = document.getElementById('ad-container');
-      if (adContainer) adContainer.classList.remove('active');
-      
-      var adBtn = document.getElementById('watch-ad-btn');
-      var adStatus = document.getElementById('ad-status-text');
-      
-      if (adBtn) {
-        adBtn.disabled = false;
-        adBtn.textContent = 'Watch';
-      }
-      
-      if (isMonetagAdWatching) {
         isMonetagAdWatching = false;
+        var adBtn = document.getElementById('watch-ad-btn');
+        var adStatus = document.getElementById('ad-status-text');
+        if (adBtn) {
+            adBtn.disabled = false;
+            adBtn.textContent = 'Watch';
+        }
         if (adStatus) adStatus.textContent = '✅ Ready to watch';
-      }
     };
 
     // ============================================================
@@ -3613,4 +3542,3 @@
   </script>
 </body>
 </html>
-```
