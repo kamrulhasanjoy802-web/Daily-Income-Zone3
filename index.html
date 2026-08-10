@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -911,52 +910,52 @@
               <button class="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg text-sm btn" id="watch-ad-btn" onclick="showMonetagAd()">Watch</button>
             </div>
 
-            <!-- Website Visit 1 - Enhanced -->
+            <!-- Website Visit 1 - NEW with 15 coins -->
             <div class="task-item-enhanced" id="task-website1">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
                 <div class="task-info">
                   <p class="task-title">Website Visit 1</p>
-                  <p class="task-desc">Wait 15 Seconds</p>
+                  <p class="task-desc">Earn 15 Coins</p>
                 </div>
               </div>
-              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="visitWebsite('https://adsfly.in/daily_1income', 'task-website1', this)">Visit</button>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('website-visit-1')">Visit</button>
             </div>
 
-            <!-- Website Visit 2 - Enhanced -->
+            <!-- Website Visit 2 - NEW with 15 coins -->
             <div class="task-item-enhanced" id="task-website2">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
                 <div class="task-info">
                   <p class="task-title">Website Visit 2</p>
-                  <p class="task-desc">Wait 15 Seconds</p>
+                  <p class="task-desc">Earn 15 Coins</p>
                 </div>
               </div>
-              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="visitWebsite('https://adsfly.in/daily_1income11', 'task-website2', this)">Visit</button>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('website-visit-2')">Visit</button>
             </div>
 
-            <!-- Website Visit 3 - Enhanced -->
+            <!-- Website Visit 3 - NEW with 15 coins -->
             <div class="task-item-enhanced" id="task-website3">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
                 <div class="task-info">
                   <p class="task-title">Website Visit 3</p>
-                  <p class="task-desc">Wait 15 Seconds</p>
+                  <p class="task-desc">Earn 15 Coins</p>
                 </div>
               </div>
-              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="visitWebsite('https://adsfly.in/dlz_zone', 'task-website3', this)">Visit</button>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('website-visit-3')">Visit</button>
             </div>
 
-            <!-- Special Task - Enhanced -->
+            <!-- Special Task - NEW with 15 coins -->
             <div class="task-item-enhanced" id="task-special">
               <div class="flex items-center flex-1">
-                <span class="task-icon">⏳</span>
+                <span class="task-icon">⭐</span>
                 <div class="task-info">
-                  <p class="task-title">Special Task Click</p>
-                  <p class="task-desc">Wait 15 Seconds</p>
+                  <p class="task-title">Special Task</p>
+                  <p class="task-desc">Earn 15 Coins</p>
                 </div>
               </div>
-              <button class="bg-white text-black font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="claimReward('dailyClick', this)">Start</button>
+              <button class="bg-orange-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('special-task')">Start</button>
             </div>
 
             <!-- Play Mini Game - Enhanced -->
@@ -971,6 +970,35 @@
               <button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="window.openGameModal(this)">Play</button>
             </div>
           </div>
+        </section>
+
+        <!-- ===== AD PLACEMENTS (Only Ads - No Coins) ===== -->
+        <section class="space-y-4 mt-6">
+          <h3 class="text-lg font-semibold mb-2">📢 Sponsored Content</h3>
+          
+          <!-- Native Banner -->
+          <div id="native-banner-container"></div>
+          
+          <!-- Banner 320x50 -->
+          <div id="banner-320x50-container"></div>
+          
+          <!-- Social Bar -->
+          <div id="social-bar-container"></div>
+          
+          <!-- Banner 160x300 -->
+          <div id="banner-160x300-container"></div>
+          
+          <!-- Smartlink Button -->
+          <button onclick="openSmartlink()" 
+                  class="w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-700 text-white font-bold hover:scale-105 transition-transform">
+            🔗 Smartlink
+          </button>
+          
+          <!-- Popunder Button -->
+          <button onclick="loadPopunderAd()" 
+                  class="w-full py-3 rounded-lg bg-gradient-to-r from-red-500 to-red-700 text-white font-bold hover:scale-105 transition-transform">
+            📢 Popunder Ad
+          </button>
         </section>
       </div>
 
@@ -2532,7 +2560,7 @@
     };
 
     // ============================================================
-    // ========== MONETAG AD SYSTEM ================================
+    // ========== MONETAG AD SYSTEM (10 Coins - Unlimited) ========
     // ============================================================
     let isMonetagAdWatching = false;
 
@@ -2547,40 +2575,305 @@
             return;
         }
 
+        if (typeof show_11341986 !== "function") {
+            showToast("❌ Monetag ad is not loaded!");
+            return;
+        }
+
         isMonetagAdWatching = true;
 
-        var adBtn = document.getElementById("watch-ad-btn");
-        if (adBtn) {
-            adBtn.disabled = true;
-            adBtn.textContent = "Loading...";
+        const btn = document.getElementById("watch-ad-btn");
+
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = "⏳ Loading...";
         }
 
         try {
-            // Rewarded Interstitial চালু
             await show_11341986();
 
-            // Ad সম্পূর্ণ দেখলে Reward
-            if (!isTaskCompleted("task-ad")) {
-                addCoins(10);
-                markTaskCompleted("task-ad");
-                showToast("🎉 +10 Coins Added!");
-            } else {
-                showToast("Task already completed.");
-            }
+            // Unlimited reward - 10 coins
+            await addCoins(10);
+            showToast("🎉 +10 Coins!");
 
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.error("Monetag Error:", error);
             showToast("❌ No ad available. Try again later.");
 
         } finally {
             isMonetagAdWatching = false;
 
-            if (adBtn) {
-                adBtn.disabled = false;
-                adBtn.textContent = "Watch";
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = "Watch";
             }
         }
     };
+
+    // ============================================================
+    // WEBSITE VISIT TASKS (15 Coins Each - Unlimited)
+    // ============================================================
+
+    const EXTRA_AD_TASKS = {
+        "website-visit-1": {
+            name: "🌐 Website Visit 1",
+            reward: 15,
+            url: "https://www.effectivecpmnetwork.com/pjbjikuv?key=16c1039a058bdc4f2b8ff2f03adea530"
+        },
+        "website-visit-2": {
+            name: "🌐 Website Visit 2",
+            reward: 15,
+            url: "https://www.effectivecpmnetwork.com/ffahenku?key=7c3c91c5e0d9b38c0b414825b0b7a65a"
+        },
+        "website-visit-3": {
+            name: "🌐 Website Visit 3",
+            reward: 15,
+            url: "https://www.effectivecpmnetwork.com/f9yz26f6vn?key=3cc44d44244a595c3967765db93d23e1"
+        },
+        "special-task": {
+            name: "⭐ Special Task",
+            reward: 15,
+            url: "https://www.effectivecpmnetwork.com/z4w4fzrxkg?key=3447c636d06833999c9a1d796c1850d7"
+        }
+    };
+
+    // ------------------------------
+    // OPEN WEBSITE TASK (Inside App)
+    // ------------------------------
+    window.openExtraAdTask = function (taskId) {
+        const task = EXTRA_AD_TASKS[taskId];
+
+        if (!task) {
+            showToast("❌ Task not found!");
+            return;
+        }
+
+        if (!currentUser) {
+            showAlert("Please login first!");
+            return;
+        }
+
+        const container = document.getElementById("ad-container");
+        const content = document.getElementById("ad-content");
+
+        if (!container || !content) {
+            window.open(task.url, "_blank", "noopener,noreferrer");
+            return;
+        }
+
+        container.classList.add("active");
+
+        content.innerHTML = `
+            <div style="
+                background:#171717;
+                color:white;
+                padding:20px;
+                border-radius:16px;
+                width:100%;
+                max-width:420px;
+                text-align:center;
+            ">
+                <h3 style="
+                    color:#ff8c00;
+                    margin-bottom:8px;
+                ">
+                    ${task.name}
+                </h3>
+
+                <p style="
+                    color:#aaa;
+                    margin-bottom:15px;
+                ">
+                    Visit the website to earn
+                    <b style="color:#ff8c00;">
+                        +${task.reward} Coins
+                    </b>
+                </p>
+
+                <iframe
+                    src="${task.url}"
+                    style="
+                        width:100%;
+                        height:450px;
+                        border:0;
+                        border-radius:10px;
+                        background:#fff;
+                    "
+                    allow="autoplay; fullscreen"
+                ></iframe>
+
+                <button
+                    onclick="claimExtraAdTask('${taskId}')"
+                    style="
+                        margin-top:15px;
+                        background:#ff8c00;
+                        color:#111;
+                        border:0;
+                        padding:12px 25px;
+                        border-radius:10px;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    ✅ Claim +${task.reward} Coins
+                </button>
+
+                <button
+                    onclick="closeMonetagAd()"
+                    style="
+                        display:block;
+                        margin:10px auto 0;
+                        background:#333;
+                        color:white;
+                        border:0;
+                        padding:9px 25px;
+                        border-radius:8px;
+                        cursor:pointer;
+                    "
+                >
+                    Close
+                </button>
+            </div>
+        `;
+    };
+
+    // ------------------------------
+    // CLAIM WEBSITE TASK (Unlimited 15 coins)
+    // ------------------------------
+    window.claimExtraAdTask = async function (taskId) {
+        const task = EXTRA_AD_TASKS[taskId];
+
+        if (!task) return;
+
+        await addCoins(task.reward);
+        showToast(`🎉 +${task.reward} Coins!`);
+        closeMonetagAd();
+    };
+
+    // ------------------------------
+    // CLOSE AD OVERLAY
+    // ------------------------------
+    window.closeMonetagAd = function () {
+        const container = document.getElementById("ad-container");
+        if (container) container.classList.remove("active");
+    };
+
+    // ============================================================
+    // 6 ADDITIONAL AD PLACEMENTS (Only Ads - No Coins)
+    // ============================================================
+
+    // 1. POPUNDER (Opens in background inside app)
+    window.loadPopunderAd = function () {
+        const container = document.getElementById("ad-container");
+        if (container) {
+            container.classList.add("active");
+            const content = document.getElementById("ad-content");
+            if (content) {
+                content.innerHTML = `
+                    <div style="background:#171717; padding:20px; border-radius:16px; max-width:420px; width:100%; text-align:center;">
+                        <h3 style="color:#ff8c00;">📢 Popunder Ad</h3>
+                        <iframe 
+                            src="https://pl30773681.effectivecpmnetwork.com/bb/28/ee/bb28ee5abe9d7d0eab9486358dead5cb.js" 
+                            style="width:100%; height:400px; border:0; border-radius:10px; background:#fff;"
+                        ></iframe>
+                        <button onclick="closeMonetagAd()" style="margin-top:15px; background:#333; color:white; border:0; padding:9px 25px; border-radius:8px; cursor:pointer;">Close</button>
+                    </div>
+                `;
+            }
+        }
+    };
+
+    // 2. NATIVE BANNER
+    window.loadNativeBanner = function () {
+        const box = document.getElementById("native-banner-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e; border-radius:12px; padding:12px; border:1px solid #333; text-align:center;">
+                <p style="color:#888; font-size:12px; margin-bottom:8px;">📢 Sponsored</p>
+                <iframe 
+                    src="https://pl30773682.effectivecpmnetwork.com/3dd7b5c4f26d9cb993c476b3038ddc5e/invoke.js" 
+                    style="width:100%; height:60px; border:0; border-radius:8px; background:#fff;"
+                ></iframe>
+            </div>
+        `;
+    };
+
+    // 3. BANNER 320x50
+    window.loadBanner320x50 = function () {
+        const box = document.getElementById("banner-320x50-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e; border-radius:12px; padding:10px; border:1px solid #333; text-align:center;">
+                <iframe 
+                    src="https://www.highperformanceformat.com/1fd60c5f2e5bbcd78e391f55e6ef6c4a/invoke.js" 
+                    style="width:320px; height:50px; border:0; border-radius:8px; background:#fff; max-width:100%;"
+                ></iframe>
+            </div>
+        `;
+    };
+
+    // 4. SOCIAL BAR
+    window.loadSocialBarAd = function () {
+        const box = document.getElementById("social-bar-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e; border-radius:12px; padding:10px; border:1px solid #333; text-align:center;">
+                <p style="color:#888; font-size:11px;">📢 Follow us</p>
+                <iframe 
+                    src="https://pl30773683.effectivecpmnetwork.com/b6/aa/32/b6aa321c27d13b9a3c084f3e75dcb6c2.js" 
+                    style="width:100%; height:80px; border:0; border-radius:8px; background:#fff;"
+                ></iframe>
+            </div>
+        `;
+    };
+
+    // 5. SMARTLINK (Opens inside app)
+    window.openSmartlink = function () {
+        const container = document.getElementById("ad-container");
+        const content = document.getElementById("ad-content");
+        if (container && content) {
+            container.classList.add("active");
+            content.innerHTML = `
+                <div style="background:#171717; padding:20px; border-radius:16px; max-width:420px; width:100%; text-align:center;">
+                    <h3 style="color:#ff8c00;">🔗 Smartlink</h3>
+                    <iframe 
+                        src="https://www.effectivecpmnetwork.com/eemn90gqn7?key=c49419e077f05f47a284be01783831c5" 
+                        style="width:100%; height:400px; border:0; border-radius:10px; background:#fff;"
+                    ></iframe>
+                    <button onclick="closeMonetagAd()" style="margin-top:15px; background:#333; color:white; border:0; padding:9px 25px; border-radius:8px; cursor:pointer;">Close</button>
+                </div>
+            `;
+        } else {
+            window.open("https://www.effectivecpmnetwork.com/eemn90gqn7?key=c49419e077f05f47a284be01783831c5", "_blank", "noopener,noreferrer");
+        }
+    };
+
+    // 6. BANNER 160x300
+    window.loadBanner160x300 = function () {
+        const box = document.getElementById("banner-160x300-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e; border-radius:12px; padding:10px; border:1px solid #333; text-align:center;">
+                <iframe 
+                    src="https://www.highperformanceformat.com/d25bc77d9f99ba843db2607d3f88c949/invoke.js" 
+                    style="width:160px; height:300px; border:0; border-radius:8px; background:#fff; max-width:100%;"
+                ></iframe>
+            </div>
+        `;
+    };
+
+    // ============================================================
+    // LOAD AD PLACEMENTS
+    // ============================================================
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            loadNativeBanner();
+            loadBanner320x50();
+            loadSocialBarAd();
+            loadBanner160x300();
+        }, 1000);
+    });
 
     // ============================================================
     // ========== TIMER TASK =======================================
@@ -3509,4 +3802,3 @@
   </script>
 </body>
 </html>
-```
