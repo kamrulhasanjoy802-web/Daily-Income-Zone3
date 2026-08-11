@@ -56,14 +56,23 @@
       transition: all 0.2s;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .ad-btn:hover { border-color: #ff8c00; background: #2a2a2a; transform: translateY(-2px); }
-    .ad-btn:active { transform: scale(0.95); }
+    .ad-btn:hover:not(:disabled) { border-color: #ff8c00; background: #2a2a2a; transform: translateY(-2px); }
+    .ad-btn:active:not(:disabled) { transform: scale(0.95); }
+    .ad-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
     .ad-btn .badge {
       display: block;
       font-size: 10px;
       color: #ff8c00;
       margin-top: 4px;
       font-weight: 400;
+    }
+    .ad-btn .badge.loading {
+      color: #ffaa33;
+      animation: pulse 1s infinite;
     }
     .header-title {
       font-size: 22px;
@@ -72,6 +81,10 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
   </style>
 </head>
@@ -141,14 +154,14 @@
 
     <main class="flex-grow p-4">
       <div class="text-center mb-4">
-        <p class="text-gray-400 text-sm">👋 Click any ad button to open the ad</p>
+        <p class="text-gray-400 text-sm">👋 Click any ad button to watch a rewarded ad</p>
       </div>
 
       <!-- 20 Ad Buttons -->
       <div class="ad-grid" id="ad-grid-container"></div>
       
       <div class="mt-6 text-center text-xs text-gray-500">
-        <p>🔁 Unlimited clicks · Opens via Telegram WebView</p>
+        <p>🔁 Unlimited clicks · Full-screen rewarded ads</p>
       </div>
     </main>
   </div>
@@ -162,6 +175,17 @@
   </div>
 
   <script>
+    // ============================================================
+    // ========== TELEGRAM WEBAPP INIT =============================
+    // ============================================================
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+
+    // Get Telegram user ID for ymid
+    const telegramUserId = (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) || Date.now();
+
     // ============================================================
     // ========== SAFE DOM HELPERS =================================
     // ============================================================
@@ -191,57 +215,84 @@
     window.showLogin = showLogin;
 
     // ============================================================
-    // ========== AD BUTTONS (Direct Link - no iframe) ============
+    // ========== AD BUTTONS (Monetag Rewarded Interstitial) ======
     // ============================================================
-    const AD_LINKS = [
-      "https://omg10.com/4/11551967",
-      "https://omg10.com/4/11551965",
-      "https://omg10.com/4/11551964",
-      "https://omg10.com/4/11551963",
-      "https://omg10.com/4/11551962",
-      "https://omg10.com/4/11551960",
-      "https://omg10.com/4/11551958",
-      "https://omg10.com/4/11282225",
-      "https://omg10.com/4/11282212",
-      "https://omg10.com/4/11550781",
-      "https://omg10.com/4/11282223",
-      "https://omg10.com/4/11282905",
-      "https://omg10.com/4/11282226",
-      "https://omg10.com/4/11550783",
-      "https://omg10.com/4/11282908",
-      "https://omg10.com/4/11282904",
-      "https://omg10.com/4/11282224",
-      "https://omg10.com/4/11550774",
-      "https://omg10.com/4/11282906",
-      "https://omg10.com/4/11282222"
-    ];
+    let isAdRunning = false;
 
-    // Direct link opener using Telegram.WebApp.openLink with fallback
-    function openDirectLink(url) {
-      if (window.Telegram &&
-          Telegram.WebApp &&
-          typeof Telegram.WebApp.openLink === 'function') {
-        Telegram.WebApp.openLink(url);
-      } else {
-        window.open(url, '_blank', 'noopener,noreferrer');
+    function showMonetagAd(buttonNumber) {
+      if (isAdRunning) {
+        showAlert('⚠️ An ad is already playing. Please wait.');
+        return;
       }
+
+      isAdRunning = true;
+      disableAllButtons(true);
+
+      const requestVar = 'watch_ads_' + buttonNumber;
+
+      console.log('[Monetag] Starting ad for:', requestVar);
+
+      // Call Monetag Rewarded Interstitial
+      if (typeof show_11341986 !== 'function') {
+        console.error('[Monetag] SDK not loaded');
+        isAdRunning = false;
+        disableAllButtons(false);
+        showAlert('⚠️ Ad SDK not ready. Please try again.');
+        return;
+      }
+
+      show_11341986({
+        ymid: String(telegramUserId),
+        requestVar: requestVar
+      })
+      .then(() => {
+        console.log('[Monetag] Ad completed successfully for:', requestVar);
+        // Ad completed - just log it, no fake rewards
+        isAdRunning = false;
+        disableAllButtons(false);
+      })
+      .catch((error) => {
+        console.log('[Monetag] Ad failed or skipped:', error, 'for:', requestVar);
+        isAdRunning = false;
+        disableAllButtons(false);
+        // Don't show alert for user-triggered skip/fail, just silently handle
+      });
+    }
+
+    function disableAllButtons(disabled) {
+      const buttons = document.querySelectorAll('.ad-btn');
+      buttons.forEach(btn => {
+        btn.disabled = disabled;
+        const badge = btn.querySelector('.badge');
+        if (badge) {
+          if (disabled) {
+            badge.textContent = '⏳ loading...';
+            badge.classList.add('loading');
+          } else {
+            badge.textContent = '▶ click';
+            badge.classList.remove('loading');
+          }
+        }
+      });
     }
 
     function renderAdButtons() {
       const container = safeGet('ad-grid-container');
       if (!container) return;
       container.innerHTML = '';
-      AD_LINKS.forEach((url, index) => {
-        const num = index + 1;
+      
+      // 20 buttons
+      for (let i = 1; i <= 20; i++) {
         const btn = document.createElement('button');
         btn.className = 'ad-btn';
-        btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
+        btn.innerHTML = `Watch Ads ${i}<span class="badge">▶ click</span>`;
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          openDirectLink(url);
+          if (this.disabled) return;
+          showMonetagAd(i);
         });
         container.appendChild(btn);
-      });
+      }
     }
 
     // ============================================================
