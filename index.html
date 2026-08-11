@@ -149,7 +149,7 @@
         <p class="text-gray-400 text-sm">👋 Click any ad button to watch</p>
       </div>
 
-      <!-- 20 Ad Buttons -->
+      <!-- 3 Ad Buttons -->
       <div class="ad-grid" id="ad-grid-container"></div>
       
       <div class="mt-6 text-center text-xs text-gray-500">
@@ -204,35 +204,30 @@
     window.showLogin = showLogin;
 
     // ============================================================
-    // ========== AD BUTTONS (Direct Link - same WebView) =========
+    // ========== AD BUTTONS (3 Ads - same WebView) ===============
     // ============================================================
     const AD_LINKS = [
-      "https://omg10.com/4/11551967",
-      "https://omg10.com/4/11551965",
-      "https://omg10.com/4/11551964",
-      "https://omg10.com/4/11551963",
-      "https://omg10.com/4/11551962",
-      "https://omg10.com/4/11551960",
-      "https://omg10.com/4/11551958",
-      "https://omg10.com/4/11282225",
-      "https://omg10.com/4/11282212",
-      "https://omg10.com/4/11550781",
-      "https://omg10.com/4/11282223",
-      "https://omg10.com/4/11282905",
-      "https://omg10.com/4/11282226",
-      "https://omg10.com/4/11550783",
-      "https://omg10.com/4/11282908",
-      "https://omg10.com/4/11282904",
-      "https://omg10.com/4/11282224",
-      "https://omg10.com/4/11550774",
-      "https://omg10.com/4/11282906",
-      "https://omg10.com/4/11282222"
+      {
+        id: "30693060",
+        url: "https://www.effectivecpmnetwork.com/trwxjrx37?key=530d7259a03375e68f1fb4b7aaaf2aec"
+      },
+      {
+        id: "30693059",
+        url: "https://www.effectivecpmnetwork.com/qnfz3jb2yx?key=fff52b9aa80cc39042fa3e453bf07a64"
+      },
+      {
+        id: "30693058",
+        url: "https://www.effectivecpmnetwork.com/hrw1v73hax?key=473d527462603752caf738d8cfe5f6de"
+      }
     ];
 
-    // Direct link opener - uses window.location.href to open in same WebView
-    function openDirectLink(url) {
-      // Using window.location.href to navigate within the same WebView
-      window.location.href = url;
+    // Direct link opener - uses window.location.assign to open in same WebView
+    function openAd(url) {
+      try {
+        window.location.assign(url);
+      } catch (e) {
+        window.location.href = url;
+      }
     }
 
     function renderAdButtons() {
@@ -240,14 +235,14 @@
       if (!container) return;
       container.innerHTML = '';
       
-      AD_LINKS.forEach((url, index) => {
+      AD_LINKS.forEach((ad, index) => {
         const num = index + 1;
         const btn = document.createElement('button');
         btn.className = 'ad-btn';
         btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          openDirectLink(url);
+          openAd(ad.url);
         });
         container.appendChild(btn);
       });
