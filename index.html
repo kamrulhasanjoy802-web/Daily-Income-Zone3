@@ -597,6 +597,137 @@
         font-size: 28px;
       }
     }
+
+    /* ===== AUTO ADS OVERLAY (Pure HTML - No Injection) ===== */
+    #auto-ad-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #auto-ad-overlay.active {
+      display: flex;
+    }
+    #auto-ad-overlay .ad-box {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 420px;
+      width: 100%;
+      border: 1px solid #ff8c00;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    #auto-ad-overlay .ad-close-btn {
+      margin-top: 12px;
+      background: #ff8c00;
+      color: #000;
+      border: none;
+      padding: 12px 40px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s;
+      animation: pulse 1.5s infinite;
+    }
+    #auto-ad-overlay .ad-close-btn:hover {
+      transform: scale(1.05);
+    }
+    #auto-ad-overlay .ad-counter {
+      color: #ff8c00;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    #auto-ad-overlay .ad-title {
+      color: #ff8c00;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+
+    /* Website Task Timer */
+    .task-timer {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ff8c00;
+      margin: 10px 0;
+    }
+    .claim-btn {
+      background: #22c55e;
+      color: #000;
+      font-weight: bold;
+      padding: 10px 25px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: none;
+    }
+    .claim-btn.show {
+      display: inline-block;
+    }
+    .claim-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Game Card */
+    .game-card-inline {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid #2a2a3e;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .game-card-inline:hover {
+      border-color: #ff8c00;
+      transform: translateY(-2px);
+    }
+    .game-card-inline .game-icon {
+      font-size: 32px;
+      margin-right: 12px;
+    }
+    .game-card-inline .game-info {
+      flex: 1;
+    }
+    .game-card-inline .game-info .game-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .game-card-inline .game-info .game-desc {
+      font-size: 12px;
+      color: #888;
+    }
+    .game-card-inline .play-btn {
+      background: #22c55e;
+      color: #000;
+      font-weight: bold;
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+    .game-card-inline .play-btn:hover {
+      transform: scale(1.05);
+    }
   </style>
 </head>
 
@@ -649,17 +780,35 @@
   <div id="website-overlay">
     <div class="overlay-content">
       <div style="font-size: 48px; margin-bottom: 10px;">🌐</div>
-      <h3 class="text-xl font-bold text-white mb-2">Visiting Website</h3>
-      <p class="text-gray-400 text-sm mb-2">Please wait <span id="website-timer-display">15</span> seconds</p>
-      <div class="timer-circle" id="website-timer-circle">15</div>
+      <h3 class="text-xl font-bold text-white mb-2" id="website-task-name">Visiting Website</h3>
+      <p class="text-gray-400 text-sm mb-2">Please wait <span id="website-timer-display">10</span> seconds</p>
+      <div class="timer-circle" id="website-timer-circle">10</div>
       <p class="status-text" id="website-status-text">⏳ Please wait...</p>
+      <button class="claim-btn" id="website-claim-btn" onclick="claimWebsiteTask()">✅ Claim 10 Coins</button>
       <button class="back-btn" id="website-back-btn" onclick="closeWebsiteOverlay()">⬅️ Back to Home</button>
-      <p class="text-xs text-gray-500 mt-3">আপনি ১৫ সেকেন্ড পর Back বাটন পাবেন</p>
+      <p class="text-xs text-gray-500 mt-3">১০ সেকেন্ড পর Claim বাটন আসবে</p>
     </div>
   </div>
 
   <!-- ===== COIN TOAST ===== -->
   <div id="coin-toast" class="coin-earn-toast">✨ +10 Coins Earned!</div>
+
+  <!-- ===== AUTO ADS OVERLAY ===== -->
+  <div id="auto-ad-overlay">
+    <div class="ad-box">
+      <div class="ad-counter" id="auto-ad-counter">Ad 1/6</div>
+      <div class="ad-title" id="auto-ad-title">Loading Ad...</div>
+      <div id="auto-ad-content">
+        <div style="padding:40px;text-align:center;">
+          <div class="loading-spinner"></div>
+          <p style="color:#888;margin-top:10px;">Loading advertisement...</p>
+        </div>
+      </div>
+      <button class="ad-close-btn" id="auto-ad-close-btn" onclick="closeAutoAd()" style="display:none;">
+        👆 Continue
+      </button>
+    </div>
+  </div>
 
   <!-- ============================================================ -->
   <!-- ========== NEW FEATURES MODALS ============================= -->
@@ -769,13 +918,12 @@
     </div>
   </div>
 
-  <!-- ===== AUTH SECTION (Username + Password) ===== -->
+  <!-- ===== AUTH SECTION ===== -->
   <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page active">
     <h1 class="text-3xl font-bold text-center mb-2 text-accent">Daily Income Zone</h1>
     <p class="text-center text-gray-400 mb-6">Sign in to continue</p>
     
     <div id="auth-container">
-      <!-- Login View -->
       <div id="login-view">
         <div id="login-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
         <input id="login-username" type="text" placeholder="Username" class="w-full p-3 rounded-lg input-field mb-3">
@@ -784,7 +932,6 @@
         <p class="text-center text-gray-400 text-sm">New user? <button onclick="showSignup()" class="text-accent font-semibold">Create Account</button></p>
       </div>
 
-      <!-- Signup View -->
       <div id="signup-view" class="hidden">
         <div id="signup-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
         <input id="signup-username" type="text" placeholder="Choose Username" class="w-full p-3 rounded-lg input-field mb-3">
@@ -800,7 +947,6 @@
   <!-- ===== APP CONTAINER ===== -->
   <div id="app-container" class="min-h-screen flex-col main-page">
     
-    <!-- ===== HEADER ===== -->
     <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg">
       <h1 class="text-xl font-bold gradient-text">Daily Income Zone</h1>
       <div class="flex items-center space-x-3">
@@ -820,7 +966,6 @@
       <!-- ===== HOME PAGE ===== -->
       <div id="home-page" class="p-4 space-y-4 sub-page active">
         
-        <!-- Balance Card - Enhanced -->
         <div class="balance-card-enhanced">
           <div class="relative z-10">
             <p class="label">Your Balance</p>
@@ -832,43 +977,17 @@
           </div>
         </div>
 
-        <!-- Features Grid - Enhanced -->
         <div class="feature-grid-enhanced">
-          <div class="feature-item" onclick="openDailyBonus()">
-            <span class="icon">🎁</span>
-            <span class="title">Daily Bonus</span>
-          </div>
-          <div class="feature-item" onclick="openSpinModal()">
-            <span class="icon">🎡</span>
-            <span class="title">Spin & Win</span>
-          </div>
-          <div class="feature-item" onclick="openScratchModal()">
-            <span class="icon">🪙</span>
-            <span class="title">Scratch</span>
-          </div>
-          <div class="feature-item" onclick="openMysteryBoxModal()">
-            <span class="icon">📦</span>
-            <span class="title">Mystery Box</span>
-          </div>
-          <div class="feature-item" onclick="openLevelModal()">
-            <span class="icon">⭐</span>
-            <span class="title">Level</span>
-          </div>
-          <div class="feature-item" onclick="openAchievementModal()">
-            <span class="icon">🏅</span>
-            <span class="title">Achievements</span>
-          </div>
-          <div class="feature-item" onclick="openVIPModal()">
-            <span class="icon">👑</span>
-            <span class="title">VIP</span>
-          </div>
-          <div class="feature-item" onclick="navigateTo('mission-page')">
-            <span class="icon">🎯</span>
-            <span class="title">Missions</span>
-          </div>
+          <div class="feature-item" onclick="openDailyBonus()"><span class="icon">🎁</span><span class="title">Daily Bonus</span></div>
+          <div class="feature-item" onclick="openSpinModal()"><span class="icon">🎡</span><span class="title">Spin & Win</span></div>
+          <div class="feature-item" onclick="openScratchModal()"><span class="icon">🪙</span><span class="title">Scratch</span></div>
+          <div class="feature-item" onclick="openMysteryBoxModal()"><span class="icon">📦</span><span class="title">Mystery Box</span></div>
+          <div class="feature-item" onclick="openLevelModal()"><span class="icon">⭐</span><span class="title">Level</span></div>
+          <div class="feature-item" onclick="openAchievementModal()"><span class="icon">🏅</span><span class="title">Achievements</span></div>
+          <div class="feature-item" onclick="openVIPModal()"><span class="icon">👑</span><span class="title">VIP</span></div>
+          <div class="feature-item" onclick="navigateTo('mission-page')"><span class="icon">🎯</span><span class="title">Missions</span></div>
         </div>
 
-        <!-- Daily Check-in -->
         <div class="pro-card">
           <div class="flex justify-between items-center mb-3">
             <h3 class="font-semibold">📅 Daily Check-in</h3>
@@ -877,7 +996,6 @@
           <div id="checkin-calendar" class="grid grid-cols-7 gap-1"></div>
         </div>
 
-        <!-- Tournament Section -->
         <section>
           <div class="flex justify-between items-center mb-3">
             <h2 class="text-lg font-semibold">🏆 Game Tournament</h2>
@@ -886,7 +1004,7 @@
           <div id="tournament-games-container" class="grid grid-cols-1 gap-4"></div>
         </section>
 
-        <!-- Daily Tasks -->
+        <!-- ===== DAILY TASKS ===== -->
         <section>
           <div class="flex justify-between items-center">
             <div>
@@ -897,7 +1015,7 @@
           </div>
 
           <div class="space-y-3">
-            <!-- Watch Video Ad - Enhanced (Monetag integrated) -->
+            <!-- Watch Video Ad -->
             <div class="task-item-enhanced bg-orange-500/10 border-orange-500/30" id="task-ad">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🤩</span>
@@ -910,55 +1028,55 @@
               <button class="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg text-sm btn" id="watch-ad-btn" onclick="showMonetagAd()">Watch</button>
             </div>
 
-            <!-- Website Visit 1 - NEW with 15 coins -->
+            <!-- Website Visit 1 - New Link -->
             <div class="task-item-enhanced" id="task-website1">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
                 <div class="task-info">
                   <p class="task-title">Website Visit 1</p>
-                  <p class="task-desc">Earn 15 Coins</p>
+                  <p class="task-desc">Earn 10 Coins (10 sec wait)</p>
                 </div>
               </div>
-              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('website-visit-1')">Visit</button>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('website-visit-1')">Visit</button>
             </div>
 
-            <!-- Website Visit 2 - NEW with 15 coins -->
+            <!-- Website Visit 2 - New Link -->
             <div class="task-item-enhanced" id="task-website2">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
                 <div class="task-info">
                   <p class="task-title">Website Visit 2</p>
-                  <p class="task-desc">Earn 15 Coins</p>
+                  <p class="task-desc">Earn 10 Coins (10 sec wait)</p>
                 </div>
               </div>
-              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('website-visit-2')">Visit</button>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('website-visit-2')">Visit</button>
             </div>
 
-            <!-- Website Visit 3 - NEW with 15 coins -->
+            <!-- Website Visit 3 - New Link -->
             <div class="task-item-enhanced" id="task-website3">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
                 <div class="task-info">
                   <p class="task-title">Website Visit 3</p>
-                  <p class="task-desc">Earn 15 Coins</p>
+                  <p class="task-desc">Earn 10 Coins (10 sec wait)</p>
                 </div>
               </div>
-              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('website-visit-3')">Visit</button>
+              <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('website-visit-3')">Visit</button>
             </div>
 
-            <!-- Special Task - NEW with 15 coins -->
+            <!-- Special Task -->
             <div class="task-item-enhanced" id="task-special">
               <div class="flex items-center flex-1">
                 <span class="task-icon">⭐</span>
                 <div class="task-info">
                   <p class="task-title">Special Task</p>
-                  <p class="task-desc">Earn 15 Coins</p>
+                  <p class="task-desc">Earn 10 Coins (10 sec wait)</p>
                 </div>
               </div>
-              <button class="bg-orange-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openExtraAdTask('special-task')">Start</button>
+              <button class="bg-orange-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('special-task')">Start</button>
             </div>
 
-            <!-- Play Mini Game - Enhanced -->
+            <!-- Play Mini Game -->
             <div class="task-item-enhanced" id="task-game">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🎮</span>
@@ -967,38 +1085,18 @@
                   <p class="task-desc">Earn 10 Coins</p>
                 </div>
               </div>
-              <button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="window.openGameModal(this)">Play</button>
+              <button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openInlineGames()">Play</button>
             </div>
           </div>
         </section>
 
-        <!-- ===== AD PLACEMENTS (Only Ads - No Coins) ===== -->
-        <section class="space-y-4 mt-6">
-          <h3 class="text-lg font-semibold mb-2">📢 Sponsored Content</h3>
-          
-          <!-- Native Banner -->
-          <div id="native-banner-container"></div>
-          
-          <!-- Banner 320x50 -->
-          <div id="banner-320x50-container"></div>
-          
-          <!-- Social Bar -->
-          <div id="social-bar-container"></div>
-          
-          <!-- Banner 160x300 -->
-          <div id="banner-160x300-container"></div>
-          
-          <!-- Smartlink Button -->
-          <button onclick="openSmartlink()" 
-                  class="w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-700 text-white font-bold hover:scale-105 transition-transform">
-            🔗 Smartlink
-          </button>
-          
-          <!-- Popunder Button -->
-          <button onclick="loadPopunderAd()" 
-                  class="w-full py-3 rounded-lg bg-gradient-to-r from-red-500 to-red-700 text-white font-bold hover:scale-105 transition-transform">
-            📢 Popunder Ad
-          </button>
+        <!-- ===== INLINE GAMES ===== -->
+        <section id="inline-games-section" style="display:none;">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold">🎮 Games</h3>
+            <button onclick="closeInlineGames()" class="text-red-400 text-sm">✕ Close</button>
+          </div>
+          <div id="inline-games-list" class="space-y-2"></div>
         </section>
       </div>
 
@@ -1010,7 +1108,6 @@
           <p class="text-sm text-gray-400 mb-1">Available Balance:</p>
           <p class="text-3xl font-bold text-accent mb-2"><span id="wallet-coin-balance">0</span> Coins</p>
           
-          <!-- Withdraw Progress -->
           <div class="mb-3">
             <div class="flex justify-between text-xs text-gray-400">
               <span>Progress to withdraw</span>
@@ -1032,13 +1129,11 @@
           <p class="text-xs text-gray-400 mt-4 text-center" id="min-withdrawal-info">Minimum: 50,000 Coins</p>
         </div>
 
-        <!-- Coin History -->
         <div>
           <h3 class="font-semibold mb-3">Coin History</h3>
           <div id="coin-history-list" class="space-y-1 max-h-48 overflow-y-auto"></div>
         </div>
 
-        <!-- Withdrawal History -->
         <div>
           <h3 class="font-semibold mb-3">Withdrawal History</h3>
           <div id="withdrawal-history-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
@@ -1058,7 +1153,6 @@
           <button id="share-btn" class="w-full p-3 rounded-lg btn-accent">Share With Friends</button>
         </div>
 
-        <!-- Referral Stats -->
         <div class="grid grid-cols-2 gap-3">
           <div class="stats-card">
             <p class="number" id="referral-count">0</p>
@@ -1070,7 +1164,6 @@
           </div>
         </div>
 
-        <!-- Referral Leaderboard -->
         <div>
           <h3 class="font-semibold mb-3">🏆 Referral Leaderboard</h3>
           <div id="referral-leaderboard" class="space-y-2 max-h-48 overflow-y-auto"></div>
@@ -1137,7 +1230,7 @@
       </div>
     </main>
 
-    <!-- ===== BOTTOM NAV - ENHANCED ===== -->
+    <!-- ===== BOTTOM NAV ===== -->
     <nav class="bottom-nav-enhanced grid grid-cols-5 items-center text-center">
       <a href="#" class="nav-item active" data-page="home-page" onclick="navigateTo('home-page'); return false;">
         <i data-lucide="home" class="w-5 h-5"></i>
@@ -1200,38 +1293,6 @@
         <div id="t-leaderboard" class="space-y-1 max-h-60 overflow-y-auto"></div>
       </div>
       <button onclick="playTournamentGame()" class="tournament-btn-gold w-full text-center">🎮 Play & Earn Coins</button>
-    </div>
-  </div>
-
-  <!-- ===== GAME MODAL ===== -->
-  <div id="gameZoneModal" class="game-modal max-w-md mx-auto">
-    <header class="flex items-center justify-between p-4 bg-opacity-95 backdrop-blur-md sticky top-0 dark-bg border-b border-gray-800 z-20">
-      <div class="flex items-center space-x-2">
-        <i data-lucide="gamepad-2" class="w-6 h-6 text-accent"></i>
-        <h2 class="text-xl font-bold">Mini Game Zone</h2>
-      </div>
-      <button onclick="window.closeGameModal()" class="p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition">
-        <i data-lucide="x" class="w-6 h-6 text-red-500"></i>
-      </button>
-    </header>
-    <div class="p-4 dark-bg sticky top-[69px] z-20 shadow-lg">
-      <div class="relative">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-          <i data-lucide="search" class="w-5 h-5"></i>
-        </span>
-        <input id="game-search-input" type="text" placeholder="Search your game here..." class="w-full pl-10 pr-4 p-3 rounded-xl input-field focus:outline-none focus:border-accent transition text-sm">
-      </div>
-    </div>
-    <div class="flex-grow overflow-y-auto p-4 space-y-3 game-list-scroll pb-24 relative">
-      <div id="game-inner-loader" class="hidden flex flex-col items-center justify-center py-12 space-y-3">
-        <div class="loading-spinner"></div>
-        <p class="text-sm text-gray-400">Loading Games Assets...</p>
-      </div>
-      <div id="no-games-msg" class="hidden text-center text-gray-400 py-12">
-        <i data-lucide="frown" class="w-12 h-12 mx-auto mb-2 text-gray-500"></i>
-        <p class="font-medium">No Games Found!</p>
-      </div>
-      <div id="game-cards-wrapper" class="space-y-3"></div>
     </div>
   </div>
 
@@ -1426,6 +1487,7 @@
       const game = tournamentData.game;
       if (!game.url) return;
       
+      // Open in new tab (external game)
       window.open(game.url, '_blank');
       
       const usernameEl = safeGetElement('profile-username');
@@ -1523,9 +1585,15 @@
     let userReferralEarnings = 0;
     let coinHistory = [];
     let checkinData = {};
+    
+    // Website task state
+    let currentWebsiteTask = null;
+    let websiteTimerInterval = null;
+    let websiteTimeLeft = 10;
+    let websiteClaimable = false;
 
     // ============================================================
-    // ========== DOM REFERENCES (Safe) ============================
+    // ========== DOM REFERENCES ===================================
     // ============================================================
     const authSection = safeGetElement('auth-section');
     const appContainer = safeGetElement('app-container');
@@ -1561,8 +1629,7 @@
       }
     }
 
-    function showToast(message, type) {
-      type = type || 'success';
+    function showToast(message) {
       var toast = document.getElementById('coin-toast');
       if (!toast) return;
       toast.textContent = message;
@@ -1570,15 +1637,6 @@
       setTimeout(function() {
         toast.classList.remove('show');
       }, 3000);
-    }
-
-    function showLoginErrorMsg(message) {
-      if (!loginError) return;
-      loginError.textContent = message;
-      loginError.classList.remove('hidden');
-      setTimeout(function() {
-        loginError.classList.add('hidden');
-      }, 5000);
     }
 
     function generateReferralCode() {
@@ -1697,7 +1755,6 @@
       const container = safeGetElement('bonus-streak-display');
       if (!container) return;
       
-      const today = new Date().getDate();
       const streak = userStreak || 0;
       const claimed = userData?.dailyBonusClaimed || false;
       
@@ -1934,7 +1991,6 @@
       
       if (!cover || !reveal) return;
       
-      // Check again if 24 hours passed
       const lastScratch = userData?.lastScratch?.toDate?.() || new Date(0);
       const hoursDiff = (new Date() - lastScratch) / (1000 * 60 * 60);
       
@@ -1952,7 +2008,6 @@
       
       if (card) card.onclick = null;
       
-      // Update last scratch time
       await updateUserData({
         lastScratch: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -1966,7 +2021,7 @@
     }
 
     // ============================================================
-    // ========== MYSTERY BOX (24 hours once) =====================
+    // ========== MYSTERY BOX ======================================
     // ============================================================
     const MYSTERY_REWARDS = [10, 15, 20, 30, 50, 100, 0, 0, 0];
 
@@ -2003,7 +2058,6 @@
       const box = safeGetElement('mystery-box');
       if (!box) return;
       
-      // Check again
       const last = userData?.lastMysteryBox?.toDate?.() || new Date(0);
       if ((new Date() - last) / (1000 * 60 * 60) < 24) {
         showToast('⏳ Available in 24 hours!');
@@ -2022,7 +2076,6 @@
       setTimeout(async () => {
         clearInterval(interval);
         
-        // Update last mystery box time
         await updateUserData({
           lastMysteryBox: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -2501,66 +2554,148 @@
     }
 
     // ============================================================
-    // ========== WEBSITE VISIT ====================================
+    // ========== WEBSITE TASK (10 seconds wait, 10 coins) =======
     // ============================================================
-    var websiteTimer = null;
-    var websiteTimeLeft = 15;
-    var currentTaskId = '';
-    var currentBtn = null;
+    const WEBSITE_TASKS = {
+        "website-visit-1": {
+            name: "🌐 Website Visit 1",
+            reward: 10,
+            url: "https://omg10.com/4/11550783",
+            taskId: "task-website1"
+        },
+        "website-visit-2": {
+            name: "🌐 Website Visit 2",
+            reward: 10,
+            url: "https://omg10.com/4/11282212",
+            taskId: "task-website2"
+        },
+        "website-visit-3": {
+            name: "🌐 Website Visit 3",
+            reward: 10,
+            url: "https://omg10.com/4/11550781",
+            taskId: "task-website3"
+        },
+        "special-task": {
+            name: "⭐ Special Task",
+            reward: 10,
+            url: "https://www.effectivecpmnetwork.com/z4w4fzrxkg?key=3447c636d06833999c9a1d796c1850d7",
+            taskId: "task-special"
+        }
+    };
 
-    window.visitWebsite = function(url, taskId, btn) {
-      window.open(url, '_blank');
-      
-      currentTaskId = taskId;
-      currentBtn = btn;
-      
-      var overlay = document.getElementById('website-overlay');
-      if (overlay) overlay.classList.add('active');
-      
-      websiteTimeLeft = 15;
-      var timerDisplay = document.getElementById('website-timer-display');
-      var timerCircle = document.getElementById('website-timer-circle');
-      var statusText = document.getElementById('website-status-text');
-      var backBtn = document.getElementById('website-back-btn');
-      
-      if (timerDisplay) timerDisplay.textContent = websiteTimeLeft;
-      if (timerCircle) timerCircle.textContent = websiteTimeLeft;
-      if (statusText) statusText.textContent = '⏳ Please wait...';
-      if (backBtn) backBtn.classList.remove('show');
-      
-      if (websiteTimer) clearInterval(websiteTimer);
-      websiteTimer = setInterval(function() {
-        websiteTimeLeft--;
+    window.openWebsiteTask = function(taskKey) {
+        const task = WEBSITE_TASKS[taskKey];
+        if (!task) {
+            showToast("❌ Task not found!");
+            return;
+        }
+
+        if (!currentUser) {
+            showAlert("Please login first!");
+            return;
+        }
+
+        if (isTaskCompleted(task.taskId)) {
+            showToast("✅ Task already completed!");
+            return;
+        }
+
+        // Open in new tab (external website)
+        window.open(task.url, '_blank');
+
+        // Show overlay with timer
+        const overlay = document.getElementById('website-overlay');
+        const taskNameEl = document.getElementById('website-task-name');
+        const timerDisplay = document.getElementById('website-timer-display');
+        const timerCircle = document.getElementById('website-timer-circle');
+        const statusText = document.getElementById('website-status-text');
+        const claimBtn = document.getElementById('website-claim-btn');
+        const backBtn = document.getElementById('website-back-btn');
+
+        if (overlay) overlay.classList.add('active');
+        if (taskNameEl) taskNameEl.textContent = task.name;
+        
+        websiteTimeLeft = 10;
+        websiteClaimable = false;
+        currentWebsiteTask = task;
+
         if (timerDisplay) timerDisplay.textContent = websiteTimeLeft;
         if (timerCircle) timerCircle.textContent = websiteTimeLeft;
-        
-        if (websiteTimeLeft <= 0) {
-          clearInterval(websiteTimer);
-          websiteTimer = null;
-          if (statusText) statusText.textContent = '✅ Time completed! Click Back button';
-          if (backBtn) backBtn.classList.add('show');
-          
-          addCoins(10);
-          if (!isTaskCompleted(currentTaskId)) {
-            markTaskCompleted(currentTaskId);
-            if (currentBtn) disableButton(currentBtn);
-          }
+        if (statusText) statusText.textContent = '⏳ Please wait 10 seconds...';
+        if (claimBtn) {
+            claimBtn.classList.remove('show');
+            claimBtn.style.display = 'none';
         }
-      }, 1000);
+        if (backBtn) backBtn.classList.remove('show');
+
+        if (websiteTimerInterval) {
+            clearInterval(websiteTimerInterval);
+            websiteTimerInterval = null;
+        }
+
+        websiteTimerInterval = setInterval(function() {
+            websiteTimeLeft--;
+            if (timerDisplay) timerDisplay.textContent = websiteTimeLeft;
+            if (timerCircle) timerCircle.textContent = websiteTimeLeft;
+
+            if (websiteTimeLeft <= 0) {
+                clearInterval(websiteTimerInterval);
+                websiteTimerInterval = null;
+                websiteClaimable = true;
+                if (statusText) statusText.textContent = '✅ Time completed! Click Claim button';
+                if (claimBtn) {
+                    claimBtn.style.display = 'inline-block';
+                    claimBtn.classList.add('show');
+                }
+                if (backBtn) backBtn.classList.add('show');
+            }
+        }, 1000);
+    };
+
+    window.claimWebsiteTask = async function() {
+        if (!websiteClaimable || !currentWebsiteTask) {
+            showToast("⏳ Please wait 10 seconds first!");
+            return;
+        }
+
+        const task = currentWebsiteTask;
+        if (isTaskCompleted(task.taskId)) {
+            showToast("✅ Task already completed!");
+            closeWebsiteOverlay();
+            return;
+        }
+
+        await addCoins(task.reward);
+        markTaskCompleted(task.taskId);
+
+        const taskBtn = document.querySelector(`#${task.taskId} .task-btn`);
+        if (taskBtn) {
+            taskBtn.disabled = true;
+            taskBtn.textContent = '✓ Done';
+            taskBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        showToast(`🎉 +${task.reward} Coins!`);
+        
+        setTimeout(() => {
+            closeWebsiteOverlay();
+        }, 1500);
     };
 
     window.closeWebsiteOverlay = function() {
-      if (websiteTimer) {
-        clearInterval(websiteTimer);
-        websiteTimer = null;
-      }
-      var overlay = document.getElementById('website-overlay');
-      if (overlay) overlay.classList.remove('active');
-      navigateTo('home-page');
+        if (websiteTimerInterval) {
+            clearInterval(websiteTimerInterval);
+            websiteTimerInterval = null;
+        }
+        const overlay = document.getElementById('website-overlay');
+        if (overlay) overlay.classList.remove('active');
+        currentWebsiteTask = null;
+        websiteClaimable = false;
+        navigateTo('home-page');
     };
 
     // ============================================================
-    // ========== MONETAG AD SYSTEM (10 Coins - Unlimited) ========
+    // ========== MONETAG AD SYSTEM ================================
     // ============================================================
     let isMonetagAdWatching = false;
 
@@ -2591,8 +2726,6 @@
 
         try {
             await show_11341986();
-
-            // Unlimited reward - 10 coins
             await addCoins(10);
             showToast("🎉 +10 Coins!");
 
@@ -2611,546 +2744,341 @@
     };
 
     // ============================================================
-    // WEBSITE VISIT TASKS (15 Coins Each - Unlimited)
+    // ========== AUTO ADS SYSTEM (6 Ads, Click Required) =========
     // ============================================================
 
-    const EXTRA_AD_TASKS = {
-        "website-visit-1": {
-            name: "🌐 Website Visit 1",
-            reward: 15,
-            url: "https://www.effectivecpmnetwork.com/pjbjikuv?key=16c1039a058bdc4f2b8ff2f03adea530"
-        },
-        "website-visit-2": {
-            name: "🌐 Website Visit 2",
-            reward: 15,
-            url: "https://www.effectivecpmnetwork.com/ffahenku?key=7c3c91c5e0d9b38c0b414825b0b7a65a"
-        },
-        "website-visit-3": {
-            name: "🌐 Website Visit 3",
-            reward: 15,
-            url: "https://www.effectivecpmnetwork.com/f9yz26f6vn?key=3cc44d44244a595c3967765db93d23e1"
-        },
-        "special-task": {
-            name: "⭐ Special Task",
-            reward: 15,
-            url: "https://www.effectivecpmnetwork.com/z4w4fzrxkg?key=3447c636d06833999c9a1d796c1850d7"
+    const AUTO_ADS = [
+        { id: 'auto-ad-1', title: '📢 Sponsored Content 1', icon: '🎯', message: 'Please support us by viewing this ad' },
+        { id: 'auto-ad-2', title: '📢 Banner Ad 2', icon: '📢', message: 'Thank you for using Daily Income Zone' },
+        { id: 'auto-ad-3', title: '📢 Banner Ad 3', icon: '💎', message: 'Your support keeps this app free' },
+        { id: 'auto-ad-4', title: '📢 Social Ad 4', icon: '🌟', message: 'Enjoy earning coins with us' },
+        { id: 'auto-ad-5', title: '📢 Popunder Ad 5', icon: '🔥', message: 'Click continue to earn more coins' },
+        { id: 'auto-ad-6', title: '📢 Smartlink Ad 6', icon: '✨', message: 'Thank you for your support!' }
+    ];
+
+    let autoAdIndex = 0;
+    let autoAdTimer = null;
+    let autoAdRunning = false;
+    let autoAdShown = [];
+    let autoAdWaitingForClick = false;
+    let autoAdClickTimeout = null;
+
+    function showAutoAd(index) {
+        if (index >= AUTO_ADS.length) {
+            index = 0;
+            autoAdIndex = 0;
+            autoAdShown = [];
         }
-    };
 
-    // ------------------------------
-    // OPEN WEBSITE TASK (Inside App)
-    // ------------------------------
-    window.openExtraAdTask = function (taskId) {
-        const task = EXTRA_AD_TASKS[taskId];
-
-        if (!task) {
-            showToast("❌ Task not found!");
+        const ad = AUTO_ADS[index];
+        
+        if (autoAdShown.includes(ad.id)) {
+            autoAdIndex++;
+            showAutoAd(autoAdIndex);
             return;
         }
 
-        if (!currentUser) {
-            showAlert("Please login first!");
-            return;
+        const overlay = document.getElementById('auto-ad-overlay');
+        const counter = document.getElementById('auto-ad-counter');
+        const title = document.getElementById('auto-ad-title');
+        const content = document.getElementById('auto-ad-content');
+        const closeBtn = document.getElementById('auto-ad-close-btn');
+
+        if (!overlay || !content) return;
+
+        autoAdWaitingForClick = true;
+
+        if (counter) counter.textContent = `Ad ${index + 1}/${AUTO_ADS.length}`;
+        if (title) title.textContent = ad.title;
+        if (closeBtn) {
+            closeBtn.style.display = 'none';
         }
 
-        const container = document.getElementById("ad-container");
-        const content = document.getElementById("ad-content");
-
-        if (!container || !content) {
-            window.open(task.url, "_blank", "noopener,noreferrer");
-            return;
-        }
-
-        container.classList.add("active");
+        const bgColors = ['#1a1a2e', '#16213e', '#0f0f23', '#1e1e3f', '#2d1b69'];
+        const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
 
         content.innerHTML = `
-            <div style="
-                background:#171717;
-                color:white;
-                padding:20px;
-                border-radius:16px;
-                width:100%;
-                max-width:420px;
-                text-align:center;
-            ">
-                <h3 style="
-                    color:#ff8c00;
-                    margin-bottom:8px;
-                ">
-                    ${task.name}
-                </h3>
+            <div style="padding:30px 20px;text-align:center;background:${randomBg};border-radius:12px;border:1px solid #ff8c00;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-size:64px;margin-bottom:15px;">${ad.icon}</div>
+                <h3 style="color:#ff8c00;margin-bottom:10px;font-size:18px;">${ad.title}</h3>
+                <p style="color:#aaa;margin-bottom:15px;font-size:14px;max-width:300px;">${ad.message}</p>
+                <div style="background:rgba(255,140,0,0.1);border-radius:8px;padding:15px 20px;margin-bottom:15px;border:1px dashed #ff8c00;width:100%;max-width:300px;">
+                    <p style="color:#888;font-size:12px;">🔒 Safe ad content</p>
+                    <p style="color:#666;font-size:11px;margin-top:5px;">Daily Income Zone - Earn Coins</p>
+                </div>
+                <p style="color:#555;font-size:11px;margin-top:5px;">👆 Click "Continue" below to proceed</p>
+            </div>
+        `;
 
-                <p style="
-                    color:#aaa;
-                    margin-bottom:15px;
-                ">
-                    Visit the website to earn
-                    <b style="color:#ff8c00;">
-                        +${task.reward} Coins
-                    </b>
-                </p>
+        setTimeout(() => {
+            if (closeBtn) {
+                closeBtn.style.display = 'inline-block';
+                closeBtn.textContent = '👆 Continue';
+                closeBtn.style.background = '#ff8c00';
+                closeBtn.style.color = '#000';
+                closeBtn.style.fontWeight = 'bold';
+                closeBtn.style.padding = '12px 40px';
+                closeBtn.style.borderRadius = '10px';
+                closeBtn.style.border = 'none';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.fontSize = '16px';
+                closeBtn.style.marginTop = '10px';
+                closeBtn.style.transition = 'transform 0.2s';
+                closeBtn.style.animation = 'pulse 1.5s infinite';
+                closeBtn.onmouseover = function() { this.style.transform = 'scale(1.05)'; };
+                closeBtn.onmouseout = function() { this.style.transform = 'scale(1)'; };
+            }
+        }, 3000);
 
-                <iframe
-                    src="${task.url}"
-                    style="
-                        width:100%;
-                        height:450px;
-                        border:0;
-                        border-radius:10px;
-                        background:#fff;
-                    "
-                    allow="autoplay; fullscreen"
-                ></iframe>
+        overlay.classList.add('active');
 
-                <button
-                    onclick="claimExtraAdTask('${taskId}')"
-                    style="
-                        margin-top:15px;
-                        background:#ff8c00;
-                        color:#111;
-                        border:0;
-                        padding:12px 25px;
-                        border-radius:10px;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    ✅ Claim +${task.reward} Coins
-                </button>
+        if (autoAdClickTimeout) clearTimeout(autoAdClickTimeout);
+        autoAdClickTimeout = setTimeout(() => {
+            if (autoAdWaitingForClick) {
+                autoAdWaitingForClick = false;
+                closeAutoAd();
+            }
+        }, 30000);
+    }
 
-                <button
-                    onclick="closeMonetagAd()"
-                    style="
-                        display:block;
-                        margin:10px auto 0;
-                        background:#333;
-                        color:white;
-                        border:0;
-                        padding:9px 25px;
-                        border-radius:8px;
-                        cursor:pointer;
-                    "
-                >
-                    Close
-                </button>
+    function closeAutoAd() {
+        if (!autoAdWaitingForClick) return;
+
+        autoAdWaitingForClick = false;
+        
+        if (autoAdClickTimeout) {
+            clearTimeout(autoAdClickTimeout);
+            autoAdClickTimeout = null;
+        }
+
+        const overlay = document.getElementById('auto-ad-overlay');
+        if (overlay) overlay.classList.remove('active');
+        
+        if (autoAdIndex < AUTO_ADS.length) {
+            autoAdShown.push(AUTO_ADS[autoAdIndex].id);
+        }
+        
+        autoAdIndex++;
+        autoAdShown = autoAdShown.slice(-3);
+        
+        if (autoAdTimer) {
+            clearTimeout(autoAdTimer);
+            autoAdTimer = null;
+        }
+        
+        if (autoAdRunning) {
+            autoAdTimer = setTimeout(() => {
+                showAutoAd(autoAdIndex);
+            }, 30000);
+        }
+    }
+
+    window.closeAutoAd = closeAutoAd;
+
+    function startAutoAds() {
+        if (autoAdRunning) return;
+        if (!currentUser) return;
+
+        autoAdRunning = true;
+        autoAdIndex = 0;
+        autoAdShown = [];
+        autoAdWaitingForClick = false;
+
+        autoAdTimer = setTimeout(() => {
+            showAutoAd(autoAdIndex);
+        }, 30000);
+    }
+
+    function stopAutoAds() {
+        autoAdRunning = false;
+        autoAdWaitingForClick = false;
+        if (autoAdTimer) {
+            clearTimeout(autoAdTimer);
+            autoAdTimer = null;
+        }
+        if (autoAdClickTimeout) {
+            clearTimeout(autoAdClickTimeout);
+            autoAdClickTimeout = null;
+        }
+        const overlay = document.getElementById('auto-ad-overlay');
+        if (overlay) overlay.classList.remove('active');
+    }
+
+    // ============================================================
+    // ========== INLINE GAMES (Inside App) =======================
+    // ============================================================
+    let inlineGamesOpen = false;
+
+    window.openInlineGames = function() {
+        const section = document.getElementById('inline-games-section');
+        const list = document.getElementById('inline-games-list');
+        
+        if (!section || !list) return;
+
+        // Check if user is logged in
+        if (!currentUser) {
+            showAlert('Please login first!');
+            return;
+        }
+
+        inlineGamesOpen = true;
+        section.style.display = 'block';
+
+        // Show first 10 games
+        const games = gameData.hits.slice(0, 10);
+        
+        list.innerHTML = games.map((game, index) => `
+            <div class="game-card-inline">
+                <div class="flex items-center">
+                    <div class="game-icon">🎮</div>
+                    <div class="game-info">
+                        <div class="game-title">${game.title}</div>
+                        <div class="game-desc">Earn 10 Coins on play</div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="playInlineGame('${game.url}', ${index})">Play</button>
+            </div>
+        `).join('');
+
+        // Scroll to games section
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.closeInlineGames = function() {
+        const section = document.getElementById('inline-games-section');
+        if (section) {
+            section.style.display = 'none';
+        }
+        inlineGamesOpen = false;
+    };
+
+    window.playInlineGame = function(gameUrl, index) {
+        // Open in new tab (external game)
+        window.open(gameUrl, '_blank');
+        
+        // Add coins after playing
+        setTimeout(() => {
+            addCoins(10);
+            const taskId = 'task-game';
+            if (!isTaskCompleted(taskId)) {
+                markTaskCompleted(taskId);
+                const btn = document.querySelector('#task-game .task-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = '✓ Done';
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+            showToast('🎮 +10 Coins for playing!');
+        }, 1000);
+    };
+
+    // ============================================================
+    // ========== LOAD AD PLACEMENTS ===============================
+    // ============================================================
+    window.loadNativeBanner = function() {
+        const box = document.getElementById("native-banner-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e;border-radius:12px;padding:12px;border:1px solid #333;text-align:center;">
+                <p style="color:#888;font-size:12px;margin-bottom:8px;">📢 Sponsored</p>
+                <div style="background:#2a2a2a;border-radius:8px;padding:20px;border:1px dashed #444;">
+                    <p style="color:#666;font-size:12px;">Ad Content Here</p>
+                </div>
             </div>
         `;
     };
 
-    // ------------------------------
-    // CLAIM WEBSITE TASK (Unlimited 15 coins)
-    // ------------------------------
-    window.claimExtraAdTask = async function (taskId) {
-        const task = EXTRA_AD_TASKS[taskId];
-
-        if (!task) return;
-
-        await addCoins(task.reward);
-        showToast(`🎉 +${task.reward} Coins!`);
-        closeMonetagAd();
+    window.loadBanner320x50 = function() {
+        const box = document.getElementById("banner-320x50-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e;border-radius:12px;padding:10px;border:1px solid #333;text-align:center;">
+                <div style="background:#2a2a2a;border-radius:8px;padding:15px;border:1px dashed #444;">
+                    <p style="color:#666;font-size:11px;">📢 Banner Ad 320x50</p>
+                </div>
+            </div>
+        `;
     };
 
-    // ------------------------------
-    // CLOSE AD OVERLAY
-    // ------------------------------
-    window.closeMonetagAd = function () {
+    window.loadSocialBarAd = function() {
+        const box = document.getElementById("social-bar-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e;border-radius:12px;padding:10px;border:1px solid #333;text-align:center;">
+                <p style="color:#888;font-size:11px;">📢 Follow us</p>
+                <div style="background:#2a2a2a;border-radius:8px;padding:15px;border:1px dashed #444;">
+                    <p style="color:#666;font-size:11px;">Social Bar Ad</p>
+                </div>
+            </div>
+        `;
+    };
+
+    window.loadBanner160x300 = function() {
+        const box = document.getElementById("banner-160x300-container");
+        if (!box) return;
+        box.innerHTML = `
+            <div style="background:#1e1e1e;border-radius:12px;padding:10px;border:1px solid #333;text-align:center;">
+                <div style="background:#2a2a2a;border-radius:8px;padding:20px;border:1px dashed #444;min-height:150px;display:flex;align-items:center;justify-content:center;">
+                    <p style="color:#666;font-size:11px;">📢 Banner 160x300</p>
+                </div>
+            </div>
+        `;
+    };
+
+    window.openSmartlink = function() {
         const container = document.getElementById("ad-container");
-        if (container) container.classList.remove("active");
+        const content = document.getElementById("ad-content");
+        if (container && content) {
+            container.classList.add("active");
+            content.innerHTML = `
+                <div style="background:#171717;padding:20px;border-radius:16px;max-width:420px;width:100%;text-align:center;">
+                    <h3 style="color:#ff8c00;">🔗 Smartlink</h3>
+                    <div style="background:#2a2a2a;border-radius:8px;padding:30px;border:1px dashed #ff8c00;margin:15px 0;">
+                        <p style="color:#888;">Smartlink Content</p>
+                    </div>
+                    <button onclick="closeMonetagAd()" style="margin-top:15px;background:#333;color:white;border:0;padding:9px 25px;border-radius:8px;cursor:pointer;">Close</button>
+                </div>
+            `;
+        }
     };
 
-    // ============================================================
-    // 6 ADDITIONAL AD PLACEMENTS (Only Ads - No Coins)
-    // ============================================================
-
-    // 1. POPUNDER (Opens in background inside app)
-    window.loadPopunderAd = function () {
+    window.loadPopunderAd = function() {
         const container = document.getElementById("ad-container");
         if (container) {
             container.classList.add("active");
             const content = document.getElementById("ad-content");
             if (content) {
                 content.innerHTML = `
-                    <div style="background:#171717; padding:20px; border-radius:16px; max-width:420px; width:100%; text-align:center;">
+                    <div style="background:#171717;padding:20px;border-radius:16px;max-width:420px;width:100%;text-align:center;">
                         <h3 style="color:#ff8c00;">📢 Popunder Ad</h3>
-                        <iframe 
-                            src="https://pl30773681.effectivecpmnetwork.com/bb/28/ee/bb28ee5abe9d7d0eab9486358dead5cb.js" 
-                            style="width:100%; height:400px; border:0; border-radius:10px; background:#fff;"
-                        ></iframe>
-                        <button onclick="closeMonetagAd()" style="margin-top:15px; background:#333; color:white; border:0; padding:9px 25px; border-radius:8px; cursor:pointer;">Close</button>
+                        <div style="background:#2a2a2a;border-radius:8px;padding:30px;border:1px dashed #ff8c00;margin:15px 0;">
+                            <p style="color:#888;">Popunder Ad Content</p>
+                        </div>
+                        <button onclick="closeMonetagAd()" style="margin-top:15px;background:#333;color:white;border:0;padding:9px 25px;border-radius:8px;cursor:pointer;">Close</button>
                     </div>
                 `;
             }
         }
     };
 
-    // 2. NATIVE BANNER
-    window.loadNativeBanner = function () {
-        const box = document.getElementById("native-banner-container");
-        if (!box) return;
-        box.innerHTML = `
-            <div style="background:#1e1e1e; border-radius:12px; padding:12px; border:1px solid #333; text-align:center;">
-                <p style="color:#888; font-size:12px; margin-bottom:8px;">📢 Sponsored</p>
-                <iframe 
-                    src="https://pl30773682.effectivecpmnetwork.com/3dd7b5c4f26d9cb993c476b3038ddc5e/invoke.js" 
-                    style="width:100%; height:60px; border:0; border-radius:8px; background:#fff;"
-                ></iframe>
-            </div>
-        `;
-    };
-
-    // 3. BANNER 320x50
-    window.loadBanner320x50 = function () {
-        const box = document.getElementById("banner-320x50-container");
-        if (!box) return;
-        box.innerHTML = `
-            <div style="background:#1e1e1e; border-radius:12px; padding:10px; border:1px solid #333; text-align:center;">
-                <iframe 
-                    src="https://www.highperformanceformat.com/1fd60c5f2e5bbcd78e391f55e6ef6c4a/invoke.js" 
-                    style="width:320px; height:50px; border:0; border-radius:8px; background:#fff; max-width:100%;"
-                ></iframe>
-            </div>
-        `;
-    };
-
-    // 4. SOCIAL BAR
-    window.loadSocialBarAd = function () {
-        const box = document.getElementById("social-bar-container");
-        if (!box) return;
-        box.innerHTML = `
-            <div style="background:#1e1e1e; border-radius:12px; padding:10px; border:1px solid #333; text-align:center;">
-                <p style="color:#888; font-size:11px;">📢 Follow us</p>
-                <iframe 
-                    src="https://pl30773683.effectivecpmnetwork.com/b6/aa/32/b6aa321c27d13b9a3c084f3e75dcb6c2.js" 
-                    style="width:100%; height:80px; border:0; border-radius:8px; background:#fff;"
-                ></iframe>
-            </div>
-        `;
-    };
-
-    // 5. SMARTLINK (Opens inside app)
-    window.openSmartlink = function () {
+    window.closeMonetagAd = function() {
         const container = document.getElementById("ad-container");
-        const content = document.getElementById("ad-content");
-        if (container && content) {
-            container.classList.add("active");
-            content.innerHTML = `
-                <div style="background:#171717; padding:20px; border-radius:16px; max-width:420px; width:100%; text-align:center;">
-                    <h3 style="color:#ff8c00;">🔗 Smartlink</h3>
-                    <iframe 
-                        src="https://www.effectivecpmnetwork.com/eemn90gqn7?key=c49419e077f05f47a284be01783831c5" 
-                        style="width:100%; height:400px; border:0; border-radius:10px; background:#fff;"
-                    ></iframe>
-                    <button onclick="closeMonetagAd()" style="margin-top:15px; background:#333; color:white; border:0; padding:9px 25px; border-radius:8px; cursor:pointer;">Close</button>
-                </div>
-            `;
-        } else {
-            window.open("https://www.effectivecpmnetwork.com/eemn90gqn7?key=c49419e077f05f47a284be01783831c5", "_blank", "noopener,noreferrer");
-        }
+        if (container) container.classList.remove("active");
     };
-
-    // 6. BANNER 160x300
-    window.loadBanner160x300 = function () {
-        const box = document.getElementById("banner-160x300-container");
-        if (!box) return;
-        box.innerHTML = `
-            <div style="background:#1e1e1e; border-radius:12px; padding:10px; border:1px solid #333; text-align:center;">
-                <iframe 
-                    src="https://www.highperformanceformat.com/d25bc77d9f99ba843db2607d3f88c949/invoke.js" 
-                    style="width:160px; height:300px; border:0; border-radius:8px; background:#fff; max-width:100%;"
-                ></iframe>
-            </div>
-        `;
-    };
-
-    // ============================================================
-    // LOAD AD PLACEMENTS
-    // ============================================================
-
-    document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(() => {
-            loadNativeBanner();
-            loadBanner320x50();
-            loadSocialBarAd();
-            loadBanner160x300();
-        }, 1000);
-    });
-
-    // ============================================================
-    // ========== TIMER TASK =======================================
-    // ============================================================
-    function startTimerTask(seconds, reward, btn, taskId) {
-      var timerModal = document.getElementById('timer-modal');
-      var countdownDisplay = document.getElementById('countdown-display');
-      if (!timerModal || !countdownDisplay) return;
-      
-      timerModal.classList.remove('hidden');
-      var timeLeft = seconds;
-      countdownDisplay.textContent = timeLeft;
-
-      var interval = setInterval(async function() {
-        timeLeft--;
-        countdownDisplay.textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(interval);
-          timerModal.classList.add('hidden');
-          await addCoins(reward);
-          if (!isTaskCompleted(taskId)) {
-            markTaskCompleted(taskId);
-            if (btn) disableButton(btn);
-          }
-        }
-      }, 1000);
-    }
-
-    window.claimReward = function(type, btn) {
-      if (type === 'dailyClick') {
-        return startTimerTask(15, 10, btn, 'task-special');
-      }
-      addCoins(10);
-    };
-
-    // ============================================================
-    // ========== GAME MODAL =======================================
-    // ============================================================
-    window.openGameModal = async function(btn) {
-      var modal = document.getElementById('gameZoneModal');
-      var innerLoader = document.getElementById('game-inner-loader');
-      var wrapper = document.getElementById('game-cards-wrapper');
-      var searchInput = document.getElementById('game-search-input');
-      
-      if (!modal) return;
-      
-      modal.classList.add('active');
-      if (searchInput) searchInput.value = ""; 
-      
-      if (innerLoader) innerLoader.classList.remove('hidden');
-      if (wrapper) wrapper.innerHTML = "";
-      
-      setTimeout(function() {
-        if (innerLoader) innerLoader.classList.add('hidden');
-        renderGameList(gameData.hits);
-      }, 300);
-    };
-
-    window.closeGameModal = function() {
-      var modal = document.getElementById('gameZoneModal');
-      if (modal) modal.classList.remove('active');
-    };
-
-    function renderGameList(games) {
-      var wrapper = document.getElementById('game-cards-wrapper');
-      var noGamesMsg = document.getElementById('no-games-msg');
-      if (!wrapper) return;
-      
-      wrapper.innerHTML = "";
-
-      if (games.length === 0) {
-        if (noGamesMsg) noGamesMsg.classList.remove('hidden');
-        return;
-      }
-      if (noGamesMsg) noGamesMsg.classList.add('hidden');
-
-      games.forEach(function(game) {
-        var gameCard = document.createElement('div');
-        gameCard.className = "card-bg p-3 rounded-xl flex items-center justify-between border border-gray-800 hover:border-accent transition duration-300";
-        
-        var imageUrl = 'https://img.gamedistribution.com/' + game.gameId + '-512x512.jpg';
-
-        gameCard.innerHTML = '<div class="flex items-center space-x-3"><img src="' + imageUrl + '" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/150x150/1e1e1e/ff8c00?text=Game\';" class="w-14 h-14 rounded-xl object-cover border border-gray-700 shadow-md" alt="' + game.title + '"><div><h4 class="font-bold text-sm text-white tracking-wide">' + game.title + '</h4><p class="text-[10px] text-gray-400 mt-0.5 flex items-center"><i data-lucide="zap" class="w-3 h-3 text-accent mr-1"></i> Play Now</p></div></div><button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-xs btn shadow-lg">Play</button>';
-
-        gameCard.querySelector('button').onclick = function() {
-          window.closeGameModal();
-          window.playSelectedGame(game.url);
-        };
-
-        wrapper.appendChild(gameCard);
-      });
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-
-    window.playSelectedGame = function(gameUrl) {
-      window.open(gameUrl, '_blank');
-      addCoins(10);
-      var taskId = 'task-game';
-      if (!isTaskCompleted(taskId)) {
-        markTaskCompleted(taskId);
-        var btn = document.querySelector('#task-game .task-btn');
-        disableButton(btn);
-      }
-    };
-
-    // Game search input
-    var searchInput = document.getElementById('game-search-input');
-    if (searchInput) {
-      searchInput.oninput = function(e) {
-        var query = e.target.value.toLowerCase().trim();
-        var filtered = gameData.hits.filter(function(g) {
-          return g.title.toLowerCase().includes(query);
-        });
-        renderGameList(filtered);
-      };
-    }
-
-    // ============================================================
-    // ========== WITHDRAWAL =======================================
-    // ============================================================
-    if (withdrawBtn) {
-      withdrawBtn.addEventListener('click', async function() {
-        if (!currentUser) {
-          showAlert('Please login first.');
-          return;
-        }
-        
-        var amount = parseInt(document.getElementById('withdraw-amount')?.value || 0);
-        var method = document.getElementById('withdraw-method')?.value || 'Bkash';
-        var paymentDetail = document.getElementById('payment-number')?.value || '';
-        
-        if (!amount || amount <= 0) {
-          showAlert('Please enter a valid amount.');
-          return;
-        }
-        
-        var minWithdrawal = 50000;
-        
-        if (amount < minWithdrawal) {
-          showAlert('Minimum withdrawal is ' + minWithdrawal + ' coins.');
-          return;
-        }
-        
-        if (amount > coinBalance) {
-          showAlert('Insufficient balance.');
-          return;
-        }
-        
-        if (!paymentDetail) {
-          showAlert('Please enter your account number.');
-          return;
-        }
-        
-        try {
-          await db.collection("withdrawals").add({
-            userId: currentUser.uid,
-            userName: userData?.name || 'User',
-            username: userData?.username || '',
-            amount: amount,
-            method: method,
-            paymentDetail: paymentDetail,
-            status: 'pending',
-            requestedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          
-          await removeCoins(amount);
-          showAlert('Withdrawal request submitted successfully!');
-          var amountInput = document.getElementById('withdraw-amount');
-          var paymentInput = document.getElementById('payment-number');
-          if (amountInput) amountInput.value = '';
-          if (paymentInput) paymentInput.value = '';
-          
-        } catch (error) {
-          showAlert('Error submitting withdrawal: ' + error.message);
-        }
-      });
-    }
-
-    // ============================================================
-    // ========== LOAD WITHDRAWAL HISTORY ==========================
-    // ============================================================
-    function loadWithdrawalHistory() {
-      if (!currentUser) {
-        console.log('No user logged in');
-        return;
-      }
-      
-      var historyList = document.getElementById('withdrawal-history-list');
-      if (!historyList) return;
-      
-      historyList.innerHTML = '<div class="text-center py-4"><div class="loading-spinner mx-auto"></div><p class="text-gray-400 text-sm mt-2">Loading history...</p></div>';
-      
-      db.collection("withdrawals")
-        .where("userId", "==", currentUser.uid)
-        .get()
-        .then(function(snapshot) {
-          if (snapshot.empty) {
-            historyList.innerHTML = '<p class="text-gray-400 text-sm text-center">No withdrawal history.</p>';
-            return;
-          }
-          
-          var docs = [];
-          snapshot.forEach(function(doc) {
-            docs.push({ id: doc.id });
-            Object.assign(docs[docs.length-1], doc.data());
-          });
-          docs.sort(function(a, b) {
-            var dateA = a.requestedAt && a.requestedAt.toDate ? a.requestedAt.toDate() : new Date(a.requestedAt);
-            var dateB = b.requestedAt && b.requestedAt.toDate ? b.requestedAt.toDate() : new Date(b.requestedAt);
-            return dateB - dateA;
-          });
-          
-          var html = '';
-          docs.forEach(function(w) {
-            var date = w.requestedAt && w.requestedAt.toDate ? w.requestedAt.toDate() : new Date(w.requestedAt);
-            var statusDisplay = '';
-            var statusColor = '';
-            if (w.status === 'pending') {
-              statusDisplay = 'Pending';
-              statusColor = 'text-yellow-400';
-            } else if (w.status === 'approved') {
-              statusDisplay = 'Approved ✅';
-              statusColor = 'text-green-400';
-            } else if (w.status === 'rejected') {
-              statusDisplay = 'Rejected ❌';
-              statusColor = 'text-red-400';
-            } else {
-              statusDisplay = w.status || 'Unknown';
-              statusColor = 'text-gray-400';
-            }
-            
-            html += '<div class="bg-gray-800 p-3 rounded-lg flex justify-between items-center"><div><p class="font-semibold">' + w.amount + ' Coins</p><p class="text-xs text-gray-400">' + w.method + ' - ' + w.paymentDetail + '</p><p class="text-xs text-gray-500">' + date.toLocaleString() + '</p></div><span class="text-sm font-semibold ' + statusColor + '">' + statusDisplay + '</span></div>';
-          });
-          historyList.innerHTML = html;
-        })
-        .catch(function(error) {
-          console.error('Error loading withdrawal history:', error);
-          historyList.innerHTML = '<p class="text-red-400 text-sm text-center">Error loading history</p>';
-        });
-    }
-
-    // ============================================================
-    // ========== LOAD NOTIFICATIONS ===============================
-    // ============================================================
-    function loadNotifications() {
-      if (!currentUser) return;
-      
-      var dot = document.getElementById('notification-dot');
-      if (!dot) return;
-      
-      db.collection("notifications")
-        .orderBy("createdAt", "desc")
-        .limit(5)
-        .onSnapshot(function(snap) {
-          if (!snap.empty) {
-            dot.style.display = 'block';
-          } else {
-            dot.style.display = 'none';
-          }
-        }, function(error) {
-          console.error('Error loading notifications:', error);
-        });
-    }
 
     // ============================================================
     // ========== AUTH FUNCTIONS ===================================
     // ============================================================
 
-    // Show/Hide Views
     function showSignup() {
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('signup-view').classList.remove('hidden');
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('signup-view').classList.remove('hidden');
     }
 
     function showLogin() {
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('signup-view').classList.add('hidden');
+        document.getElementById('login-view').classList.remove('hidden');
+        document.getElementById('signup-view').classList.add('hidden');
     }
     window.showLogin = showLogin;
     window.showSignup = showSignup;
@@ -3159,533 +3087,482 @@
     // ========== SIGNUP ===========================================
     // ============================================================
     signupBtn.addEventListener('click', async function() {
-      signupBtn.disabled = true;
-      signupBtn.textContent = 'Creating...';
-      signupError.classList.add('hidden');
+        signupBtn.disabled = true;
+        signupBtn.textContent = 'Creating...';
+        signupError.classList.add('hidden');
 
-      const username = document.getElementById('signup-username').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const password = document.getElementById('signup-password').value;
-      const referral = document.getElementById('signup-referral').value.trim();
+        const username = document.getElementById('signup-username').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const referral = document.getElementById('signup-referral').value.trim();
 
-      // Validation
-      if (!username || username.length < 3) {
-        signupError.textContent = 'Username must be at least 3 characters.';
-        signupError.classList.remove('hidden');
-        signupBtn.disabled = false;
-        signupBtn.textContent = 'Create Account';
-        return;
-      }
-
-      if (!email || !email.includes('@')) {
-        signupError.textContent = 'Please enter a valid email.';
-        signupError.classList.remove('hidden');
-        signupBtn.disabled = false;
-        signupBtn.textContent = 'Create Account';
-        return;
-      }
-
-      if (!password || password.length < 6) {
-        signupError.textContent = 'Password must be at least 6 characters.';
-        signupError.classList.remove('hidden');
-        signupBtn.disabled = false;
-        signupBtn.textContent = 'Create Account';
-        return;
-      }
-
-      try {
-        // Check if username exists
-        const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
-        if (usernameDoc.exists) {
-          signupError.textContent = 'Username already taken. Please choose another.';
-          signupError.classList.remove('hidden');
-          signupBtn.disabled = false;
-          signupBtn.textContent = 'Create Account';
-          return;
+        if (!username || username.length < 3) {
+            signupError.textContent = 'Username must be at least 3 characters.';
+            signupError.classList.remove('hidden');
+            signupBtn.disabled = false;
+            signupBtn.textContent = 'Create Account';
+            return;
         }
 
-        // Create user with email/password
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+        if (!email || !email.includes('@')) {
+            signupError.textContent = 'Please enter a valid email.';
+            signupError.classList.remove('hidden');
+            signupBtn.disabled = false;
+            signupBtn.textContent = 'Create Account';
+            return;
+        }
 
-        // Send email verification
-        await user.sendEmailVerification();
+        if (!password || password.length < 6) {
+            signupError.textContent = 'Password must be at least 6 characters.';
+            signupError.classList.remove('hidden');
+            signupBtn.disabled = false;
+            signupBtn.textContent = 'Create Account';
+            return;
+        }
 
-        // Save user data to Firestore
-        const newReferralCode = generateReferralCode();
-        await db.collection("users").doc(user.uid).set({
-          name: username,
-          username: username,
-          email: email,
-          balance: 0,
-          referralCode: newReferralCode,
-          isBlocked: false,
-          completedTasks: {},
-          level: 1,
-          xp: 0,
-          streak: 0,
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-          dailyBonusClaimed: false,
-          spinAvailable: true,
-          lastSpin: null,
-          lastScratch: null,
-          lastMysteryBox: null,
-          vip: false,
-          achievements: [],
-          referrals: [],
-          referralEarnings: 0,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          referredBy: null,
-          referralBonusClaimed: false,
-          checkedDays: []
-        });
-
-        // Save username mapping
-        await db.collection("usernames").doc(username.toLowerCase()).set({
-          uid: user.uid,
-          email: email,
-          username: username,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // Handle referral if provided
-        if (referral) {
-          try {
-            const refSnapshot = await db.collection('users')
-              .where('referralCode', '==', referral.toUpperCase())
-              .get();
-
-            if (!refSnapshot.empty) {
-              const referrerDoc = refSnapshot.docs[0];
-              const referrerId = referrerDoc.id;
-
-              await db.collection("users").doc(user.uid).update({
-                referredBy: referrerId
-              });
-
-              await db.collection("users").doc(referrerId).update({
-                referrals: firebase.firestore.FieldValue.arrayUnion(user.uid)
-              });
+        try {
+            const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+            if (usernameDoc.exists) {
+                signupError.textContent = 'Username already taken. Please choose another.';
+                signupError.classList.remove('hidden');
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create Account';
+                return;
             }
-          } catch (refError) {
-            console.error('Referral error:', refError);
-          }
+
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            await user.sendEmailVerification();
+
+            const newReferralCode = generateReferralCode();
+            await db.collection("users").doc(user.uid).set({
+                name: username,
+                username: username,
+                email: email,
+                balance: 0,
+                referralCode: newReferralCode,
+                isBlocked: false,
+                completedTasks: {},
+                level: 1,
+                xp: 0,
+                streak: 0,
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                dailyBonusClaimed: false,
+                spinAvailable: true,
+                lastSpin: null,
+                lastScratch: null,
+                lastMysteryBox: null,
+                vip: false,
+                achievements: [],
+                referrals: [],
+                referralEarnings: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                referredBy: null,
+                referralBonusClaimed: false,
+                checkedDays: []
+            });
+
+            await db.collection("usernames").doc(username.toLowerCase()).set({
+                uid: user.uid,
+                email: email,
+                username: username,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            if (referral) {
+                try {
+                    const refSnapshot = await db.collection('users')
+                        .where('referralCode', '==', referral.toUpperCase())
+                        .get();
+
+                    if (!refSnapshot.empty) {
+                        const referrerDoc = refSnapshot.docs[0];
+                        const referrerId = referrerDoc.id;
+
+                        await db.collection("users").doc(user.uid).update({
+                            referredBy: referrerId
+                        });
+
+                        await db.collection("users").doc(referrerId).update({
+                            referrals: firebase.firestore.FieldValue.arrayUnion(user.uid)
+                        });
+                    }
+                } catch (refError) {
+                    console.error('Referral error:', refError);
+                }
+            }
+
+            await auth.signOut();
+            showToast('📧 Verification email sent! Please check your inbox.');
+            showAlert('Please check your email to verify your account. Then login again.');
+            showLogin();
+
+        } catch (error) {
+            console.error('Signup error:', error);
+            signupError.textContent = error.message || 'Error creating account.';
+            signupError.classList.remove('hidden');
+            
+            if (error.code === 'auth/email-already-in-use') {
+                signupError.textContent = 'Email already registered. Please login.';
+            }
         }
 
-        // Sign out so user must verify first
-        await auth.signOut();
-
-        showToast('📧 Verification email sent! Please check your inbox.');
-        showAlert('Please check your email to verify your account. Then login again.');
-
-        // Show login view
-        showLogin();
-
-      } catch (error) {
-        console.error('Signup error:', error);
-        signupError.textContent = error.message || 'Error creating account.';
-        signupError.classList.remove('hidden');
-        
-        if (error.code === 'auth/email-already-in-use') {
-          signupError.textContent = 'Email already registered. Please login.';
-        }
-      }
-
-      signupBtn.disabled = false;
-      signupBtn.textContent = 'Create Account';
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
     });
 
     // ============================================================
-    // ========== LOGIN (No email verification check) ==============
+    // ========== LOGIN ============================================
     // ============================================================
     loginBtn.addEventListener('click', async function() {
-      loginBtn.disabled = true;
-      loginBtn.textContent = 'Logging in...';
-      loginError.classList.add('hidden');
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Logging in...';
+        loginError.classList.add('hidden');
 
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value;
 
-      if (!username || !password) {
-        loginError.textContent = 'Please enter username and password.';
-        loginError.classList.remove('hidden');
+        if (!username || !password) {
+            loginError.textContent = 'Please enter username and password.';
+            loginError.classList.remove('hidden');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Login';
+            return;
+        }
+
+        try {
+            const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+            if (!usernameDoc.exists) {
+                loginError.textContent = 'Username not found. Please check and try again.';
+                loginError.classList.remove('hidden');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+                return;
+            }
+
+            const email = usernameDoc.data().email;
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            const userDoc = await db.collection("users").doc(user.uid).get();
+            if (userDoc.exists && userDoc.data().isBlocked) {
+                await auth.signOut();
+                loginError.textContent = 'Your account has been blocked. Contact support.';
+                loginError.classList.remove('hidden');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+                return;
+            }
+
+            await db.collection("users").doc(user.uid).update({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            showToast('✅ Welcome back, ' + username + '!');
+
+            setTimeout(() => {
+                startAutoAds();
+            }, 3000);
+
+        } catch (error) {
+            console.error('Login error:', error);
+            if (error.code === 'auth/user-not-found') {
+                loginError.textContent = 'Username not found. Please check and try again.';
+            } else if (error.code === 'auth/wrong-password') {
+                loginError.textContent = 'Incorrect password. Please try again.';
+            } else if (error.code === 'auth/invalid-email') {
+                loginError.textContent = 'Invalid email format.';
+            } else {
+                loginError.textContent = error.message || 'Login failed. Please try again.';
+            }
+            loginError.classList.remove('hidden');
+        }
+
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
-        return;
-      }
-
-      try {
-        // Find email by username
-        const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
-        if (!usernameDoc.exists) {
-          loginError.textContent = 'Username not found. Please check and try again.';
-          loginError.classList.remove('hidden');
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'Login';
-          return;
-        }
-
-        const email = usernameDoc.data().email;
-
-        // Sign in (NO email verification check)
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        // Check if account is blocked
-        const userDoc = await db.collection("users").doc(user.uid).get();
-        if (userDoc.exists && userDoc.data().isBlocked) {
-          await auth.signOut();
-          loginError.textContent = 'Your account has been blocked. Contact support.';
-          loginError.classList.remove('hidden');
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'Login';
-          return;
-        }
-
-        await db.collection("users").doc(user.uid).update({
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        showToast('✅ Welcome back, ' + username + '!');
-
-      } catch (error) {
-        console.error('Login error:', error);
-        if (error.code === 'auth/user-not-found') {
-          loginError.textContent = 'Username not found. Please check and try again.';
-        } else if (error.code === 'auth/wrong-password') {
-          loginError.textContent = 'Incorrect password. Please try again.';
-        } else if (error.code === 'auth/invalid-email') {
-          loginError.textContent = 'Invalid email format.';
-        } else {
-          loginError.textContent = error.message || 'Login failed. Please try again.';
-        }
-        loginError.classList.remove('hidden');
-      }
-
-      loginBtn.disabled = false;
-      loginBtn.textContent = 'Login';
     });
 
-    // Enter key for login
     document.getElementById('login-password').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') loginBtn.click();
+        if (e.key === 'Enter') loginBtn.click();
     });
 
-    document.getElementById('login-username').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') document.getElementById('login-password').focus();
-    });
-
-    // Enter key for signup
     document.getElementById('signup-password').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') signupBtn.click();
+        if (e.key === 'Enter') signupBtn.click();
     });
-
-    // ============================================================
-    // ========== REFERRAL SYSTEM ==================================
-    // ============================================================
-    async function handleReferral(refCode) {
-      if (!currentUser) return;
-      
-      try {
-        const snapshot = await db.collection('users')
-          .where('referralCode', '==', refCode)
-          .get();
-        
-        if (!snapshot.empty) {
-          const referrerDoc = snapshot.docs[0];
-          const referrerData = referrerDoc.data();
-          
-          await updateUserData({ referredBy: referrerDoc.id });
-          
-          const referrerRef = db.collection('users').doc(referrerDoc.id);
-          await referrerRef.update({
-            referralEarnings: firebase.firestore.FieldValue.increment(10),
-            referrals: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
-          });
-          
-          await addCoins(10);
-          
-          showToast('🎉 You joined with referral! +10 bonus coins!');
-        }
-      } catch (error) {
-        console.error('Error handling referral:', error);
-      }
-    }
 
     // ============================================================
     // ========== AUTH STATE LISTENER ==============================
     // ============================================================
     auth.onAuthStateChanged(async function(user) {
-      if (user) {
-        currentUser = user;
-        
-        try {
-          var userDoc = await db.collection("users").doc(user.uid).get();
-          if (userDoc.exists) {
-            var data = userDoc.data();
-            if (data.isBlocked) {
-              showAlert('Your account has been blocked. Please contact support.');
-              await logoutUser();
-              return;
-            }
-          }
-        } catch (e) {}
-        
-        if (authSection) authSection.classList.remove('active');
-        authSection.style.display = 'none';
-        if (appContainer) appContainer.classList.add('active');
-        appContainer.style.display = 'flex';
-        
-        await loadUserData(user.uid);
-        navigateTo('home-page');
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        
-        loadTournamentData();
-        renderTournament();
-        
-        setTimeout(function() {
-          loadWithdrawalHistory();
-        }, 500);
-        
-        loadNotifications();
-        
-        // Check referral bonus
-        if (userData && !userData.referralBonusClaimed && userData.referredBy) {
-          // Process referral bonus when user reaches 1000 coins
-          if (coinBalance >= 1000) {
-            processReferralBonus(user.uid);
-          }
-        }
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const refCode = urlParams.get('ref');
-        if (refCode && !userData?.referredBy) {
-          try {
-            const refSnapshot = await db.collection('users')
-              .where('referralCode', '==', refCode.toUpperCase())
-              .get();
+        if (user) {
+            currentUser = user;
             
-            if (!refSnapshot.empty) {
-              const referrerDoc = refSnapshot.docs[0];
-              await db.collection("users").doc(user.uid).update({
-                referredBy: referrerDoc.id
-              });
-              userData.referredBy = referrerDoc.id;
-              showToast('🎉 Referral applied! You will get bonus when you reach 1000 coins.');
+            try {
+                var userDoc = await db.collection("users").doc(user.uid).get();
+                if (userDoc.exists) {
+                    var data = userDoc.data();
+                    if (data.isBlocked) {
+                        showAlert('Your account has been blocked. Please contact support.');
+                        await logoutUser();
+                        return;
+                    }
+                }
+            } catch (e) {}
+            
+            if (authSection) authSection.classList.remove('active');
+            authSection.style.display = 'none';
+            if (appContainer) appContainer.classList.add('active');
+            appContainer.style.display = 'flex';
+            
+            await loadUserData(user.uid);
+            navigateTo('home-page');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            loadTournamentData();
+            renderTournament();
+            
+            setTimeout(function() {
+                loadWithdrawalHistory();
+            }, 500);
+            
+            loadNotifications();
+            
+            if (userData && !userData.referralBonusClaimed && userData.referredBy) {
+                if (coinBalance >= 1000) {
+                    processReferralBonus(user.uid);
+                }
             }
-          } catch (refError) {
-            console.error('Referral error:', refError);
-          }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode && !userData?.referredBy) {
+                try {
+                    const refSnapshot = await db.collection('users')
+                        .where('referralCode', '==', refCode.toUpperCase())
+                        .get();
+                    
+                    if (!refSnapshot.empty) {
+                        const referrerDoc = refSnapshot.docs[0];
+                        await db.collection("users").doc(user.uid).update({
+                            referredBy: referrerDoc.id
+                        });
+                        userData.referredBy = referrerDoc.id;
+                        showToast('🎉 Referral applied! You will get bonus when you reach 1000 coins.');
+                    }
+                } catch (refError) {
+                    console.error('Referral error:', refError);
+                }
+            }
+
+            setTimeout(() => {
+                startAutoAds();
+            }, 5000);
+
+        } else {
+            currentUser = null;
+            userData = null;
+            coinBalance = 0;
+            completedTasks = {};
+            userLevel = 1;
+            userXP = 0;
+            userStreak = 0;
+            userVIP = false;
+            userAchievements = [];
+            userReferrals = [];
+            userReferralEarnings = 0;
+            if (authSection) authSection.classList.add('active');
+            authSection.style.display = 'flex';
+            if (appContainer) appContainer.classList.remove('active');
+            appContainer.style.display = 'none';
+            if (loginView) loginView.classList.remove('hidden');
+            if (signupView) signupView.classList.add('hidden');
+            updateUI();
+            
+            loadTournamentData();
+            renderTournament();
+
+            stopAutoAds();
         }
-        
-      } else {
-        currentUser = null;
-        userData = null;
-        coinBalance = 0;
-        completedTasks = {};
-        userLevel = 1;
-        userXP = 0;
-        userStreak = 0;
-        userVIP = false;
-        userAchievements = [];
-        userReferrals = [];
-        userReferralEarnings = 0;
-        if (authSection) authSection.classList.add('active');
-        authSection.style.display = 'flex';
-        if (appContainer) appContainer.classList.remove('active');
-        appContainer.style.display = 'none';
-        if (loginView) loginView.classList.remove('hidden');
-        if (signupView) signupView.classList.add('hidden');
-        updateUI();
-        
-        loadTournamentData();
-        renderTournament();
-      }
     });
 
     // ============================================================
     // ========== REFERRAL BONUS ===================================
     // ============================================================
     async function processReferralBonus(userId) {
-      try {
-        const userDoc = await db.collection("users").doc(userId).get();
-        if (!userDoc.exists) return;
-        const userData = userDoc.data();
-        
-        if (userData.referralBonusClaimed) return;
-        if (userData.balance < 1000) return;
-        
-        const referredBy = userData.referredBy;
-        if (!referredBy) return;
-        
-        const referrerDoc = await db.collection("users").doc(referredBy).get();
-        if (!referrerDoc.exists) return;
-        const referrerData = referrerDoc.data();
-        
-        if (referrerData.balance < 2000) return;
-        
-        const referralCount = referrerData.referrals?.length || 0;
-        if (referralCount >= 10) return;
-        
-        // Give 100 coins to new user
-        await db.collection("users").doc(userId).update({
-          balance: firebase.firestore.FieldValue.increment(100),
-          referralBonusClaimed: true
-        });
-        
-        // Give 200 coins to referrer
-        await db.collection("users").doc(referredBy).update({
-          balance: firebase.firestore.FieldValue.increment(200),
-          referralEarnings: firebase.firestore.FieldValue.increment(200)
-        });
-        
-        showToast('🎉 Referral bonus! You got 100 coins!');
-        
-      } catch (error) {
-        console.error('Error processing referral bonus:', error);
-      }
+        try {
+            const userDoc = await db.collection("users").doc(userId).get();
+            if (!userDoc.exists) return;
+            const userData = userDoc.data();
+            
+            if (userData.referralBonusClaimed) return;
+            if (userData.balance < 1000) return;
+            
+            const referredBy = userData.referredBy;
+            if (!referredBy) return;
+            
+            const referrerDoc = await db.collection("users").doc(referredBy).get();
+            if (!referrerDoc.exists) return;
+            const referrerData = referrerDoc.data();
+            
+            if (referrerData.balance < 2000) return;
+            
+            const referralCount = referrerData.referrals?.length || 0;
+            if (referralCount >= 10) return;
+            
+            await db.collection("users").doc(userId).update({
+                balance: firebase.firestore.FieldValue.increment(100),
+                referralBonusClaimed: true
+            });
+            
+            await db.collection("users").doc(referredBy).update({
+                balance: firebase.firestore.FieldValue.increment(200),
+                referralEarnings: firebase.firestore.FieldValue.increment(200)
+            });
+            
+            showToast('🎉 Referral bonus! You got 100 coins!');
+            
+        } catch (error) {
+            console.error('Error processing referral bonus:', error);
+        }
     }
 
     // ============================================================
     // ========== LOGOUT ===========================================
     // ============================================================
     async function logoutUser() {
-      try {
-        await auth.signOut();
-        currentUser = null;
-        userData = null;
-        coinBalance = 0;
-        completedTasks = {};
-        userLevel = 1;
-        userXP = 0;
-        userStreak = 0;
-        userVIP = false;
-        userAchievements = [];
-        userReferrals = [];
-        userReferralEarnings = 0;
-        if (authSection) authSection.classList.add('active');
-        authSection.style.display = 'flex';
-        if (appContainer) appContainer.classList.remove('active');
-        appContainer.style.display = 'none';
-        if (loginView) loginView.classList.remove('hidden');
-        if (signupView) signupView.classList.add('hidden');
-        updateUI();
-        showToast('Logged out successfully');
-      } catch (error) {
-        showAlert('Error logging out: ' + error.message);
-      }
+        try {
+            await auth.signOut();
+            currentUser = null;
+            userData = null;
+            coinBalance = 0;
+            completedTasks = {};
+            userLevel = 1;
+            userXP = 0;
+            userStreak = 0;
+            userVIP = false;
+            userAchievements = [];
+            userReferrals = [];
+            userReferralEarnings = 0;
+            if (authSection) authSection.classList.add('active');
+            authSection.style.display = 'flex';
+            if (appContainer) appContainer.classList.remove('active');
+            appContainer.style.display = 'none';
+            if (loginView) loginView.classList.remove('hidden');
+            if (signupView) signupView.classList.add('hidden');
+            updateUI();
+            showToast('Logged out successfully');
+            stopAutoAds();
+        } catch (error) {
+            showAlert('Error logging out: ' + error.message);
+        }
     }
 
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', logoutUser);
+        logoutBtn.addEventListener('click', logoutUser);
     }
 
     // ============================================================
     // ========== PROFILE FUNCTIONS ================================
     // ============================================================
-    window.showForgotUsername = function() {
-      showAlert('Please contact support to recover your username.');
-    };
-
     window.showChangePassword = function() {
-      if (!currentUser) {
-        showAlert('Please login first.');
-        return;
-      }
-      showAlert('Password reset link will be sent to your email.');
-      auth.sendPasswordResetEmail(currentUser.email)
-        .then(() => {
-          showAlert('Password reset email sent! Check your inbox.');
-        })
-        .catch((error) => {
-          showAlert('Error: ' + error.message);
-        });
+        if (!currentUser) {
+            showAlert('Please login first.');
+            return;
+        }
+        showAlert('Password reset link will be sent to your email.');
+        auth.sendPasswordResetEmail(currentUser.email)
+            .then(() => {
+                showAlert('Password reset email sent! Check your inbox.');
+            })
+            .catch((error) => {
+                showAlert('Error: ' + error.message);
+            });
     };
 
     window.showChangeUsername = function() {
-      if (!currentUser) {
-        showAlert('Please login first.');
-        return;
-      }
-      
-      const newUsername = prompt('Enter new username:');
-      if (newUsername && newUsername.trim().length >= 3) {
-        const username = newUsername.trim();
-        db.collection('usernames').doc(username.toLowerCase()).get()
-          .then(async (doc) => {
-            if (doc.exists) {
-              showAlert('Username already taken!');
-              return;
-            }
-            
-            await updateUserData({ username: username });
-            
-            const oldUsername = userData.username;
-            await db.collection('usernames').doc(oldUsername.toLowerCase()).delete();
-            await db.collection('usernames').doc(username.toLowerCase()).set({
-              uid: currentUser.uid,
-              email: currentUser.email,
-              username: username,
-              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            showAlert('Username updated successfully!');
-            updateUI();
-          })
-          .catch((error) => {
-            showAlert('Error: ' + error.message);
-          });
-      } else if (newUsername !== null) {
-        showAlert('Username must be at least 3 characters.');
-      }
+        if (!currentUser) {
+            showAlert('Please login first.');
+            return;
+        }
+        
+        const newUsername = prompt('Enter new username:');
+        if (newUsername && newUsername.trim().length >= 3) {
+            const username = newUsername.trim();
+            db.collection('usernames').doc(username.toLowerCase()).get()
+                .then(async (doc) => {
+                    if (doc.exists) {
+                        showAlert('Username already taken!');
+                        return;
+                    }
+                    
+                    await updateUserData({ username: username });
+                    
+                    const oldUsername = userData.username;
+                    await db.collection('usernames').doc(oldUsername.toLowerCase()).delete();
+                    await db.collection('usernames').doc(username.toLowerCase()).set({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        username: username,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    showAlert('Username updated successfully!');
+                    updateUI();
+                })
+                .catch((error) => {
+                    showAlert('Error: ' + error.message);
+                });
+        } else if (newUsername !== null) {
+            showAlert('Username must be at least 3 characters.');
+        }
     };
 
     window.showEmailVerification = function() {
-      if (!currentUser) {
-        showAlert('Please login first.');
-        return;
-      }
-      
-      if (currentUser.emailVerified) {
-        showAlert('Your email is already verified!');
-        return;
-      }
-      
-      currentUser.sendEmailVerification()
-        .then(() => {
-          showAlert('Verification email sent! Check your inbox.');
-        })
-        .catch((error) => {
-          showAlert('Error: ' + error.message);
-        });
+        if (!currentUser) {
+            showAlert('Please login first.');
+            return;
+        }
+        
+        if (currentUser.emailVerified) {
+            showAlert('Your email is already verified!');
+            return;
+        }
+        
+        currentUser.sendEmailVerification()
+            .then(() => {
+                showAlert('Verification email sent! Check your inbox.');
+            })
+            .catch((error) => {
+                showAlert('Error: ' + error.message);
+            });
     };
 
     window.changeProfilePic = function() {
-      showAlert('Profile picture feature coming soon!');
+        showAlert('Profile picture feature coming soon!');
     };
 
     // ============================================================
     // ========== LEVEL MODAL ======================================
     // ============================================================
     function openLevelModal() {
-      const modal = safeGetElement('level-modal');
-      if (modal) modal.classList.remove('hidden');
-      
-      const levelEl = safeGetElement('level-display');
-      const xpCurrent = safeGetElement('xp-current');
-      const xpNext = safeGetElement('xp-next');
-      const xpProgress = safeGetElement('xp-progress');
-      
-      if (levelEl) levelEl.textContent = userLevel;
-      const xpNeeded = getXPForLevel(userLevel);
-      if (xpCurrent) xpCurrent.textContent = userXP;
-      if (xpNext) xpNext.textContent = xpNeeded;
-      if (xpProgress) xpProgress.style.width = (userXP / xpNeeded * 100) + '%';
+        const modal = safeGetElement('level-modal');
+        if (modal) modal.classList.remove('hidden');
+        
+        const levelEl = safeGetElement('level-display');
+        const xpCurrent = safeGetElement('xp-current');
+        const xpNext = safeGetElement('xp-next');
+        const xpProgress = safeGetElement('xp-progress');
+        
+        if (levelEl) levelEl.textContent = userLevel;
+        const xpNeeded = getXPForLevel(userLevel);
+        if (xpCurrent) xpCurrent.textContent = userXP;
+        if (xpNext) xpNext.textContent = xpNeeded;
+        if (xpProgress) xpProgress.style.width = (userXP / xpNeeded * 100) + '%';
     }
 
     function closeLevelModal() {
-      const modal = safeGetElement('level-modal');
-      if (modal) modal.classList.add('hidden');
+        const modal = safeGetElement('level-modal');
+        if (modal) modal.classList.add('hidden');
     }
 
     // ============================================================
@@ -3693,22 +3570,22 @@
     // ============================================================
     var copyBtn = document.getElementById('copy-code-btn');
     if (copyBtn) {
-      copyBtn.addEventListener('click', function() {
-        var code = referralCodeEl?.textContent || '';
-        if (code && code !== 'LOADING...') {
-          navigator.clipboard.writeText(code).then(function() {
-            showToast('Referral code copied!');
-          }).catch(function() {
-            var textArea = document.createElement('textarea');
-            textArea.value = code;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            textArea.remove();
-            showToast('Referral code copied!');
-          });
-        }
-      });
+        copyBtn.addEventListener('click', function() {
+            var code = referralCodeEl?.textContent || '';
+            if (code && code !== 'LOADING...') {
+                navigator.clipboard.writeText(code).then(function() {
+                    showToast('Referral code copied!');
+                }).catch(function() {
+                    var textArea = document.createElement('textarea');
+                    textArea.value = code;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    textArea.remove();
+                    showToast('Referral code copied!');
+                });
+            }
+        });
     }
 
     // ============================================================
@@ -3716,24 +3593,24 @@
     // ============================================================
     var shareBtn = document.getElementById('share-btn');
     if (shareBtn) {
-      shareBtn.addEventListener('click', function() {
-        var code = referralCodeEl?.textContent || '';
-        if (code && code !== 'LOADING...') {
-          var text = 'Join Daily Income Zone and earn coins! Use my referral code: ' + code;
-          var url = window.location.origin + window.location.pathname + '?ref=' + code;
-          if (navigator.share) {
-            navigator.share({
-              title: 'Daily Income Zone',
-              text: text,
-              url: url
-            }).catch(function() {});
-          } else {
-            navigator.clipboard.writeText(text + '\n' + url).then(function() {
-              showToast('Referral link copied! Share with friends.');
-            });
-          }
-        }
-      });
+        shareBtn.addEventListener('click', function() {
+            var code = referralCodeEl?.textContent || '';
+            if (code && code !== 'LOADING...') {
+                var text = 'Join Daily Income Zone and earn coins! Use my referral code: ' + code;
+                var url = window.location.origin + window.location.pathname + '?ref=' + code;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Daily Income Zone',
+                        text: text,
+                        url: url
+                    }).catch(function() {});
+                } else {
+                    navigator.clipboard.writeText(text + '\n' + url).then(function() {
+                        showToast('Referral link copied! Share with friends.');
+                    });
+                }
+            }
+        });
     }
 
     // ============================================================
@@ -3741,63 +3618,196 @@
     // ============================================================
     var bellBtn = document.getElementById('notification-bell');
     if (bellBtn) {
-      bellBtn.addEventListener('click', function() {
+        bellBtn.addEventListener('click', function() {
+            var dot = document.getElementById('notification-dot');
+            if (dot) dot.style.display = 'none';
+            
+            db.collection("notifications")
+                .orderBy("createdAt", "desc")
+                .limit(5)
+                .get()
+                .then(function(snap) {
+                    if (snap.empty) {
+                        showAlert('No notifications.');
+                        return;
+                    }
+                    var messages = snap.docs.map(function(doc) {
+                        var n = doc.data();
+                        return '📢 ' + n.title + '\n' + n.message;
+                    });
+                    showAlert(messages.join('\n\n'));
+                });
+        });
+    }
+
+    // ============================================================
+    // ========== LOAD WITHDRAWAL HISTORY ==========================
+    // ============================================================
+    function loadWithdrawalHistory() {
+        if (!currentUser) return;
+        
+        var historyList = document.getElementById('withdrawal-history-list');
+        if (!historyList) return;
+        
+        historyList.innerHTML = '<div class="text-center py-4"><div class="loading-spinner mx-auto"></div><p class="text-gray-400 text-sm mt-2">Loading history...</p></div>';
+        
+        db.collection("withdrawals")
+            .where("userId", "==", currentUser.uid)
+            .get()
+            .then(function(snapshot) {
+                if (snapshot.empty) {
+                    historyList.innerHTML = '<p class="text-gray-400 text-sm text-center">No withdrawal history.</p>';
+                    return;
+                }
+                
+                var docs = [];
+                snapshot.forEach(function(doc) {
+                    docs.push({ id: doc.id });
+                    Object.assign(docs[docs.length-1], doc.data());
+                });
+                docs.sort(function(a, b) {
+                    var dateA = a.requestedAt && a.requestedAt.toDate ? a.requestedAt.toDate() : new Date(a.requestedAt);
+                    var dateB = b.requestedAt && b.requestedAt.toDate ? b.requestedAt.toDate() : new Date(b.requestedAt);
+                    return dateB - dateA;
+                });
+                
+                var html = '';
+                docs.forEach(function(w) {
+                    var date = w.requestedAt && w.requestedAt.toDate ? w.requestedAt.toDate() : new Date(w.requestedAt);
+                    var statusDisplay = '';
+                    var statusColor = '';
+                    if (w.status === 'pending') {
+                        statusDisplay = 'Pending';
+                        statusColor = 'text-yellow-400';
+                    } else if (w.status === 'approved') {
+                        statusDisplay = 'Approved ✅';
+                        statusColor = 'text-green-400';
+                    } else if (w.status === 'rejected') {
+                        statusDisplay = 'Rejected ❌';
+                        statusColor = 'text-red-400';
+                    } else {
+                        statusDisplay = w.status || 'Unknown';
+                        statusColor = 'text-gray-400';
+                    }
+                    
+                    html += '<div class="bg-gray-800 p-3 rounded-lg flex justify-between items-center"><div><p class="font-semibold">' + w.amount + ' Coins</p><p class="text-xs text-gray-400">' + w.method + ' - ' + w.paymentDetail + '</p><p class="text-xs text-gray-500">' + date.toLocaleString() + '</p></div><span class="text-sm font-semibold ' + statusColor + '">' + statusDisplay + '</span></div>';
+                });
+                historyList.innerHTML = html;
+            })
+            .catch(function(error) {
+                console.error('Error loading withdrawal history:', error);
+                historyList.innerHTML = '<p class="text-red-400 text-sm text-center">Error loading history</p>';
+            });
+    }
+
+    // ============================================================
+    // ========== LOAD NOTIFICATIONS ===============================
+    // ============================================================
+    function loadNotifications() {
+        if (!currentUser) return;
+        
         var dot = document.getElementById('notification-dot');
-        if (dot) dot.style.display = 'none';
+        if (!dot) return;
         
         db.collection("notifications")
-          .orderBy("createdAt", "desc")
-          .limit(5)
-          .get()
-          .then(function(snap) {
-            if (snap.empty) {
-              showAlert('No notifications.');
-              return;
-            }
-            var messages = snap.docs.map(function(doc) {
-              var n = doc.data();
-              return '📢 ' + n.title + '\n' + n.message;
+            .orderBy("createdAt", "desc")
+            .limit(5)
+            .onSnapshot(function(snap) {
+                if (!snap.empty) {
+                    dot.style.display = 'block';
+                } else {
+                    dot.style.display = 'none';
+                }
+            }, function(error) {
+                console.error('Error loading notifications:', error);
             });
-            showAlert(messages.join('\n\n'));
-          });
-      });
+    }
+
+    // ============================================================
+    // ========== WITHDRAWAL =======================================
+    // ============================================================
+    if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', async function() {
+            if (!currentUser) {
+                showAlert('Please login first.');
+                return;
+            }
+            
+            var amount = parseInt(document.getElementById('withdraw-amount')?.value || 0);
+            var method = document.getElementById('withdraw-method')?.value || 'Bkash';
+            var paymentDetail = document.getElementById('payment-number')?.value || '';
+            
+            if (!amount || amount <= 0) {
+                showAlert('Please enter a valid amount.');
+                return;
+            }
+            
+            var minWithdrawal = 50000;
+            
+            if (amount < minWithdrawal) {
+                showAlert('Minimum withdrawal is ' + minWithdrawal + ' coins.');
+                return;
+            }
+            
+            if (amount > coinBalance) {
+                showAlert('Insufficient balance.');
+                return;
+            }
+            
+            if (!paymentDetail) {
+                showAlert('Please enter your account number.');
+                return;
+            }
+            
+            try {
+                await db.collection("withdrawals").add({
+                    userId: currentUser.uid,
+                    userName: userData?.name || 'User',
+                    username: userData?.username || '',
+                    amount: amount,
+                    method: method,
+                    paymentDetail: paymentDetail,
+                    status: 'pending',
+                    requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                await removeCoins(amount);
+                showAlert('Withdrawal request submitted successfully!');
+                var amountInput = document.getElementById('withdraw-amount');
+                var paymentInput = document.getElementById('payment-number');
+                if (amountInput) amountInput.value = '';
+                if (paymentInput) paymentInput.value = '';
+                
+            } catch (error) {
+                showAlert('Error submitting withdrawal: ' + error.message);
+            }
+        });
     }
 
     // ============================================================
     // ========== INIT =============================================
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      if (authSection) authSection.classList.add('active');
-      authSection.style.display = 'flex';
-      
-      loadTournamentData();
-      renderTournament();
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      const refCode = urlParams.get('ref');
-      if (refCode) {
-        localStorage.setItem('pending_ref', refCode);
-      }
-    });
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (authSection) authSection.classList.add('active');
+        authSection.style.display = 'flex';
+        
+        loadTournamentData();
+        renderTournament();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) {
+            localStorage.setItem('pending_ref', refCode);
+        }
 
-    // ============================================================
-    // ========== KEYBOARD SHORTCUTS ===============================
-    // ============================================================
-    var loginUsername = document.getElementById('login-username');
-    if (loginUsername && loginBtn) {
-      loginUsername.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') document.getElementById('login-password').focus();
-      });
-    }
-
-    // Close ad container on background click (optional)
-    document.getElementById('ad-container')?.addEventListener('click', function(e) {
-      if (e.target === this) {
-        // Optionally close ad if clicked outside
-        // Uncomment if you want to allow closing by clicking background
-        // window.closeMonetagAd();
-      }
+        // Load ad placements
+        setTimeout(() => {
+            loadNativeBanner();
+            loadBanner320x50();
+            loadSocialBarAd();
+            loadBanner160x300();
+        }, 1000);
     });
   </script>
 </body>
