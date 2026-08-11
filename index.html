@@ -148,7 +148,7 @@
       <div class="ad-grid" id="ad-grid-container"></div>
       
       <div class="mt-6 text-center text-xs text-gray-500">
-        <p>🔁 Unlimited clicks · Ad opens in the same window (Telegram WebView)</p>
+        <p>🔁 Unlimited clicks · Opens via Telegram WebView</p>
       </div>
     </main>
   </div>
@@ -216,6 +216,17 @@
       "https://omg10.com/4/11282222"
     ];
 
+    // Direct link opener using Telegram.WebApp.openLink with fallback
+    function openDirectLink(url) {
+      if (window.Telegram &&
+          Telegram.WebApp &&
+          typeof Telegram.WebApp.openLink === 'function') {
+        Telegram.WebApp.openLink(url);
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    }
+
     function renderAdButtons() {
       const container = safeGet('ad-grid-container');
       if (!container) return;
@@ -227,8 +238,7 @@
         btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          // Direct open - no iframe, no overlay
-          window.location.href = url;
+          openDirectLink(url);
         });
         container.appendChild(btn);
       });
