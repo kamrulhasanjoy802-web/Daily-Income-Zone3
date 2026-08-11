@@ -46,20 +46,6 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .ip-warning { background-color: #dc2626; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; display: none; }
 
-    .game-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(18, 18, 18, 0.98);
-      z-index: 1000;
-      flex-direction: column;
-    }
-    .game-modal.active { display: flex; }
-    .game-list-scroll { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-    .game-list-scroll::-webkit-scrollbar { display: none; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
     /* Monetag Ad Container - Fullscreen overlay for ad */
@@ -85,11 +71,14 @@
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.95); z-index: 10000; flex-direction: column;
       align-items: center; justify-content: center; padding: 20px;
+      overflow-y: auto;
     }
     #website-overlay.active { display: flex; }
     #website-overlay .overlay-content {
-      background: #1e1e1e; border-radius: 16px; padding: 30px; max-width: 400px;
+      background: #1e1e1e; border-radius: 16px; padding: 30px; max-width: 420px;
       width: 100%; text-align: center; border: 1px solid #ff8c00;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     #website-overlay .timer-circle {
       width: 100px; height: 100px; border-radius: 50%; border: 4px solid #ff8c00;
@@ -102,6 +91,14 @@
     }
     #website-overlay .back-btn.show { display: inline-block; }
     #website-overlay .status-text { color: #aaa; font-size: 14px; margin-top: 10px; }
+    #website-overlay iframe {
+      width: 100%;
+      height: 350px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff;
+      margin: 10px 0;
+    }
     
     .loading-spinner {
       display: inline-block; width: 20px; height: 20px;
@@ -109,53 +106,6 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* ===== TOURNAMENT STYLES ===== */
-    .tournament-card {
-      background: linear-gradient(145deg, #1a1a2e, #16213e);
-      border-radius: 16px; border: 1px solid rgba(255, 140, 0, 0.2);
-      transition: all 0.3s ease; overflow: hidden; cursor: pointer;
-    }
-    .tournament-card:hover { border-color: #ff8c00; transform: translateY(-3px); }
-    .tournament-card img { width: 100%; height: 160px; object-fit: cover; }
-    .tournament-rank-badge {
-      position: absolute; top: 10px; right: 10px; background: #ff8c00;
-      color: #000; font-weight: 900; padding: 4px 12px; border-radius: 20px; font-size: 14px;
-    }
-    .tournament-leaderboard-item {
-      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 15px;
-      margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
-      border-left: 3px solid transparent;
-    }
-    .tournament-leaderboard-item.top1 { border-left-color: #ffd700; background: rgba(255,215,0,0.1); }
-    .tournament-leaderboard-item.top2 { border-left-color: #c0c0c0; background: rgba(192,192,192,0.08); }
-    .tournament-leaderboard-item.top3 { border-left-color: #cd7f32; background: rgba(205,127,50,0.08); }
-    .tournament-leaderboard-item .rank-num { font-weight: 900; font-size: 18px; width: 40px; }
-    .tournament-leaderboard-item .score-num { font-weight: 700; color: #ff8c00; }
-    
-    .tournament-prize-pool {
-      background: linear-gradient(135deg, #1a1a2e, #2d1b69);
-      border-radius: 12px; border: 1px solid #ff8c00; padding: 15px;
-    }
-    .tournament-btn-gold {
-      background: linear-gradient(135deg, #ff8c00, #ff6a00);
-      color: #000; font-weight: 700; padding: 12px 30px; border-radius: 12px;
-      border: none; transition: all 0.3s; cursor: pointer;
-    }
-    .tournament-btn-gold:hover { transform: scale(1.05); box-shadow: 0 5px 25px rgba(255, 140, 0, 0.4); }
-    .tournament-modal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-      z-index: 2000; padding: 20px; overflow-y: auto;
-    }
-    .tournament-modal.active { display: flex; align-items: center; justify-content: center; }
-    .tournament-modal-content {
-      background: #1a1a2e; border-radius: 20px; max-width: 600px; width: 100%;
-      padding: 30px; border: 1px solid #ff8c00; max-height: 90vh; overflow-y: auto;
-    }
-    .tournament-user-tag {
-      background: #ff8c00; color: #000; font-weight: 700;
-      padding: 2px 10px; border-radius: 12px; font-size: 11px;
-    }
 
     /* ===== NEW FEATURES STYLES ===== */
     .feature-card {
@@ -683,50 +633,34 @@
       transform: scale(1.05);
     }
 
-    /* Game Card */
-    .game-card-inline {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 12px;
-      border: 1px solid #2a2a3e;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      display: flex;
+    /* Timer Modal */
+    #timer-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 50;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      padding: 20px;
     }
-    .game-card-inline:hover {
-      border-color: #ff8c00;
-      transform: translateY(-2px);
+    #timer-modal.active {
+      display: flex;
     }
-    .game-card-inline .game-icon {
-      font-size: 32px;
-      margin-right: 12px;
+    #timer-modal .timer-box {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid #ff8c00;
     }
-    .game-card-inline .game-info {
-      flex: 1;
-    }
-    .game-card-inline .game-info .game-title {
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .game-card-inline .game-info .game-desc {
-      font-size: 12px;
-      color: #888;
-    }
-    .game-card-inline .play-btn {
-      background: #22c55e;
-      color: #000;
+    #timer-modal .timer-number {
+      font-size: 64px;
       font-weight: bold;
-      padding: 8px 20px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 12px;
-      transition: transform 0.2s;
-    }
-    .game-card-inline .play-btn:hover {
-      transform: scale(1.05);
+      color: #ff8c00;
+      margin: 15px 0;
     }
   </style>
 </head>
@@ -761,11 +695,11 @@
   </div>
 
   <!-- ===== TIMER MODAL ===== -->
-  <div id="timer-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-6">
-    <div class="bg-gray-800 rounded-lg p-8 w-full max-w-sm text-center">
-      <h3 class="text-xl font-bold mb-4 text-accent">Please Wait</h3>
-      <div class="text-4xl font-bold mb-4" id="countdown-display">0</div>
-      <p class="text-gray-400 text-sm">কাজটি সম্পন্ন করতে অপেক্ষা করুন। ব্রাউজার বা অ্যাপ বন্ধ করবেন না।</p>
+  <div id="timer-modal">
+    <div class="timer-box">
+      <h3 class="text-xl font-bold text-accent mb-2">⏳ Please Wait</h3>
+      <div class="timer-number" id="countdown-display">10</div>
+      <p class="text-gray-400 text-sm">Please wait while we process your request...</p>
     </div>
   </div>
 
@@ -781,6 +715,7 @@
     <div class="overlay-content">
       <div style="font-size: 48px; margin-bottom: 10px;">🌐</div>
       <h3 class="text-xl font-bold text-white mb-2" id="website-task-name">Visiting Website</h3>
+      <div id="website-iframe-container"></div>
       <p class="text-gray-400 text-sm mb-2">Please wait <span id="website-timer-display">10</span> seconds</p>
       <div class="timer-circle" id="website-timer-circle">10</div>
       <p class="status-text" id="website-status-text">⏳ Please wait...</p>
@@ -996,14 +931,6 @@
           <div id="checkin-calendar" class="grid grid-cols-7 gap-1"></div>
         </div>
 
-        <section>
-          <div class="flex justify-between items-center mb-3">
-            <h2 class="text-lg font-semibold">🏆 Game Tournament</h2>
-            <span class="text-xs text-gray-400" id="tournament-rank-display">Rank: -</span>
-          </div>
-          <div id="tournament-games-container" class="grid grid-cols-1 gap-4"></div>
-        </section>
-
         <!-- ===== DAILY TASKS ===== -->
         <section>
           <div class="flex justify-between items-center">
@@ -1028,7 +955,7 @@
               <button class="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg text-sm btn" id="watch-ad-btn" onclick="showMonetagAd()">Watch</button>
             </div>
 
-            <!-- Website Visit 1 - New Link -->
+            <!-- Website Visit 1 -->
             <div class="task-item-enhanced" id="task-website1">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
@@ -1040,7 +967,7 @@
               <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('website-visit-1')">Visit</button>
             </div>
 
-            <!-- Website Visit 2 - New Link -->
+            <!-- Website Visit 2 -->
             <div class="task-item-enhanced" id="task-website2">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
@@ -1052,7 +979,7 @@
               <button class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('website-visit-2')">Visit</button>
             </div>
 
-            <!-- Website Visit 3 - New Link -->
+            <!-- Website Visit 3 -->
             <div class="task-item-enhanced" id="task-website3">
               <div class="flex items-center flex-1">
                 <span class="task-icon">🌐</span>
@@ -1075,28 +1002,25 @@
               </div>
               <button class="bg-orange-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openWebsiteTask('special-task')">Start</button>
             </div>
-
-            <!-- Play Mini Game -->
-            <div class="task-item-enhanced" id="task-game">
-              <div class="flex items-center flex-1">
-                <span class="task-icon">🎮</span>
-                <div class="task-info">
-                  <p class="task-title">Play Mini Game</p>
-                  <p class="task-desc">Earn 10 Coins</p>
-                </div>
-              </div>
-              <button class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg text-sm btn task-btn" onclick="openInlineGames()">Play</button>
-            </div>
           </div>
         </section>
 
-        <!-- ===== INLINE GAMES ===== -->
-        <section id="inline-games-section" style="display:none;">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="text-lg font-semibold">🎮 Games</h3>
-            <button onclick="closeInlineGames()" class="text-red-400 text-sm">✕ Close</button>
-          </div>
-          <div id="inline-games-list" class="space-y-2"></div>
+        <!-- ===== AD PLACEMENTS ===== -->
+        <section class="space-y-4 mt-6">
+          <h3 class="text-lg font-semibold mb-2">📢 Sponsored Content</h3>
+          
+          <div id="native-banner-container"></div>
+          <div id="banner-320x50-container"></div>
+          <div id="social-bar-container"></div>
+          <div id="banner-160x300-container"></div>
+          
+          <button onclick="openSmartlink()" class="w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-700 text-white font-bold hover:scale-105 transition-transform">
+            🔗 Smartlink
+          </button>
+          
+          <button onclick="loadPopunderAd()" class="w-full py-3 rounded-lg bg-gradient-to-r from-red-500 to-red-700 text-white font-bold hover:scale-105 transition-transform">
+            📢 Popunder Ad
+          </button>
         </section>
       </div>
 
@@ -1263,39 +1187,6 @@
     </div>
   </div>
 
-  <!-- ===== TOURNAMENT MODAL ===== -->
-  <div id="tournament-modal" class="tournament-modal">
-    <div class="tournament-modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h2 id="t-modal-title" class="text-2xl font-bold text-white">Game Title</h2>
-        <button onclick="closeTournamentModal()" class="text-gray-400 hover:text-white text-2xl">✕</button>
-      </div>
-      <img id="t-modal-image" src="" alt="" class="w-full h-48 object-cover rounded-xl mb-4">
-      <div class="tournament-prize-pool mb-4">
-        <h3 class="font-bold text-orange-400 mb-2">🏆 Prize Pool</h3>
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-black/30 rounded-lg p-2">
-            <p class="text-yellow-400 font-bold text-lg" id="t-prize-1">0</p>
-            <p class="text-xs text-gray-400">🥇 1st</p>
-          </div>
-          <div class="bg-black/30 rounded-lg p-2">
-            <p class="text-gray-300 font-bold text-lg" id="t-prize-2">0</p>
-            <p class="text-xs text-gray-400">🥈 2nd</p>
-          </div>
-          <div class="bg-black/30 rounded-lg p-2">
-            <p class="text-amber-600 font-bold text-lg" id="t-prize-3">0</p>
-            <p class="text-xs text-gray-400">🥉 3rd</p>
-          </div>
-        </div>
-      </div>
-      <div class="mb-4">
-        <h3 class="font-bold text-white mb-2">📊 Leaderboard</h3>
-        <div id="t-leaderboard" class="space-y-1 max-h-60 overflow-y-auto"></div>
-      </div>
-      <button onclick="playTournamentGame()" class="tournament-btn-gold w-full text-center">🎮 Play & Earn Coins</button>
-    </div>
-  </div>
-
   <!-- ============================================================ -->
   <!-- ========== MAIN JAVASCRIPT ================================== -->
   <!-- ============================================================ -->
@@ -1317,258 +1208,6 @@
       return el;
     }
 
-    function safeAddClass(el, className) {
-      if (el && el.classList) el.classList.add(className);
-    }
-
-    function safeRemoveClass(el, className) {
-      if (el && el.classList) el.classList.remove(className);
-    }
-
-    function safeToggleClass(el, className) {
-      if (el && el.classList) el.classList.toggle(className);
-    }
-
-    // ============================================================
-    // ========== TOURNAMENT SYSTEM ================================
-    // ============================================================
-    const TOURNAMENT_KEY = 'tournament_data';
-    let tournamentData = null;
-
-    function loadTournamentData() {
-      try {
-        const saved = localStorage.getItem(TOURNAMENT_KEY);
-        if (saved) {
-          tournamentData = JSON.parse(saved);
-        } else {
-          tournamentData = {
-            game: {
-              id: 'bubble-pop-tournament',
-              title: 'Bubble Pop Master',
-              image: 'https://play-lh.googleusercontent.com/1kq2O2nCBh6GBfF2Q9LwGZ7L8ZjQjKxQWzNQJqX9L9vQ',
-              url: 'https://playgama.com/export/game/bubble-pop-legend?clid=p_884d80fd-3275-47c8-8420-377ca8205874',
-              prizes: { 1: 1000000, 2: 500000, 3: 300000 },
-              scores: {}
-            }
-          };
-          saveTournamentData();
-        }
-      } catch(e) {
-        tournamentData = {
-          game: {
-            id: 'bubble-pop-tournament',
-            title: 'Bubble Pop Master',
-            image: 'https://play-lh.googleusercontent.com/1kq2O2nCBh6GBfF2Q9LwGZ7L8ZjQjKxQWzNQJqX9L9vQ',
-            url: 'https://playgama.com/export/game/bubble-pop-legend?clid=p_884d80fd-3275-47c8-8420-377ca8205874',
-            prizes: { 1: 1000000, 2: 500000, 3: 300000 },
-            scores: {}
-          }
-        };
-        saveTournamentData();
-      }
-    }
-    
-    function saveTournamentData() {
-      localStorage.setItem(TOURNAMENT_KEY, JSON.stringify(tournamentData));
-    }
-    
-    function getTournamentScores() {
-      if (!tournamentData || !tournamentData.game) return [];
-      const scores = Object.entries(tournamentData.game.scores || {})
-        .map(([user, score]) => ({ user, score }))
-        .sort((a, b) => b.score - a.score);
-      return scores;
-    }
-    
-    function renderTournament() {
-      const container = safeGetElement('tournament-games-container');
-      
-      if (!tournamentData || !tournamentData.game) {
-        container.innerHTML = `
-          <div class="text-center py-6 text-gray-400">
-            <p class="text-2xl mb-2">🎮</p>
-            <p class="text-sm">No tournament available</p>
-          </div>
-        `;
-        return;
-      }
-      
-      const game = tournamentData.game;
-      const scores = getTournamentScores();
-      const totalPlayers = scores.length;
-      const topScore = scores[0]?.score || 0;
-      const usernameEl = safeGetElement('profile-username');
-      const username = usernameEl?.textContent?.replace('@', '') || 'Guest';
-      const userRank = scores.findIndex(s => s.user === username) + 1;
-      
-      const rankDisplay = safeGetElement('tournament-rank-display');
-      if (rankDisplay) {
-        rankDisplay.textContent = userRank > 0 ? `Rank: #${userRank}` : 'Rank: -';
-      }
-      
-      container.innerHTML = `
-        <div class="tournament-card" onclick="openTournament()">
-          <div class="relative">
-            <img src="${game.image || 'https://placehold.co/400x200/1a1a2e/ff8c00?text=Game'}" 
-                 alt="${game.title}" 
-                 onerror="this.src='https://placehold.co/400x200/1a1a2e/ff8c00?text=${game.title}'">
-            <span class="tournament-rank-badge">🏆</span>
-          </div>
-          <div class="p-3">
-            <h3 class="font-bold text-white text-sm">${game.title}</h3>
-            <div class="flex justify-between text-xs text-gray-400 mt-1">
-              <span>👥 ${totalPlayers} players</span>
-              <span>🏆 ${topScore}</span>
-            </div>
-            ${userRank > 0 ? `<span class="tournament-user-tag text-xs">Your Rank: #${userRank}</span>` : ''}
-          </div>
-        </div>
-      `;
-    }
-    
-    function openTournament() {
-      if (!tournamentData || !tournamentData.game) return;
-      
-      const game = tournamentData.game;
-      const modal = safeGetElement('tournament-modal');
-      
-      const titleEl = safeGetElement('t-modal-title');
-      const imageEl = safeGetElement('t-modal-image');
-      const prize1El = safeGetElement('t-prize-1');
-      const prize2El = safeGetElement('t-prize-2');
-      const prize3El = safeGetElement('t-prize-3');
-      const lbContainer = safeGetElement('t-leaderboard');
-      
-      if (titleEl) titleEl.textContent = game.title;
-      if (imageEl) {
-        imageEl.src = game.image || 'https://placehold.co/400x200/1a1a2e/ff8c00?text=Game';
-        imageEl.onerror = function() {
-          this.src = 'https://placehold.co/400x200/1a1a2e/ff8c00?text=' + game.title;
-        };
-      }
-      if (prize1El) prize1El.textContent = (game.prizes[1] || 0).toLocaleString();
-      if (prize2El) prize2El.textContent = (game.prizes[2] || 0).toLocaleString();
-      if (prize3El) prize3El.textContent = (game.prizes[3] || 0).toLocaleString();
-      
-      const scores = getTournamentScores();
-      const usernameEl = safeGetElement('profile-username');
-      const username = usernameEl?.textContent?.replace('@', '') || 'Guest';
-      
-      if (scores.length === 0) {
-        if (lbContainer) lbContainer.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">No scores yet. Be the first!</p>';
-      } else {
-        if (lbContainer) {
-          lbContainer.innerHTML = scores.map((s, i) => {
-            const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
-            const isUser = s.user === username;
-            return `
-              <div class="tournament-leaderboard-item ${rankClass} ${isUser ? 'border border-orange-500' : ''}">
-                <div class="flex items-center gap-3">
-                  <span class="rank-num text-gray-400">#${i+1}</span>
-                  <span class="font-medium ${isUser ? 'text-orange-400' : ''}">${s.user} ${isUser ? '👤' : ''}</span>
-                </div>
-                <span class="score-num font-bold">${s.score}</span>
-              </div>
-            `;
-          }).join('');
-        }
-      }
-      
-      if (modal) safeAddClass(modal, 'active');
-    }
-    
-    function closeTournamentModal() {
-      const modal = safeGetElement('tournament-modal');
-      if (modal) safeRemoveClass(modal, 'active');
-    }
-    
-    function playTournamentGame() {
-      if (!tournamentData || !tournamentData.game) return;
-      const game = tournamentData.game;
-      if (!game.url) return;
-      
-      // Open in new tab (external game)
-      window.open(game.url, '_blank');
-      
-      const usernameEl = safeGetElement('profile-username');
-      const username = usernameEl?.textContent?.replace('@', '') || 'Guest';
-      if (username && username !== 'Guest' && username !== 'Loading...') {
-        if (!game.scores) game.scores = {};
-        const currentScore = game.scores[username] || 0;
-        const newScore = currentScore + Math.floor(Math.random() * 100) + 10;
-        game.scores[username] = newScore;
-        saveTournamentData();
-        renderTournament();
-        const modal = safeGetElement('tournament-modal');
-        if (modal && modal.classList.contains('active')) {
-          openTournament();
-        }
-        showToast('🎮 Score updated! +' + (newScore - currentScore) + ' points');
-        addXP(5);
-      } else {
-        showToast('👤 Please login to save your score!');
-      }
-    }
-
-    // ============================================================
-    // ========== GAME DATA ========================================
-    // ============================================================
-    const gameData = {
-      "hits": [
-        { "title": "Hidden Object: Street Of Secrets", "url": "https://playgama.com/export/game/hidden-object-street-of-secrets?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "120105" },
-        { "title": "Hidden Object: Clues and Mysteries", "url": "https://playgama.com/export/game/hidden-object-clues-and-mysteries?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99671" },
-        { "title": "Hidden Objects: Island Secrets", "url": "https://playgama.com/export/game/hidden-objects-island-secrets?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116495" },
-        { "title": "Idol Livestream: Doll Dress Up", "url": "https://playgama.com/export/game/idol-livestream-doll-dress-up?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116800" },
-        { "title": "Good Sort Master: Triple Match", "url": "https://playgama.com/export/game/good-sort-master?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "46" },
-        { "title": "Nuts Puzzle: Sort By Color", "url": "https://playgama.com/export/game/nuts-puzzle-sort-by-color?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118123" },
-        { "title": "Paper Doll Diary: Dress Up DIY", "url": "https://playgama.com/export/game/paper-doll-diary-dress-up-diy?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116926" },
-        { "title": "Fruit Merge: Juicy Drop Game", "url": "https://playgama.com/export/game/fruit-merge-playgama?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "59" },
-        { "title": "Numicolor", "url": "https://numicolor.com/export?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123250" },
-        { "title": "Soccer Random", "url": "https://playgama.com/export/game/soccer-random?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122769" },
-        { "title": "PLAYMUSIC", "url": "https://playgama.com/export/game/playmusic?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122780" },
-        { "title": "Hidden Object: My Hotel", "url": "https://playgama.com/export/game/hidden-object-my-hotel?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "109352" },
-        { "title": "Playground Man! Ragdoll Show!", "url": "https://playgama.com/export/game/playground-man-ragdoll-show?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "98048" },
-        { "title": "Sprunki", "url": "https://playgama.com/export/game/sprunki-2c27-1?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "86451" },
-        { "title": "ASMR Girl: Livestream Mukbang", "url": "https://playgama.com/export/game/asmr-girl-livestream-mukbang?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116704" },
-        { "title": "Master Chess", "url": "https://playgama.com/export/game/master-chess?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "86262" },
-        { "title": "Word Finder", "url": "https://playgama.com/export/game/word-finder?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118618" },
-        { "title": "Mahjong Lines", "url": "https://playgama.com/export/game/mahjong-lines?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118432" },
-        { "title": "Bubble Pop Legend", "url": "https://playgama.com/export/game/bubble-pop-legend?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117896" },
-        { "title": "Epic Sword Battle! Fight in the Ragdoll Arena!", "url": "https://playgama.com/export/game/epic-sword-battle-fight-in-the-ragdoll-arena?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "115055" },
-        { "title": "Chess Online Playing", "url": "https://playgama.com/export/game/chess-online-playing?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118817" },
-        { "title": "Wild Love", "url": "https://playgama.com/export/game/wild-love?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "115951" },
-        { "title": "Basketball Stars", "url": "https://playgama.com/export/game/basketball-stars?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "114034" },
-        { "title": "The Tall Man", "url": "https://playgama.com/export/game/the-tall-man?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123229" },
-        { "title": "Yarn Fever! Unravel Puzzle", "url": "https://playgama.com/export/game/yarn-fever-unravel-puzzle?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "116925" },
-        { "title": "Arrow Exit Puzzle", "url": "https://playgama.com/export/game/arrow-exit-puzzle?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123316" },
-        { "title": "Bubble Shooter: Tap & Pop", "url": "https://playgama.com/export/game/bubble-shooter-tap--pop?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99633" },
-        { "title": "DIY Phone Case Maker", "url": "https://playgama.com/export/game/diy-phone-case-maker?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117063" },
-        { "title": "Age of Tanks Warriors: TD War", "url": "https://playgama.com/export/game/age-of-tanks-warriors-td-war?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "106324" },
-        { "title": "Mystery Squishy Dumpling Blind Box", "url": "https://playgama.com/export/game/mystery-squishy-dumpling-blind-box?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "123286" },
-        { "title": "Tap 3D Wood Block Away", "url": "https://playgama.com/export/game/tap-3d-wood-block-away?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "95758" },
-        { "title": "Find the Frog - Hidden Objects", "url": "https://playgama.com/export/game/find-the-frog--hidden-objects?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99734" },
-        { "title": "Millionaire Life", "url": "https://playgama.com/export/game/millionaire-life?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "111970" },
-        { "title": "Mahjong Puzzle: Tile Match", "url": "https://playgama.com/export/game/mahjong-puzzle-tile-match?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122429" },
-        { "title": "Bubble Blast", "url": "https://playgama.com/export/game/bubble-blast?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "72" },
-        { "title": "Fun Ragdoll Challenge! Mini Games Collection!", "url": "https://playgama.com/export/game/fun-ragdoll-challenge-mini-games-collection?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "119970" },
-        { "title": "Mahjong Unlimited", "url": "https://playgama.com/export/game/mahjong-unlimited?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117101" },
-        { "title": "Favorite Puzzles", "url": "https://playgama.com/export/game/favorite-puzzles?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "117768" },
-        { "title": "Block Blast 2048", "url": "https://playgama.com/export/game/block-blast-2048?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "118589" },
-        { "title": "Screw Match", "url": "https://playgama.com/export/game/screw-match?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "111955" },
-        { "title": "Arrows Out!", "url": "https://playgama.com/export/game/arrows-out?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "119381" },
-        { "title": "Weapon Upgrade", "url": "https://playgama.com/export/game/weapon-upgrade?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "99437" },
-        { "title": "Ragdoll Racing: Extreme Downhill!", "url": "https://playgama.com/export/game/ragdoll-racing-extreme-downhill?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "119972" },
-        { "title": "Color Pixels - Coloring by Numbers", "url": "https://playgama.com/export/game/color-pixels-coloring-by-numbers?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "94837" },
-        { "title": "Find Out Hidden Object", "url": "https://playgama.com/export/game/find-out-hidden-object?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "110785" },
-        { "title": "Moto X3M", "url": "https://playgama.com/export/game/moto-x3m?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "106346" },
-        { "title": "Fashion Princess - Dress Up for Girls", "url": "https://playgama.com/export/game/fashion-princess--dress-up-for-girls-e00c-1?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "96760" },
-        { "title": "Basket Random", "url": "https://playgama.com/export/game/basket-random?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "122770" },
-        { "title": "Chess Online Multiplayer", "url": "https://playgama.com/export/game/chess-online-multiplayer?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "111579" },
-        { "title": "Gym Boss", "url": "https://playgama.com/export/game/gym-boss?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "121780" },
-        { "title": "Hexa Master 3D: Sort Puzzle", "url": "https://playgama.com/export/game/hexa-master-3d-sort-puzzle?clid=p_884d80fd-3275-47c8-8420-377ca8205874", "gameId": "121523" }
-      ]
-    };
-
     // ============================================================
     // ========== APP STATE ========================================
     // ============================================================
@@ -1583,8 +1222,6 @@
     let userAchievements = [];
     let userReferrals = [];
     let userReferralEarnings = 0;
-    let coinHistory = [];
-    let checkinData = {};
     
     // Website task state
     let currentWebsiteTask = null;
@@ -1694,7 +1331,6 @@
       var left = totalTasks - completedCount;
       if (adsLeftCountEl) adsLeftCountEl.textContent = left > 0 ? left : '0';
       
-      renderTournament();
       updateCheckinCalendar();
       updateWithdrawProgress();
       loadCoinHistory();
@@ -2191,7 +1827,6 @@
         { id: 'daily_1', name: 'Watch 1 Ad', desc: 'Watch 1 video ad', target: 1, reward: 10 },
         { id: 'daily_2', name: 'Complete 3 Tasks', desc: 'Complete 3 daily tasks', target: 3, reward: 15 },
         { id: 'daily_3', name: 'Earn 50 Coins', desc: 'Earn 50 coins today', target: 50, reward: 20 },
-        { id: 'daily_4', name: 'Play 1 Game', desc: 'Play 1 mini game', target: 1, reward: 10 },
       ],
       weekly: [
         { id: 'weekly_1', name: 'Watch 7 Ads', desc: 'Watch 7 video ads this week', target: 7, reward: 50 },
@@ -2345,7 +1980,6 @@
           userAchievements = userData.achievements || [];
           userReferrals = userData.referrals || [];
           userReferralEarnings = userData.referralEarnings || 0;
-          checkinData = userData.checkedDays || [];
           
           updateUI();
           
@@ -2382,7 +2016,6 @@
               userAchievements = userData.achievements || [];
               userReferrals = userData.referrals || [];
               userReferralEarnings = userData.referralEarnings || 0;
-              checkinData = userData.checkedDays || [];
               updateUI();
             }
           });
@@ -2545,16 +2178,8 @@
       return completedTasks[taskId] || false;
     }
 
-    function disableButton(btn) {
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = '✓ Done';
-        btn.classList.add('opacity-50', 'cursor-not-allowed');
-      }
-    }
-
     // ============================================================
-    // ========== WEBSITE TASK (10 seconds wait, 10 coins) =======
+    // ========== WEBSITE TASK (Inside App - No External Browser) ==
     // ============================================================
     const WEBSITE_TASKS = {
         "website-visit-1": {
@@ -2600,10 +2225,7 @@
             return;
         }
 
-        // Open in new tab (external website)
-        window.open(task.url, '_blank');
-
-        // Show overlay with timer
+        // Open inside app using iframe overlay (NOT in external browser)
         const overlay = document.getElementById('website-overlay');
         const taskNameEl = document.getElementById('website-task-name');
         const timerDisplay = document.getElementById('website-timer-display');
@@ -2627,6 +2249,19 @@
             claimBtn.style.display = 'none';
         }
         if (backBtn) backBtn.classList.remove('show');
+
+        // Load website in iframe inside overlay
+        const container = document.getElementById('website-iframe-container');
+        if (container) {
+            container.innerHTML = `
+                <iframe 
+                    src="${task.url}" 
+                    style="width:100%;height:350px;border:0;border-radius:10px;background:#fff;margin:10px 0;"
+                    allow="autoplay; fullscreen"
+                    id="website-iframe"
+                ></iframe>
+            `;
+        }
 
         if (websiteTimerInterval) {
             clearInterval(websiteTimerInterval);
@@ -2905,76 +2540,7 @@
     }
 
     // ============================================================
-    // ========== INLINE GAMES (Inside App) =======================
-    // ============================================================
-    let inlineGamesOpen = false;
-
-    window.openInlineGames = function() {
-        const section = document.getElementById('inline-games-section');
-        const list = document.getElementById('inline-games-list');
-        
-        if (!section || !list) return;
-
-        // Check if user is logged in
-        if (!currentUser) {
-            showAlert('Please login first!');
-            return;
-        }
-
-        inlineGamesOpen = true;
-        section.style.display = 'block';
-
-        // Show first 10 games
-        const games = gameData.hits.slice(0, 10);
-        
-        list.innerHTML = games.map((game, index) => `
-            <div class="game-card-inline">
-                <div class="flex items-center">
-                    <div class="game-icon">🎮</div>
-                    <div class="game-info">
-                        <div class="game-title">${game.title}</div>
-                        <div class="game-desc">Earn 10 Coins on play</div>
-                    </div>
-                </div>
-                <button class="play-btn" onclick="playInlineGame('${game.url}', ${index})">Play</button>
-            </div>
-        `).join('');
-
-        // Scroll to games section
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    window.closeInlineGames = function() {
-        const section = document.getElementById('inline-games-section');
-        if (section) {
-            section.style.display = 'none';
-        }
-        inlineGamesOpen = false;
-    };
-
-    window.playInlineGame = function(gameUrl, index) {
-        // Open in new tab (external game)
-        window.open(gameUrl, '_blank');
-        
-        // Add coins after playing
-        setTimeout(() => {
-            addCoins(10);
-            const taskId = 'task-game';
-            if (!isTaskCompleted(taskId)) {
-                markTaskCompleted(taskId);
-                const btn = document.querySelector('#task-game .task-btn');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.textContent = '✓ Done';
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                }
-            }
-            showToast('🎮 +10 Coins for playing!');
-        }, 1000);
-    };
-
-    // ============================================================
-    // ========== LOAD AD PLACEMENTS ===============================
+    // ========== AD PLACEMENTS ====================================
     // ============================================================
     window.loadNativeBanner = function() {
         const box = document.getElementById("native-banner-container");
@@ -3318,9 +2884,6 @@
             navigateTo('home-page');
             if (typeof lucide !== 'undefined') lucide.createIcons();
             
-            loadTournamentData();
-            renderTournament();
-            
             setTimeout(function() {
                 loadWithdrawalHistory();
             }, 500);
@@ -3377,9 +2940,6 @@
             if (loginView) loginView.classList.remove('hidden');
             if (signupView) signupView.classList.add('hidden');
             updateUI();
-            
-            loadTournamentData();
-            renderTournament();
 
             stopAutoAds();
         }
@@ -3792,16 +3352,12 @@
         if (authSection) authSection.classList.add('active');
         authSection.style.display = 'flex';
         
-        loadTournamentData();
-        renderTournament();
-        
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         if (refCode) {
             localStorage.setItem('pending_ref', refCode);
         }
 
-        // Load ad placements
         setTimeout(() => {
             loadNativeBanner();
             loadBanner320x50();
