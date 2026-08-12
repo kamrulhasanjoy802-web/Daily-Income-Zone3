@@ -78,64 +78,6 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    /* Ad Overlay */
-    #ad-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 10000;
-      flex-direction: column;
-    }
-    #ad-overlay.active {
-      display: flex;
-    }
-    #ad-overlay .close-btn {
-      background: #ff3b30;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 18px;
-      margin: 10px 12px;
-      cursor: pointer;
-      flex-shrink: 0;
-      z-index: 20;
-      align-self: flex-start;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
-    }
-    #ad-overlay .close-btn:hover { background: #e0352b; }
-    #ad-overlay .close-btn:active { transform: scale(0.95); }
-    #ad-overlay iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-      background: #1a1a1a;
-    }
-    #ad-overlay .loading-placeholder {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0a0a0a;
-      color: #666;
-      font-size: 16px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #333;
-      border-top-color: #ff8c00;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 
@@ -159,19 +101,7 @@
 
   <!-- ===== LOADER ===== -->
   <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
-    <div class="spinner"></div>
-  </div>
-
-  <!-- ===== AD OVERLAY ===== -->
-  <div id="ad-overlay">
-    <button class="close-btn" id="ad-close-btn">✕ Close Ad</button>
-    <div class="loading-placeholder" id="ad-loading">
-      <div style="text-align:center;">
-        <div class="spinner"></div>
-        <p>Loading ad...</p>
-      </div>
-    </div>
-    <iframe id="ad-iframe" src="about:blank" allow="fullscreen; autoplay; encrypted-media;" style="display:none;"></iframe>
+    <div class="w-8 h-8 border-4 border-t-orange-500 border-white/20 rounded-full animate-spin"></div>
   </div>
 
   <!-- ===== AUTH SECTION ===== -->
@@ -223,7 +153,7 @@
       <div class="ad-grid" id="ad-grid-container"></div>
       
       <div class="mt-6 text-center text-xs text-gray-500">
-        <p>🔁 Unlimited clicks · Opens in overlay</p>
+        <p>🔁 Unlimited clicks · Opens in new tab</p>
       </div>
     </main>
   </div>
@@ -274,75 +204,7 @@
     window.showLogin = showLogin;
 
     // ============================================================
-    // ========== AD OVERLAY LOGIC =================================
-    // ============================================================
-    const adOverlay = safeGet('ad-overlay');
-    const adIframe = safeGet('ad-iframe');
-    const adCloseBtn = safeGet('ad-close-btn');
-    const adLoading = safeGet('ad-loading');
-    let isAdOpen = false;
-
-    function openAd(url) {
-      if (!adOverlay || !adIframe) return;
-      
-      // Reset overlay
-      adOverlay.classList.add('active');
-      adLoading.style.display = 'flex';
-      adIframe.style.display = 'none';
-      adIframe.src = 'about:blank';
-      isAdOpen = true;
-      
-      // Load ad in iframe after a small delay
-      setTimeout(() => {
-        if (isAdOpen) {
-          adIframe.src = url;
-          adIframe.style.display = 'block';
-          adLoading.style.display = 'none';
-        }
-      }, 300);
-      
-      // Push history state for back button
-      history.pushState({ adOpen: true }, "", "#ad");
-    }
-
-    function closeAd() {
-      if (!adOverlay || !adIframe) return;
-      
-      adOverlay.classList.remove('active');
-      adIframe.src = 'about:blank';
-      adIframe.style.display = 'none';
-      adLoading.style.display = 'flex';
-      isAdOpen = false;
-      
-      // Remove hash
-      if (window.location.hash === '#ad') {
-        history.replaceState({}, "", window.location.pathname);
-      }
-      
-      // Ensure app is visible and auth is hidden (but only if user is logged in)
-      // We check currentUser from auth state, not from isAdOpen
-      if (currentUser) {
-        const authSection = safeGet('auth-section');
-        const appContainer = safeGet('app-container');
-        if (authSection) { authSection.classList.remove('active'); authSection.style.display = 'none'; }
-        if (appContainer) { appContainer.classList.add('active'); appContainer.style.display = 'flex'; }
-      }
-    }
-
-    // Close button event
-    if (adCloseBtn) {
-      adCloseBtn.addEventListener('click', closeAd);
-    }
-
-    // Back button support - only close ad, never sign out
-    window.addEventListener('popstate', function(event) {
-      if (isAdOpen) {
-        closeAd();
-      }
-    });
-
-    // ============================================================
-    // ========== AD BUTTONS (20 Ads) ==============================
+    // ========== AD BUTTONS (20 Ads - New Tab) ===================
     // ============================================================
     const AD_LINKS = [
       "https://omg10.com/4/11551967",
@@ -367,6 +229,10 @@
       "https://omg10.com/4/11282222"
     ];
 
+    function openAd(url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
     function renderAdButtons() {
       const container = safeGet('ad-grid-container');
       if (!container) return;
@@ -379,9 +245,7 @@
         btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          if (!isAdOpen) {
-            openAd(url);
-          }
+          openAd(url);
         });
         container.appendChild(btn);
       });
@@ -559,13 +423,10 @@
     const logoutBtn = safeGet('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async function() {
-        // Close ad if open
-        if (isAdOpen) {
-          closeAd();
-        }
-        // Now sign out
         await auth.signOut();
-        // Don't reset here - auth listener will handle it
+        currentUser = null;
+        userData = null;
+        resetToAuth();
       });
     }
 
@@ -586,11 +447,7 @@
       } else {
         currentUser = null;
         userData = null;
-        // Only reset to auth if ad is NOT open
-        // This prevents auth screen from showing while ad is open
-        if (!isAdOpen) {
-          resetToAuth();
-        }
+        resetToAuth();
       }
     });
 
