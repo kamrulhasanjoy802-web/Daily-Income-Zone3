@@ -108,10 +108,6 @@
       z-index: 20;
       align-self: flex-start;
       box-shadow: 0 2px 12px rgba(0,0,0,0.5);
-      display: none;
-    }
-    #ad-overlay .close-btn.show {
-      display: block;
     }
     #ad-overlay .close-btn:hover { background: #e0352b; }
     #ad-overlay .close-btn:active { transform: scale(0.95); }
@@ -285,14 +281,12 @@
     const adCloseBtn = safeGet('ad-close-btn');
     const adLoading = safeGet('ad-loading');
     let isAdOpen = false;
-    let closeBtnTimer = null;
 
     function openAd(url) {
       if (!adOverlay || !adIframe) return;
       
       // Reset overlay
       adOverlay.classList.add('active');
-      adCloseBtn.classList.remove('show');
       adLoading.style.display = 'flex';
       adIframe.style.display = 'none';
       adIframe.src = 'about:blank';
@@ -307,14 +301,6 @@
         }
       }, 300);
       
-      // Show close button after 1.5 seconds
-      if (closeBtnTimer) clearTimeout(closeBtnTimer);
-      closeBtnTimer = setTimeout(() => {
-        if (isAdOpen) {
-          adCloseBtn.classList.add('show');
-        }
-      }, 1500);
-      
       // Push history state for back button
       history.pushState({ adOpen: true }, "", "#ad");
     }
@@ -327,17 +313,17 @@
       adIframe.style.display = 'none';
       adLoading.style.display = 'flex';
       isAdOpen = false;
-      adCloseBtn.classList.remove('show');
-      
-      if (closeBtnTimer) {
-        clearTimeout(closeBtnTimer);
-        closeBtnTimer = null;
-      }
       
       // Remove hash
       if (window.location.hash === '#ad') {
         history.replaceState({}, "", window.location.pathname);
       }
+      
+      // Ensure app is visible and auth is hidden
+      const authSection = safeGet('auth-section');
+      const appContainer = safeGet('app-container');
+      if (authSection) { authSection.classList.remove('active'); authSection.style.display = 'none'; }
+      if (appContainer) { appContainer.classList.add('active'); appContainer.style.display = 'flex'; }
     }
 
     // Close button event
