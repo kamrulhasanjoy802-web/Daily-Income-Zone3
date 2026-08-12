@@ -78,49 +78,6 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    /* Ad Viewer Overlay */
-    #ad-viewer {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #000;
-      z-index: 10000;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 0;
-      margin: 0;
-    }
-    #ad-viewer.active {
-      display: flex;
-    }
-    #ad-viewer .close-btn {
-      background: #ff3b30;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 700;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 20px;
-      margin: 10px;
-      cursor: pointer;
-      flex-shrink: 0;
-      z-index: 10;
-      box-shadow: 0 2px 12px rgba(255, 59, 48, 0.3);
-      align-self: flex-start;
-    }
-    #ad-viewer .close-btn:hover { background: #e0352b; }
-    #ad-viewer .close-btn:active { transform: scale(0.95); }
-    #ad-viewer iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-      background: #1a1a1a;
-    }
   </style>
 </head>
 
@@ -145,12 +102,6 @@
   <!-- ===== LOADER ===== -->
   <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
     <div class="w-8 h-8 border-4 border-t-orange-500 border-white/20 rounded-full animate-spin"></div>
-  </div>
-
-  <!-- ===== AD VIEWER ===== -->
-  <div id="ad-viewer">
-    <button class="close-btn" id="ad-close-btn">✕ Close Ad</button>
-    <iframe id="ad-iframe" src="about:blank" allow="fullscreen; autoplay; encrypted-media;"></iframe>
   </div>
 
   <!-- ===== AUTH SECTION ===== -->
@@ -198,11 +149,11 @@
         <p class="text-gray-400 text-sm">👋 Click any ad button to watch</p>
       </div>
 
-      <!-- 3 Ad Buttons -->
+      <!-- 20 Ad Buttons -->
       <div class="ad-grid" id="ad-grid-container"></div>
       
       <div class="mt-6 text-center text-xs text-gray-500">
-        <p>🔁 Unlimited clicks · Opens in internal viewer</p>
+        <p>🔁 Unlimited clicks · Opens in same WebView</p>
       </div>
     </main>
   </div>
@@ -253,90 +204,49 @@
     window.showLogin = showLogin;
 
     // ============================================================
-    // ========== AD VIEWER LOGIC ==================================
-    // ============================================================
-    const adViewer = safeGet('ad-viewer');
-    const adIframe = safeGet('ad-iframe');
-    const adCloseBtn = safeGet('ad-close-btn');
-    let isAdViewerOpen = false;
-
-    function openAd(url) {
-      if (!adViewer || !adIframe) return;
-      
-      // Show ad viewer
-      adViewer.classList.add('active');
-      adIframe.src = url;
-      isAdViewerOpen = true;
-      
-      // Push history state for back button handling
-      history.pushState({ adViewer: true }, "", "#ad");
-    }
-
-    function closeAd() {
-      if (!adViewer || !adIframe) return;
-      
-      // Hide ad viewer
-      adViewer.classList.remove('active');
-      adIframe.src = 'about:blank';
-      isAdViewerOpen = false;
-      
-      // Remove hash if present
-      if (window.location.hash === '#ad') {
-        history.replaceState({}, "", window.location.pathname);
-      }
-      
-      // No Firebase signout - user stays logged in
-    }
-
-    // Close button event
-    if (adCloseBtn) {
-      adCloseBtn.addEventListener('click', closeAd);
-    }
-
-    // ============================================================
-    // ========== BACK BUTTON HANDLING =============================
-    // ============================================================
-    window.addEventListener('popstate', function(event) {
-      if (event.state && event.state.adViewer) {
-        // User pressed back while ad viewer is open
-        closeAd();
-      } else if (isAdViewerOpen) {
-        // Fallback: if viewer is open but state doesn't match
-        closeAd();
-      }
-    });
-
-    // ============================================================
-    // ========== AD BUTTONS =======================================
+    // ========== AD BUTTONS (20 Ads - same WebView) ==============
     // ============================================================
     const AD_LINKS = [
-      {
-        id: "30693060",
-        url: "https://www.effectivecpmnetwork.com/trwxjrx37?key=530d7259a03375e68f1fb4b7aaaf2aec"
-      },
-      {
-        id: "30693059",
-        url: "https://www.effectivecpmnetwork.com/qnfz3jb2yx?key=fff52b9aa80cc39042fa3e453bf07a64"
-      },
-      {
-        id: "30693058",
-        url: "https://www.effectivecpmnetwork.com/hrw1v73hax?key=473d527462603752caf738d8cfe5f6de"
-      }
+      "https://omg10.com/4/11551967",
+      "https://omg10.com/4/11551965",
+      "https://omg10.com/4/11551964",
+      "https://omg10.com/4/11551963",
+      "https://omg10.com/4/11551962",
+      "https://omg10.com/4/11551960",
+      "https://omg10.com/4/11551958",
+      "https://omg10.com/4/11282225",
+      "https://omg10.com/4/11282212",
+      "https://omg10.com/4/11550781",
+      "https://omg10.com/4/11282223",
+      "https://omg10.com/4/11282905",
+      "https://omg10.com/4/11282226",
+      "https://omg10.com/4/11550783",
+      "https://omg10.com/4/11282908",
+      "https://omg10.com/4/11282904",
+      "https://omg10.com/4/11282224",
+      "https://omg10.com/4/11550774",
+      "https://omg10.com/4/11282906",
+      "https://omg10.com/4/11282222"
     ];
+
+    // Direct link opener - opens in same WebView
+    function openDirectLink(url) {
+      window.location.href = url;
+    }
 
     function renderAdButtons() {
       const container = safeGet('ad-grid-container');
       if (!container) return;
       container.innerHTML = '';
       
-      AD_LINKS.forEach((ad, index) => {
+      AD_LINKS.forEach((url, index) => {
         const num = index + 1;
         const btn = document.createElement('button');
         btn.className = 'ad-btn';
         btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          openAd(ad.url);
+          openDirectLink(url);
         });
         container.appendChild(btn);
       });
@@ -514,8 +424,6 @@
     const logoutBtn = safeGet('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async function() {
-        // Close ad viewer if open
-        if (isAdViewerOpen) closeAd();
         await auth.signOut();
         currentUser = null;
         userData = null;
@@ -540,10 +448,7 @@
       } else {
         currentUser = null;
         userData = null;
-        // Only reset if no ad viewer is open (to avoid losing state)
-        if (!isAdViewerOpen) {
-          resetToAuth();
-        }
+        resetToAuth();
       }
     });
 
