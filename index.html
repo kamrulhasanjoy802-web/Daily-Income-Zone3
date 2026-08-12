@@ -259,6 +259,7 @@
     const adIframe = safeGet('ad-iframe');
     const adCloseBtn = safeGet('ad-close-btn');
     let isAdViewerOpen = false;
+    let adLoadTimeout = null;
 
     function openAd(url) {
       if (!adViewer || !adIframe) return;
@@ -270,6 +271,21 @@
       
       // Push history state for back button handling
       history.pushState({ adViewer: true }, "", "#ad");
+      
+      // Set timeout to detect if ad loads or not
+      if (adLoadTimeout) clearTimeout(adLoadTimeout);
+      adLoadTimeout = setTimeout(() => {
+        // If ad doesn't load in 8 seconds, try loading again
+        if (isAdViewerOpen && adIframe.src === url) {
+          // Reload iframe
+          adIframe.src = 'about:blank';
+          setTimeout(() => {
+            if (isAdViewerOpen) {
+              adIframe.src = url;
+            }
+          }, 300);
+        }
+      }, 8000);
     }
 
     function closeAd() {
@@ -279,6 +295,11 @@
       adViewer.classList.remove('active');
       adIframe.src = 'about:blank';
       isAdViewerOpen = false;
+      
+      if (adLoadTimeout) {
+        clearTimeout(adLoadTimeout);
+        adLoadTimeout = null;
+      }
       
       // Remove hash if present
       if (window.location.hash === '#ad') {
@@ -297,11 +318,7 @@
     // ========== BACK BUTTON HANDLING =============================
     // ============================================================
     window.addEventListener('popstate', function(event) {
-      if (event.state && event.state.adViewer) {
-        // User pressed back while ad viewer is open
-        closeAd();
-      } else if (isAdViewerOpen) {
-        // Fallback: if viewer is open but state doesn't match
+      if (isAdViewerOpen) {
         closeAd();
       }
     });
