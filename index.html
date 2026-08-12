@@ -78,6 +78,62 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    /* Ad Overlay */
+    #ad-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 10000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    #ad-overlay.active {
+      display: flex;
+    }
+    #ad-overlay .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: rgba(255, 59, 48, 0.9);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    #ad-overlay .close-btn.show {
+      display: flex;
+    }
+    #ad-overlay .close-btn:hover { background: #e0352b; }
+    #ad-overlay .close-btn:active { transform: scale(0.92); }
+    #ad-overlay iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #1a1a1a;
+    }
+    #ad-overlay .monetag-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0a;
+    }
   </style>
 </head>
 
@@ -103,6 +159,22 @@
   <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
     <div class="w-8 h-8 border-4 border-t-orange-500 border-white/20 rounded-full animate-spin"></div>
   </div>
+
+  <!-- ===== AD OVERLAY ===== -->
+  <div id="ad-overlay">
+    <button class="close-btn" id="ad-close-btn">✕</button>
+    <div class="monetag-container" id="monetag-container">
+      <div style="color:#888; text-align:center; padding:20px;">
+        <div class="loading-spinner" style="margin:0 auto 15px; width:40px; height:40px; border:4px solid #333; border-top-color:#ff8c00; border-radius:50%; animation:spin 1s linear infinite;"></div>
+        <p>Loading ad...</p>
+      </div>
+    </div>
+    <iframe id="ad-iframe" src="about:blank" allow="fullscreen; autoplay; encrypted-media;" style="display:none;"></iframe>
+  </div>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 
   <!-- ===== AUTH SECTION ===== -->
   <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page active">
@@ -153,7 +225,7 @@
       <div class="ad-grid" id="ad-grid-container"></div>
       
       <div class="mt-6 text-center text-xs text-gray-500">
-        <p>🔁 Unlimited clicks · Opens in same WebView</p>
+        <p>🔁 Unlimited clicks · Opens in overlay</p>
       </div>
     </main>
   </div>
@@ -204,7 +276,73 @@
     window.showLogin = showLogin;
 
     // ============================================================
-    // ========== AD BUTTONS (20 Ads - Direct Navigation) =========
+    // ========== AD OVERLAY LOGIC =================================
+    // ============================================================
+    const adOverlay = safeGet('ad-overlay');
+    const adIframe = safeGet('ad-iframe');
+    const adCloseBtn = safeGet('ad-close-btn');
+    const monetagContainer = safeGet('monetag-container');
+    let isAdOpen = false;
+    let closeBtnTimer = null;
+
+    function openAd(url) {
+      if (!adOverlay) return;
+      
+      // Reset
+      adOverlay.classList.add('active');
+      adCloseBtn.classList.remove('show');
+      isAdOpen = true;
+      
+      // Hide monetag container, show iframe
+      monetagContainer.style.display = 'none';
+      adIframe.style.display = 'block';
+      adIframe.src = url;
+      
+      // Show close button after 1 second
+      if (closeBtnTimer) clearTimeout(closeBtnTimer);
+      closeBtnTimer = setTimeout(() => {
+        adCloseBtn.classList.add('show');
+      }, 1000);
+      
+      // Push history state for back button
+      history.pushState({ adOpen: true }, "", "#ad");
+    }
+
+    function closeAd() {
+      if (!adOverlay) return;
+      
+      adOverlay.classList.remove('active');
+      adIframe.src = 'about:blank';
+      adIframe.style.display = 'none';
+      monetagContainer.style.display = 'flex';
+      isAdOpen = false;
+      adCloseBtn.classList.remove('show');
+      
+      if (closeBtnTimer) {
+        clearTimeout(closeBtnTimer);
+        closeBtnTimer = null;
+      }
+      
+      // Remove hash
+      if (window.location.hash === '#ad') {
+        history.replaceState({}, "", window.location.pathname);
+      }
+    }
+
+    // Close button event
+    if (adCloseBtn) {
+      adCloseBtn.addEventListener('click', closeAd);
+    }
+
+    // Back button support
+    window.addEventListener('popstate', function(event) {
+      if (isAdOpen) {
+        closeAd();
+      }
+    });
+
+    // ============================================================
+    // ========== AD BUTTONS (20 Ads) ==============================
     // ============================================================
     const AD_LINKS = [
       "https://omg10.com/4/11551967",
@@ -229,11 +367,6 @@
       "https://omg10.com/4/11282222"
     ];
 
-    // Direct navigation - opens in same WebView
-    function openDirectLink(url) {
-      window.location.href = url;
-    }
-
     function renderAdButtons() {
       const container = safeGet('ad-grid-container');
       if (!container) return;
@@ -246,7 +379,7 @@
         btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          openDirectLink(url);
+          openAd(url);
         });
         container.appendChild(btn);
       });
@@ -424,6 +557,7 @@
     const logoutBtn = safeGet('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async function() {
+        if (isAdOpen) closeAd();
         await auth.signOut();
         currentUser = null;
         userData = null;
@@ -448,7 +582,9 @@
       } else {
         currentUser = null;
         userData = null;
-        resetToAuth();
+        if (!isAdOpen) {
+          resetToAuth();
+        }
       }
     });
 
