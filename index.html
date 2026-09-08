@@ -7,9 +7,6 @@
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
-  <!-- Monetag SDK -->
-  <script src="//libtl.com/sdk.js" data-zone="11341986" data-sdk="show_11341986"></script>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -18,58 +15,75 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; }
-    .dark-bg { background-color: #121212; }
-    .card-bg { background-color: #1e1e1e; }
-    .border-accent { border-color: #ff8c00; }
-    .text-accent { color: #ff8c00; }
-    .btn, .btn-accent { transition: all 0.2s ease-in-out; transform: scale(1); }
-    .btn:active, .btn-accent:active { transform: scale(0.95); }
-    .btn-accent { background-color: #ff8c00; color: #121212; font-weight: bold; }
-    .btn-accent:hover { background-color: #e67e00; }
-    .input-field { background-color: #2c2c2c; border: 1px solid #444; color: white; }
-    .main-page { display: none; }
-    .main-page.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
-    .sub-page { display: none; }
-    .sub-page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    
-    .ad-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 12px;
-      padding: 12px 0;
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: #ffffff;
     }
-    .ad-btn {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    .dark-bg {
+      background-color: #121212;
     }
-    .ad-btn:hover:not(:disabled) { border-color: #ff8c00; background: #2a2a2a; transform: translateY(-2px); }
-    .ad-btn:active:not(:disabled) { transform: scale(0.95); }
-    .ad-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
+
+    .card-bg {
+      background-color: #1e1e1e;
     }
-    .ad-btn .badge {
-      display: block;
-      font-size: 10px;
+
+    .border-accent {
+      border-color: #ff8c00;
+    }
+
+    .text-accent {
       color: #ff8c00;
-      margin-top: 4px;
-      font-weight: 400;
     }
+
+    .btn,
+    .btn-accent {
+      transition: all 0.2s ease-in-out;
+      transform: scale(1);
+    }
+
+    .btn:active,
+    .btn-accent:active {
+      transform: scale(0.95);
+    }
+
+    .btn-accent {
+      background-color: #ff8c00;
+      color: #121212;
+      font-weight: bold;
+    }
+
+    .btn-accent:hover {
+      background-color: #e67e00;
+    }
+
+    .input-field {
+      background-color: #2c2c2c;
+      border: 1px solid #444;
+      color: white;
+    }
+
+    .main-page {
+      display: none;
+    }
+
+    .main-page.active {
+      display: flex;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
     .header-title {
       font-size: 22px;
       font-weight: 800;
@@ -77,6 +91,85 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+    }
+
+    /* ===== ADS STYLES ===== */
+    .ad-container {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .ad-container iframe {
+      max-width: 100%;
+      border: none;
+    }
+
+    .ad-label {
+      color: #666;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .ad-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff8c00, #ff6a00);
+      color: #121212;
+      font-weight: 700;
+      padding: 12px 30px;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-size: 14px;
+      box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .ad-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(255, 140, 0, 0.5);
+    }
+
+    .ad-btn:active {
+      transform: scale(0.95);
+    }
+
+    .ad-banner {
+      background: #0d0d0d;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 8px 0;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #444;
+    }
+
+    .ad-banner img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ===== ADS BUTTON STYLES ===== */
+    .ads-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .ads-btn-group .ad-btn {
+      width: 100%;
+      max-width: 100%;
     }
   </style>
 </head>
@@ -94,386 +187,974 @@
       appId: "1:744535360580:web:6aa14f64f1952a0b082811",
       measurementId: "G-RG6H88R3L9"
     };
+
     firebase.initializeApp(firebaseConfig);
+
     const auth = firebase.auth();
     const db = firebase.firestore();
   </script>
 
-  <!-- ===== LOADER ===== -->
-  <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
+  <!-- LOADER -->
+  <div id="loader"
+       class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
     <div class="w-8 h-8 border-4 border-t-orange-500 border-white/20 rounded-full animate-spin"></div>
   </div>
 
-  <!-- ===== AUTH SECTION ===== -->
-  <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page active">
-    <h1 class="text-3xl font-bold text-center mb-2 text-accent">Daily Income Zone</h1>
-    <p class="text-center text-gray-400 mb-6">Sign in to continue</p>
-    
+  <!-- AUTH SECTION -->
+  <div id="auth-section"
+       class="min-h-screen p-6 flex-col justify-center main-page active">
+
+    <h1 class="text-3xl font-bold text-center mb-2 text-accent">
+      Daily Income Zone
+    </h1>
+
+    <p class="text-center text-gray-400 mb-6">
+      Sign in to continue
+    </p>
+
     <div id="auth-container">
-      <!-- Login View -->
+
+      <!-- LOGIN -->
       <div id="login-view">
-        <div id="login-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
-        <input id="login-username" type="text" placeholder="Username" class="w-full p-3 rounded-lg input-field mb-3">
-        <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
-        <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-3">Login</button>
-        <p class="text-center text-gray-400 text-sm">New user? <button onclick="showSignup()" class="text-accent font-semibold">Create Account</button></p>
+
+        <div id="login-error"
+             class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4">
+        </div>
+
+        <input
+          id="login-username"
+          type="text"
+          placeholder="Username"
+          class="w-full p-3 rounded-lg input-field mb-3"
+        >
+
+        <input
+          id="login-password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-3 rounded-lg input-field mb-4"
+        >
+
+        <button
+          id="login-btn"
+          class="w-full p-3 rounded-lg btn-accent mb-3">
+          Login
+        </button>
+
+        <p class="text-center text-gray-400 text-sm">
+          New user?
+          <button
+            onclick="showSignup()"
+            class="text-accent font-semibold">
+            Create Account
+          </button>
+        </p>
+
+        <!-- ===== ADS BUTTON 1 (Login Page) ===== -->
+        <div class="ad-container mt-4">
+          <div class="ad-label">✨ Sponsored Content</div>
+          <button 
+            id="ads-btn-1"
+            class="ad-btn">
+            🔥 Claim Your Bonus
+          </button>
+          <p style="color:#555; font-size:10px; margin-top:6px;">Limited time offer</p>
+        </div>
+
       </div>
 
-      <!-- Signup View -->
+      <!-- SIGNUP -->
       <div id="signup-view" class="hidden">
-        <div id="signup-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
-        <input id="signup-username" type="text" placeholder="Choose Username" class="w-full p-3 rounded-lg input-field mb-3">
-        <input id="signup-email" type="email" placeholder="Your Email" class="w-full p-3 rounded-lg input-field mb-3">
-        <input id="signup-password" type="password" placeholder="Password (min 6 chars)" class="w-full p-3 rounded-lg input-field mb-3">
-        <input id="signup-referral" type="text" placeholder="Referral Code (optional)" class="w-full p-3 rounded-lg input-field mb-4">
-        <button id="signup-btn" class="w-full p-3 rounded-lg btn-accent mb-3">Create Account</button>
-        <p class="text-center text-gray-400 text-sm">Already have an account? <button onclick="showLogin()" class="text-accent font-semibold">Login</button></p>
+
+        <div id="signup-error"
+             class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4">
+        </div>
+
+        <input
+          id="signup-username"
+          type="text"
+          placeholder="Choose Username"
+          class="w-full p-3 rounded-lg input-field mb-3"
+        >
+
+        <input
+          id="signup-email"
+          type="email"
+          placeholder="Your Email"
+          class="w-full p-3 rounded-lg input-field mb-3"
+        >
+
+        <input
+          id="signup-password"
+          type="password"
+          placeholder="Password (min 6 chars)"
+          class="w-full p-3 rounded-lg input-field mb-3"
+        >
+
+        <input
+          id="signup-referral"
+          type="text"
+          placeholder="Referral Code (optional)"
+          class="w-full p-3 rounded-lg input-field mb-4"
+        >
+
+        <button
+          id="signup-btn"
+          class="w-full p-3 rounded-lg btn-accent mb-3">
+          Create Account
+        </button>
+
+        <p class="text-center text-gray-400 text-sm">
+          Already have an account?
+          <button
+            onclick="showLogin()"
+            class="text-accent font-semibold">
+            Login
+          </button>
+        </p>
+
+        <!-- ===== ADS BUTTON 2 (Signup Page) ===== -->
+        <div class="ad-container mt-4">
+          <div class="ad-label">🎯 Partner Offer</div>
+          <button 
+            id="ads-btn-2"
+            class="ad-btn">
+            ⭐ Get Free Reward
+          </button>
+          <p style="color:#555; font-size:10px; margin-top:6px;">Exclusive for new users</p>
+        </div>
+
       </div>
+
     </div>
   </div>
 
-  <!-- ===== APP CONTAINER ===== -->
-  <div id="app-container" class="min-h-screen flex-col main-page">
-    
-    <!-- Header -->
+  <!-- APP CONTAINER -->
+  <div id="app-container"
+       class="min-h-screen flex-col main-page">
+
+    <!-- HEADER -->
     <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg">
-      <h1 class="text-xl font-bold header-title">Daily Income Zone</h1>
+
+      <h1 class="text-xl font-bold header-title">
+        Daily Income Zone
+      </h1>
+
       <div class="flex items-center space-x-3">
-        <span id="user-greeting" class="text-sm text-gray-300">Welcome, <span id="greeting-username">User</span></span>
-        <button id="logout-btn" class="bg-red-600/80 hover:bg-red-700 px-3 py-1 rounded-lg text-sm font-medium text-white">Logout</button>
+
+        <span id="user-greeting"
+              class="text-sm text-gray-300">
+          Welcome,
+          <span id="greeting-username">User</span>
+        </span>
+
+        <button
+          id="logout-btn"
+          class="bg-red-600/80 hover:bg-red-700 px-3 py-1 rounded-lg text-sm font-medium text-white">
+          Logout
+        </button>
+
       </div>
     </header>
 
+    <!-- MAIN CONTENT -->
     <main class="flex-grow p-4">
-      <div class="text-center mb-4">
-        <p class="text-gray-400 text-sm">👋 Click any ad button to watch</p>
+
+      <div class="text-center mt-10">
+
+        <h2 class="text-2xl font-bold text-accent mb-3">
+          Welcome to Daily Income Zone
+        </h2>
+
+        <p class="text-gray-400 text-sm">
+          Your account dashboard is ready.
+        </p>
+
       </div>
 
-      <!-- 20 Ad Buttons -->
-      <div class="ad-grid" id="ad-grid-container"></div>
-      
-      <div class="mt-6 text-center text-xs text-gray-500">
-        <p>🔁 Unlimited clicks · Opens in new tab</p>
+      <!-- ===== ADS BUTTON 3 (Dashboard - Optional) ===== -->
+      <!--
+      <div class="ad-container mt-6">
+        <div class="ad-label">📢 Advertisement</div>
+        <button class="ad-btn" onclick="window.open('https://www.profitableratecpmnetwork.com/fnz7twhk5?key=6deeed292613c558b5e06cf51d42608c', '_blank')">
+          🚀 Visit Now
+        </button>
       </div>
+      -->
+
     </main>
+
   </div>
 
-  <!-- ===== CUSTOM ALERT ===== -->
-  <div id="custom-alert" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4">
+  <!-- CUSTOM ALERT -->
+  <div id="custom-alert"
+       class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4">
+
     <div class="bg-gray-800 rounded-lg p-6 w-full max-w-xs text-center border border-accent">
-      <p id="alert-message" class="mb-4 font-medium text-sm"></p>
-      <button id="alert-ok-btn" class="btn-accent px-8 py-2 rounded-lg text-sm">OK</button>
+
+      <p id="alert-message"
+         class="mb-4 font-medium text-sm">
+      </p>
+
+      <button
+        id="alert-ok-btn"
+        class="btn-accent px-8 py-2 rounded-lg text-sm">
+        OK
+      </button>
+
     </div>
+
   </div>
 
   <script>
+
     // ============================================================
-    // ========== TELEGRAM WEBAPP INIT =============================
+    // TELEGRAM WEBAPP INIT
     // ============================================================
+
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
     }
 
+
     // ============================================================
-    // ========== SAFE DOM HELPERS =================================
+    // SAFE DOM HELPERS
     // ============================================================
-    function safeGet(id) { return document.getElementById(id); }
+
+    function safeGet(id) {
+      return document.getElementById(id);
+    }
+
 
     function showAlert(msg) {
+
       const el = safeGet('alert-message');
       const box = safeGet('custom-alert');
       const ok = safeGet('alert-ok-btn');
-      if (el) el.textContent = msg;
-      if (box) box.classList.remove('hidden');
-      if (ok) ok.onclick = () => { if (box) box.classList.add('hidden'); };
+
+      if (el) {
+        el.textContent = msg;
+      }
+
+      if (box) {
+        box.classList.remove('hidden');
+      }
+
+      if (ok) {
+        ok.onclick = () => {
+          if (box) {
+            box.classList.add('hidden');
+          }
+        };
+      }
     }
 
+
     // ============================================================
-    // ========== AUTH UI TOGGLES ==================================
+    // ADS BUTTONS HANDLERS
     // ============================================================
+
+    // === ADS BUTTON 1 ===
+    const adsBtn1 = safeGet('ads-btn-1');
+    if (adsBtn1) {
+      adsBtn1.addEventListener('click', function() {
+        window.open(
+          'https://www.profitableratecpmnetwork.com/fnz7twhk5?key=6deeed292613c558b5e06cf51d42608c',
+          '_blank'
+        );
+      });
+    }
+
+    // === ADS BUTTON 2 ===
+    const adsBtn2 = safeGet('ads-btn-2');
+    if (adsBtn2) {
+      adsBtn2.addEventListener('click', function() {
+        window.open(
+          'https://www.profitableratecpmnetwork.com/nn2wfsupzg?key=eb79cc4ec894bbf43ee32e541f3b17f2',
+          '_blank'
+        );
+      });
+    }
+
+
+    // ============================================================
+    // AUTH UI
+    // ============================================================
+
     function showSignup() {
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('signup-view').classList.remove('hidden');
+
+      document
+        .getElementById('login-view')
+        .classList.add('hidden');
+
+      document
+        .getElementById('signup-view')
+        .classList.remove('hidden');
     }
+
+
     function showLogin() {
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('signup-view').classList.add('hidden');
+
+      document
+        .getElementById('login-view')
+        .classList.remove('hidden');
+
+      document
+        .getElementById('signup-view')
+        .classList.add('hidden');
     }
+
+
     window.showSignup = showSignup;
     window.showLogin = showLogin;
 
-    // ============================================================
-    // ========== AD BUTTONS (20 Ads - New Tab) ===================
-    // ============================================================
-    const AD_LINKS = [
-      "https://omg10.com/4/11551967",
-      "https://omg10.com/4/11551965",
-      "https://omg10.com/4/11551964",
-      "https://omg10.com/4/11551963",
-      "https://omg10.com/4/11551962",
-      "https://omg10.com/4/11551960",
-      "https://omg10.com/4/11551958",
-      "https://omg10.com/4/11282225",
-      "https://omg10.com/4/11282212",
-      "https://omg10.com/4/11550781",
-      "https://omg10.com/4/11282223",
-      "https://omg10.com/4/11282905",
-      "https://omg10.com/4/11282226",
-      "https://omg10.com/4/11550783",
-      "https://omg10.com/4/11282908",
-      "https://omg10.com/4/11282904",
-      "https://omg10.com/4/11282224",
-      "https://omg10.com/4/11550774",
-      "https://omg10.com/4/11282906",
-      "https://omg10.com/4/11282222"
-    ];
-
-    function openAd(url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-
-    function renderAdButtons() {
-      const container = safeGet('ad-grid-container');
-      if (!container) return;
-      container.innerHTML = '';
-      
-      AD_LINKS.forEach((url, index) => {
-        const num = index + 1;
-        const btn = document.createElement('button');
-        btn.className = 'ad-btn';
-        btn.innerHTML = `Watch Ads ${num}<span class="badge">▶ click</span>`;
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          openAd(url);
-        });
-        container.appendChild(btn);
-      });
-    }
 
     // ============================================================
-    // ========== AUTH STATE =======================================
+    // USER DATA
     // ============================================================
+
     let currentUser = null;
     let userData = null;
 
+
     async function loadUserData(uid) {
+
       try {
-        const doc = await db.collection("users").doc(uid).get();
+
+        const doc =
+          await db.collection("users").doc(uid).get();
+
         if (doc.exists) {
+
           userData = doc.data();
-          const greet = safeGet('greeting-username');
-          if (greet) greet.textContent = userData?.username || 'User';
+
+          const greet =
+            safeGet('greeting-username');
+
+          if (greet) {
+            greet.textContent =
+              userData?.username || 'User';
+          }
+
           return true;
         }
+
         return false;
-      } catch (e) { return false; }
+
+      } catch (e) {
+
+        console.error(e);
+        return false;
+      }
     }
+
+
+    // ============================================================
+    // LOGIN UI
+    // ============================================================
 
     function updateUIAfterLogin() {
-      const authSection = safeGet('auth-section');
-      const appContainer = safeGet('app-container');
-      if (authSection) { authSection.classList.remove('active'); authSection.style.display = 'none'; }
-      if (appContainer) { appContainer.classList.add('active'); appContainer.style.display = 'flex'; }
-      renderAdButtons();
+
+      const authSection =
+        safeGet('auth-section');
+
+      const appContainer =
+        safeGet('app-container');
+
+      if (authSection) {
+
+        authSection.classList.remove('active');
+        authSection.style.display = 'none';
+      }
+
+      if (appContainer) {
+
+        appContainer.classList.add('active');
+        appContainer.style.display = 'flex';
+      }
     }
+
 
     function resetToAuth() {
-      const authSection = safeGet('auth-section');
-      const appContainer = safeGet('app-container');
-      if (authSection) { authSection.classList.add('active'); authSection.style.display = 'flex'; }
-      if (appContainer) { appContainer.classList.remove('active'); appContainer.style.display = 'none'; }
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('signup-view').classList.add('hidden');
+
+      const authSection =
+        safeGet('auth-section');
+
+      const appContainer =
+        safeGet('app-container');
+
+      if (authSection) {
+
+        authSection.classList.add('active');
+        authSection.style.display = 'flex';
+      }
+
+      if (appContainer) {
+
+        appContainer.classList.remove('active');
+        appContainer.style.display = 'none';
+      }
+
+      safeGet('login-view')
+        ?.classList.remove('hidden');
+
+      safeGet('signup-view')
+        ?.classList.add('hidden');
     }
 
+
     // ============================================================
-    // ========== SIGNUP ===========================================
+    // SIGNUP
     // ============================================================
-    const signupBtn = safeGet('signup-btn');
+
+    const signupBtn =
+      safeGet('signup-btn');
+
+
     if (signupBtn) {
-      signupBtn.addEventListener('click', async function() {
-        signupBtn.disabled = true;
-        signupBtn.textContent = 'Creating...';
-        const errEl = safeGet('signup-error');
-        if (errEl) errEl.classList.add('hidden');
 
-        const username = safeGet('signup-username')?.value.trim() || '';
-        const email = safeGet('signup-email')?.value.trim() || '';
-        const password = safeGet('signup-password')?.value || '';
-        const referral = safeGet('signup-referral')?.value.trim() || '';
+      signupBtn.addEventListener(
+        'click',
+        async function() {
 
-        if (username.length < 3) {
-          if (errEl) { errEl.textContent = 'Username must be at least 3 characters.'; errEl.classList.remove('hidden'); }
-          signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
-        }
-        if (!email || !email.includes('@')) {
-          if (errEl) { errEl.textContent = 'Valid email required.'; errEl.classList.remove('hidden'); }
-          signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
-        }
-        if (password.length < 6) {
-          if (errEl) { errEl.textContent = 'Password min 6 characters.'; errEl.classList.remove('hidden'); }
-          signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
-        }
+          signupBtn.disabled = true;
+          signupBtn.textContent = 'Creating...';
 
-        try {
-          const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
-          if (usernameDoc.exists) {
-            if (errEl) { errEl.textContent = 'Username already taken.'; errEl.classList.remove('hidden'); }
-            signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
+          const errEl =
+            safeGet('signup-error');
+
+          if (errEl) {
+            errEl.classList.add('hidden');
           }
 
-          const userCred = await auth.createUserWithEmailAndPassword(email, password);
-          const user = userCred.user;
-          await user.sendEmailVerification();
+          const username =
+            safeGet('signup-username')
+            ?.value.trim() || '';
 
-          const refCode = generateReferralCode();
-          await db.collection("users").doc(user.uid).set({
-            name: username,
-            username: username,
-            email: email,
-            balance: 0,
-            referralCode: refCode,
-            isBlocked: false,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          await db.collection("usernames").doc(username.toLowerCase()).set({
-            uid: user.uid,
-            email: email,
-            username: username,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          const email =
+            safeGet('signup-email')
+            ?.value.trim() || '';
 
-          if (referral) {
-            try {
-              const snap = await db.collection('users').where('referralCode', '==', referral.toUpperCase()).get();
-              if (!snap.empty) {
-                const refDoc = snap.docs[0];
-                await db.collection("users").doc(user.uid).update({ referredBy: refDoc.id });
-                await db.collection("users").doc(refDoc.id).update({
-                  referrals: firebase.firestore.FieldValue.arrayUnion(user.uid)
-                });
+          const password =
+            safeGet('signup-password')
+            ?.value || '';
+
+          const referral =
+            safeGet('signup-referral')
+            ?.value.trim() || '';
+
+
+          if (username.length < 3) {
+
+            if (errEl) {
+
+              errEl.textContent =
+                'Username must be at least 3 characters.';
+
+              errEl.classList.remove('hidden');
+            }
+
+            signupBtn.disabled = false;
+            signupBtn.textContent = 'Create Account';
+
+            return;
+          }
+
+
+          if (!email || !email.includes('@')) {
+
+            if (errEl) {
+
+              errEl.textContent =
+                'Valid email required.';
+
+              errEl.classList.remove('hidden');
+            }
+
+            signupBtn.disabled = false;
+            signupBtn.textContent = 'Create Account';
+
+            return;
+          }
+
+
+          if (password.length < 6) {
+
+            if (errEl) {
+
+              errEl.textContent =
+                'Password min 6 characters.';
+
+              errEl.classList.remove('hidden');
+            }
+
+            signupBtn.disabled = false;
+            signupBtn.textContent = 'Create Account';
+
+            return;
+          }
+
+
+          try {
+
+            const usernameDoc =
+              await db
+                .collection('usernames')
+                .doc(username.toLowerCase())
+                .get();
+
+
+            if (usernameDoc.exists) {
+
+              if (errEl) {
+
+                errEl.textContent =
+                  'Username already taken.';
+
+                errEl.classList.remove('hidden');
               }
-            } catch (e) { console.warn('Referral error:', e); }
+
+              signupBtn.disabled = false;
+              signupBtn.textContent = 'Create Account';
+
+              return;
+            }
+
+
+            const userCred =
+              await auth
+                .createUserWithEmailAndPassword(
+                  email,
+                  password
+                );
+
+
+            const user =
+              userCred.user;
+
+
+            await user.sendEmailVerification();
+
+
+            const refCode =
+              generateReferralCode();
+
+
+            await db
+              .collection("users")
+              .doc(user.uid)
+              .set({
+
+                name: username,
+                username: username,
+                email: email,
+                balance: 0,
+                referralCode: refCode,
+                isBlocked: false,
+
+                createdAt:
+                  firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
+              });
+
+
+            await db
+              .collection("usernames")
+              .doc(username.toLowerCase())
+              .set({
+
+                uid: user.uid,
+                email: email,
+                username: username,
+
+                createdAt:
+                  firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
+              });
+
+
+            // REFERRAL
+            if (referral) {
+
+              try {
+
+                const snap =
+                  await db
+                    .collection('users')
+                    .where(
+                      'referralCode',
+                      '==',
+                      referral.toUpperCase()
+                    )
+                    .get();
+
+
+                if (!snap.empty) {
+
+                  const refDoc =
+                    snap.docs[0];
+
+                  await db
+                    .collection("users")
+                    .doc(user.uid)
+                    .update({
+                      referredBy: refDoc.id
+                    });
+
+
+                  await db
+                    .collection("users")
+                    .doc(refDoc.id)
+                    .update({
+
+                      referrals:
+                        firebase.firestore
+                          .FieldValue
+                          .arrayUnion(user.uid)
+                    });
+                }
+
+              } catch (e) {
+
+                console.warn(
+                  'Referral error:',
+                  e
+                );
+              }
+            }
+
+
+            await auth.signOut();
+
+            showAlert(
+              '📧 Verification email sent! Please check your inbox and login.'
+            );
+
+            showLogin();
+
+          } catch (error) {
+
+            if (errEl) {
+
+              errEl.textContent =
+                error.message ||
+                'Signup failed.';
+
+              errEl.classList.remove('hidden');
+            }
           }
 
-          await auth.signOut();
-          showAlert('📧 Verification email sent! Please check your inbox and login.');
-          showLogin();
-        } catch (error) {
-          if (errEl) { errEl.textContent = error.message || 'Signup failed.'; errEl.classList.remove('hidden'); }
+
+          signupBtn.disabled = false;
+          signupBtn.textContent =
+            'Create Account';
         }
-        signupBtn.disabled = false;
-        signupBtn.textContent = 'Create Account';
-      });
+      );
     }
+
+
+    // ============================================================
+    // REFERRAL CODE
+    // ============================================================
 
     function generateReferralCode() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+      const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
       let code = '';
-      for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+
+      for (let i = 0; i < 6; i++) {
+
+        code +=
+          chars.charAt(
+            Math.floor(
+              Math.random() * chars.length
+            )
+          );
+      }
+
       return code;
     }
 
+
     // ============================================================
-    // ========== LOGIN ============================================
+    // LOGIN
     // ============================================================
-    const loginBtn = safeGet('login-btn');
+
+    const loginBtn =
+      safeGet('login-btn');
+
+
     if (loginBtn) {
-      loginBtn.addEventListener('click', async function() {
-        loginBtn.disabled = true;
-        loginBtn.textContent = 'Logging in...';
-        const errEl = safeGet('login-error');
-        if (errEl) errEl.classList.add('hidden');
 
-        const username = safeGet('login-username')?.value.trim() || '';
-        const password = safeGet('login-password')?.value || '';
+      loginBtn.addEventListener(
+        'click',
+        async function() {
 
-        if (!username || !password) {
-          if (errEl) { errEl.textContent = 'Please enter username and password.'; errEl.classList.remove('hidden'); }
-          loginBtn.disabled = false; loginBtn.textContent = 'Login'; return;
-        }
+          loginBtn.disabled = true;
+          loginBtn.textContent =
+            'Logging in...';
 
-        try {
-          const unameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
-          if (!unameDoc.exists) {
-            if (errEl) { errEl.textContent = 'Username not found.'; errEl.classList.remove('hidden'); }
-            loginBtn.disabled = false; loginBtn.textContent = 'Login'; return;
+          const errEl =
+            safeGet('login-error');
+
+          if (errEl) {
+            errEl.classList.add('hidden');
           }
-          const email = unameDoc.data().email;
-          const userCred = await auth.signInWithEmailAndPassword(email, password);
-          const user = userCred.user;
-          const userDoc = await db.collection("users").doc(user.uid).get();
-          if (userDoc.exists && userDoc.data().isBlocked) {
-            await auth.signOut();
-            if (errEl) { errEl.textContent = 'Account blocked. Contact support.'; errEl.classList.remove('hidden'); }
-            loginBtn.disabled = false; loginBtn.textContent = 'Login'; return;
+
+
+          const username =
+            safeGet('login-username')
+            ?.value.trim() || '';
+
+          const password =
+            safeGet('login-password')
+            ?.value || '';
+
+
+          if (!username || !password) {
+
+            if (errEl) {
+
+              errEl.textContent =
+                'Please enter username and password.';
+
+              errEl.classList.remove('hidden');
+            }
+
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Login';
+
+            return;
           }
-        } catch (error) {
-          if (errEl) { errEl.textContent = error.message || 'Login failed.'; errEl.classList.remove('hidden'); }
+
+
+          try {
+
+            const unameDoc =
+              await db
+                .collection('usernames')
+                .doc(username.toLowerCase())
+                .get();
+
+
+            if (!unameDoc.exists) {
+
+              if (errEl) {
+
+                errEl.textContent =
+                  'Username not found.';
+
+                errEl.classList.remove('hidden');
+              }
+
+              loginBtn.disabled = false;
+              loginBtn.textContent = 'Login';
+
+              return;
+            }
+
+
+            const email =
+              unameDoc.data().email;
+
+
+            const userCred =
+              await auth
+                .signInWithEmailAndPassword(
+                  email,
+                  password
+                );
+
+
+            const user =
+              userCred.user;
+
+
+            const userDoc =
+              await db
+                .collection("users")
+                .doc(user.uid)
+                .get();
+
+
+            if (
+              userDoc.exists &&
+              userDoc.data().isBlocked
+            ) {
+
+              await auth.signOut();
+
+              if (errEl) {
+
+                errEl.textContent =
+                  'Account blocked. Contact support.';
+
+                errEl.classList.remove('hidden');
+              }
+
+              loginBtn.disabled = false;
+              loginBtn.textContent = 'Login';
+
+              return;
+            }
+
+          } catch (error) {
+
+            if (errEl) {
+
+              errEl.textContent =
+                error.message ||
+                'Login failed.';
+
+              errEl.classList.remove('hidden');
+            }
+          }
+
+
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
         }
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login';
-      });
+      );
     }
 
+
     // ============================================================
-    // ========== LOGOUT ===========================================
+    // LOGOUT
     // ============================================================
-    const logoutBtn = safeGet('logout-btn');
+
+    const logoutBtn =
+      safeGet('logout-btn');
+
+
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', async function() {
-        await auth.signOut();
-        currentUser = null;
-        userData = null;
-        resetToAuth();
-      });
-    }
 
-    // ============================================================
-    // ========== AUTH STATE LISTENER ==============================
-    // ============================================================
-    auth.onAuthStateChanged(async function(user) {
-      if (user) {
-        currentUser = user;
-        const ok = await loadUserData(user.uid);
-        if (ok && userData) {
-          updateUIAfterLogin();
-          const greet = safeGet('greeting-username');
-          if (greet) greet.textContent = userData?.username || 'User';
-        } else {
+      logoutBtn.addEventListener(
+        'click',
+        async function() {
+
+          await auth.signOut();
+
+          currentUser = null;
+          userData = null;
+
           resetToAuth();
         }
-      } else {
-        currentUser = null;
-        userData = null;
-        resetToAuth();
+      );
+    }
+
+
+    // ============================================================
+    // AUTH STATE LISTENER
+    // ============================================================
+
+    auth.onAuthStateChanged(
+      async function(user) {
+
+        if (user) {
+
+          currentUser = user;
+
+          const ok =
+            await loadUserData(user.uid);
+
+
+          if (ok && userData) {
+
+            updateUIAfterLogin();
+
+            const greet =
+              safeGet('greeting-username');
+
+            if (greet) {
+
+              greet.textContent =
+                userData?.username ||
+                'User';
+            }
+
+          } else {
+
+            resetToAuth();
+          }
+
+        } else {
+
+          currentUser = null;
+          userData = null;
+
+          resetToAuth();
+        }
       }
-    });
+    );
+
 
     // ============================================================
-    // ========== INIT =============================================
+    // INIT
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-      resetToAuth();
-      renderAdButtons();
-    });
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      function() {
+
+        resetToAuth();
+
+      }
+    );
+
 
     // ============================================================
-    // ========== KEYBOARD SHORTCUTS ===============================
+    // KEYBOARD SHORTCUTS
     // ============================================================
-    const loginPassword = safeGet('login-password');
+
+    const loginPassword =
+      safeGet('login-password');
+
+
     if (loginPassword) {
-      loginPassword.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && loginBtn) loginBtn.click();
-      });
+
+      loginPassword.addEventListener(
+        'keydown',
+        function(e) {
+
+          if (
+            e.key === 'Enter' &&
+            loginBtn
+          ) {
+            loginBtn.click();
+          }
+
+        }
+      );
     }
-    const signupPassword = safeGet('signup-password');
+
+
+    const signupPassword =
+      safeGet('signup-password');
+
+
     if (signupPassword) {
-      signupPassword.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && signupBtn) signupBtn.click();
-      });
+
+      signupPassword.addEventListener(
+        'keydown',
+        function(e) {
+
+          if (
+            e.key === 'Enter' &&
+            signupBtn
+          ) {
+            signupBtn.click();
+          }
+
+        }
+      );
     }
+
   </script>
+
 </body>
 </html>
