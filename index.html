@@ -1,112 +1,716 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Daily Income Zone</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Income Zone</title>
+    <meta name="theme-color" content="#ff9800">
 
-<script src="https://cdn.tailwindcss.com"></script>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<style>
-  body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 0; }
-  .text-accent { color: #ff8c00; }
-  .header-title {
-    font-size: 22px; font-weight: 800;
-    background: linear-gradient(135deg, #ff8c00, #ff6a00);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .ad-container {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 16px;
-    margin: 12px 0;
-    text-align: center;
-  }
-  .ad-label {
-    color: #666; font-size: 10px; text-transform: uppercase;
-    letter-spacing: 1px; margin-bottom: 10px;
-  }
-  .ad-btn {
-    display: block;
-    background: linear-gradient(135deg, #ff8c00, #ff6a00);
-    color: #121212;
-    font-weight: 700;
-    padding: 14px 20px;
-    border-radius: 30px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-size: 15px;
-    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
-    cursor: pointer;
-    border: none;
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-  }
-  .ad-btn:hover { transform: scale(1.03); box-shadow: 0 6px 25px rgba(255, 140, 0, 0.5); }
-  .ad-btn:active { transform: scale(0.95); }
-</style>
+    <!-- Google AdSense (আপনার ID বসান) -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+    <style>
+        :root {
+            --primary: #ff7a00;
+            --secondary: #ff9800;
+            --bg: #0f1115;
+            --card: #1b1e24;
+            --text: #ffffff;
+            --muted: #9ca3af;
+            --radius: 18px;
+            --shadow: 0 10px 25px rgba(0,0,0,.25);
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        img { max-width: 100%; height: auto; }
+        button { min-height: 48px; cursor: pointer; font-family: inherit; }
+        input, select, textarea { font-size: 16px; font-family: inherit; }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: auto;
+            padding: 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            animation: fadeUp .35s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes skeleton {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .25s;
+            font-size: 16px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+        .btn-primary.w-full { width: 100%; }
+
+        .header-icon {
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            background: #22252c; border-radius: 14px;
+            position: relative; transition: .25s;
+            border: none; color: #fff; font-size: 20px;
+        }
+        .header-icon:hover { background: #2c313a; transform: translateY(-2px); }
+
+        #notification-dot {
+            position: absolute; top: 8px; right: 8px;
+            width: 10px; height: 10px;
+            background: #ff3b30; border-radius: 50%;
+        }
+
+        .coin-card {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #ff9800, #ff6a00);
+            border-radius: 16px;
+            font-weight: 700; color: #fff;
+            box-shadow: 0 6px 18px rgba(255,122,0,.35);
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #ff8a00, #ff5f00);
+            border-radius: 24px;
+            padding: 22px;
+            color: #fff;
+            box-shadow: 0 15px 35px rgba(255,122,0,.35);
+        }
+
+        .balance-label { opacity: .8; font-size: 14px; }
+        .balance-amount { font-size: 36px; font-weight: 800; margin-top: 8px; }
+        .balance-subtitle { margin-top: 6px; font-size: 13px; opacity: .85; }
+
+        .balance-icon {
+            width: 64px; height: 64px;
+            border-radius: 18px;
+            background: rgba(255,255,255,.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255,255,255,.2);
+            border-radius: 20px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fff;
+            border-radius: 20px;
+            transition: .4s;
+        }
+
+        .streak-card { display: flex; justify-content: space-between; align-items: center; }
+        .streak-number { font-size: 30px; font-weight: bold; color: #ff9800; text-align: center; }
+        .streak-number small { display: block; font-size: 12px; color: var(--muted); }
+
+        .task-card {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px; margin-bottom: 14px;
+            background: #22252c;
+            border-radius: 18px;
+            transition: .25s;
+        }
+        .task-card:hover { transform: translateY(-2px); }
+        .task-card:last-child { margin-bottom: 0; }
+
+        .task-left { display: flex; align-items: center; gap: 14px; }
+
+        .task-icon {
+            width: 54px; height: 54px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            background: linear-gradient(135deg, #ff9800, #ff6a00);
+            flex-shrink: 0;
+        }
+
+        .task-left h3 { font-size: 16px; font-weight: 700; }
+        .task-left p { font-size: 13px; color: #9ca3af; }
+        .task-btn { padding: 10px 20px; font-size: 14px; flex-shrink: 0; }
+
+        .notice-bar {
+            background: #1f2937;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 14px;
+            margin: 0 0 15px 0;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+        .notice-bar marquee { color: #fff; }
+
+        #loading-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.55);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+        #loading-overlay.hidden { display: none; }
+
+        .loader {
+            width: 46px; height: 46px;
+            border: 4px solid #444;
+            border-top: 4px solid #ff9800;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        .skeleton {
+            height: 70px; border-radius: 16px;
+            background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%);
+            background-size: 400% 100%;
+            animation: skeleton 1.2s infinite;
+        }
+
+        #toast-container {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            width: 90%; max-width: 400px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: #fff;
+            font-weight: 600;
+            margin-top: 10px;
+            animation: fadeUp .3s ease;
+            text-align: center;
+            transition: all .3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,.3);
+        }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+
+        .ad-banner {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border-radius: 16px;
+            padding: 14px;
+            margin: 14px 0;
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            border: 1px dashed rgba(255,255,255,.3);
+        }
+
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .w-full { width: 100%; }
+        .mt-3 { margin-top: 12px; }
+        .mt-4 { margin-top: 16px; }
+        .mt-5 { margin-top: 20px; }
+        .mb-4 { margin-bottom: 16px; }
+        .pb-24 { padding-bottom: 96px; }
+        .text-sm { font-size: 14px; }
+        .text-lg { font-size: 18px; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-gray-300 { color: #d1d5db; }
+        .text-orange-400 { color: #fb923c; }
+        .rounded-full { border-radius: 50%; }
+        .w-12 { width: 48px; height: 48px; }
+        .border-2 { border-width: 2px; }
+        .border-orange-500 { border-color: #ff9800; }
+        .hidden { display: none; }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            border-radius: 14px;
+            background: #252932;
+            border: none;
+            color: #fff;
+        }
+        input:focus, select:focus { outline: 2px solid #ff9800; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        @media (max-width: 480px) {
+            .container { padding: 10px; }
+            .balance-amount { font-size: 28px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="p-4 text-center border-b border-gray-800">
-  <h1 class="header-title"> Daily Income Zone </h1>
-  <p class="text-gray-500 text-xs mt-1"> Click any offer below to unlock rewards </p>
-</header>
+    <!-- লোডিং -->
+    <div id="loading-overlay" class="hidden">
+        <div class="loader"></div>
+    </div>
 
-<!-- ADS BUTTONS -->
-<main class="p-4 max-w-md mx-auto">
+    <!-- টোস্ট -->
+    <div id="toast-container"></div>
 
-  <!-- BUTTON 1 -->
-  <div class="ad-container">
-    <div class="ad-label">✨ Sponsored Content</div>
-    <a href="https://omg10.com/4/11282905" target="_blank" rel="noopener noreferrer" class="ad-btn">
-      🔥 Claim Your Bonus
-    </a>
-  </div>
+    <div class="container">
 
-  <!-- BUTTON 2 -->
-  <div class="ad-container">
-    <div class="ad-label">🎯 Partner Offer</div>
-    <a href="https://omg10.com/4/11551960" target="_blank" rel="noopener noreferrer" class="ad-btn">
-      ⭐ Get Free Reward
-    </a>
-  </div>
+        <!-- নোটিশ -->
+        <div class="notice-bar">
+            <marquee scrollamount="4" id="marquee-notice">🎉 Welcome to Daily Income Zone | Complete Tasks • Earn Coins • Withdraw 💰</marquee>
+        </div>
 
-  <!-- BUTTON 3 -->
-  <div class="ad-container">
-    <div class="ad-label">📢 Advertisement</div>
-    <a href="https://omg10.com/4/11551960" target="_blank" rel="noopener noreferrer" class="ad-btn">
-      🚀 Offer 1 - Visit Now
-    </a>
-  </div>
+        <main id="home-page" class="pb-24">
 
-  <!-- BUTTON 4 -->
-  <div class="ad-container">
-    <div class="ad-label">📢 Advertisement</div>
-    <a href="https://omg10.com/4/11282212" target="_blank" rel="noopener noreferrer" class="ad-btn">
-      💎 Offer 2 - Claim Bonus
-    </a>
-  </div>
+            <!-- হেডার -->
+            <header class="card flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img id="profile-photo" src="https://ui-avatars.com/api/?name=User&background=ff9800&color=fff&size=48" class="w-12 rounded-full border-2 border-orange-500" alt="Profile">
+                    <div>
+                        <p class="text-gray-400 text-sm">Welcome Back 👋</p>
+                        <h2 id="profile-name" class="font-bold text-lg">User</h2>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="notification-btn" class="header-icon" aria-label="Notifications">
+                        🔔
+                        <span id="notification-dot" class="hidden"></span>
+                    </button>
+                    <div class="coin-card">
+                        🪙 <span id="coin-balance">0</span>
+                    </div>
+                </div>
+            </header>
 
-  <!-- BUTTON 5 -->
-  <div class="ad-container">
-    <div class="ad-label">📢 Advertisement</div>
-    <a href="https://omg10.com/4/11551958" target="_blank" rel="noopener noreferrer" class="ad-btn">
-      🎁 Offer 3 - Get Reward
-    </a>
-  </div>
+            <!-- Ad Banner 1 -->
+            <div class="ad-banner mt-4" id="ad-banner-1">
+                📢 Ad Space — Google AdSense Banner এখানে বসবে
+            </div>
 
-</main>
+            <!-- ব্যালেন্স কার্ড -->
+            <section class="balance-card mt-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="balance-label">Available Balance</p>
+                        <h1 class="balance-amount">🪙 <span id="balance-amount">0</span></h1>
+                        <p class="balance-subtitle">Keep completing tasks to earn more coins.</p>
+                    </div>
+                    <div class="balance-icon">💰</div>
+                </div>
+                <div class="mt-5">
+                    <div class="flex justify-between text-sm text-gray-300">
+                        <span>Withdraw Progress</span>
+                        <span id="withdraw-progress-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="withdraw-progress-fill" class="progress-fill" style="width:0%"></div>
+                    </div>
+                </div>
+                <button id="withdraw-btn" class="btn-primary w-full mt-5">💳 Withdraw Now</button>
+            </section>
 
-<!-- FOOTER -->
-<footer class="p-4 text-center text-gray-600 text-xs">
-  © 2025 Daily Income Zone. All rights reserved.
-</footer>
+            <!-- স্ট্রিক -->
+            <div class="card streak-card mt-4">
+                <div>
+                    <h3>🔥 Daily Streak</h3>
+                    <p class="text-gray-400 text-sm">Login every day to earn extra rewards.</p>
+                </div>
+                <div class="streak-number">
+                    <span id="streak-count">0</span>
+                    <small>Days</small>
+                </div>
+            </div>
+
+            <!-- Ad Banner 2 (Rewarded) -->
+            <div class="ad-banner mt-4" id="ad-banner-2">
+                🎬 Watch Rewarded Ad — Get Extra Coins!
+                <button class="btn-primary mt-3" onclick="watchRewardedAd()" style="width:100%;">▶️ Watch Ad (+50 Coins)</button>
+            </div>
+
+            <!-- টাস্ক -->
+            <section class="card mt-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold">📋 Daily Tasks</h2>
+                    <span class="text-orange-400 text-sm">Complete & Earn</span>
+                </div>
+                <div id="task-list">
+                    <div class="task-card">
+                        <div class="task-left">
+                            <div class="task-icon">🎥</div>
+                            <div>
+                                <h3>Watch Video</h3>
+                                <p>Reward: +10 Coins</p>
+                            </div>
+                        </div>
+                        <button class="task-btn btn-primary" onclick="completeTask(this, 10)">Start</button>
+                    </div>
+                    <div class="task-card">
+                        <div class="task-left">
+                            <div class="task-icon">🌐</div>
+                            <div>
+                                <h3>Visit Website</h3>
+                                <p>Reward: +15 Coins</p>
+                            </div>
+                        </div>
+                        <button class="task-btn btn-primary" onclick="completeTask(this, 15)">Visit</button>
+                    </div>
+                    <div class="task-card">
+                        <div class="task-left">
+                            <div class="task-icon">🎮</div>
+                            <div>
+                                <h3>Play Game</h3>
+                                <p>Reward: +20 Coins</p>
+                            </div>
+                        </div>
+                        <button class="task-btn btn-primary" onclick="completeTask(this, 20)">Play</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- টুর্নামেন্ট -->
+            <section class="card mt-4">
+                <h3>🏆 Weekly Tournament</h3>
+                <div class="progress-bar mt-3">
+                    <div class="progress-fill" style="width:65%"></div>
+                </div>
+                <p class="mt-3 text-gray-400">Rank #125 • Top 100 gets bonus rewards</p>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getFirestore, doc, getDoc, setDoc, updateDoc,
+            collection, getDocs, addDoc, deleteDoc,
+            query, where, serverTimestamp, onSnapshot
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // ============ Firebase Config ============
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.fbFns = { doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc, query, where, serverTimestamp, onSnapshot };
+
+        console.log("✅ Firebase Initialized");
+    </script>
+
+    <!-- App Logic -->
+    <script>
+        "use strict";
+
+        // ============ কনফিগ ============
+        const CONFIG = {
+            MIN_WITHDRAW: 1000,
+            DAILY_BONUS: 20,
+            REWARDED_AD_COINS: 50,
+            VERSION: "1.0.0"
+        };
+
+        console.log("Daily Income Zone", CONFIG.VERSION);
+
+        // ============ Telegram User ============
+        let telegramUser = { id: "guest_" + Date.now(), first_name: "Guest" };
+
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                telegramUser = tg.initDataUnsafe.user;
+            }
+        }
+
+        // ============ স্টেট ============
+        let coins = 0;
+        let streak = 0;
+        let lastLogin = localStorage.getItem("diz_last_login") || null;
+
+        // ============ টোস্ট ============
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(10px)";
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // ============ লোডিং ============
+        function showLoading() {
+            document.getElementById("loading-overlay").classList.remove("hidden");
+        }
+        function hideLoading() {
+            document.getElementById("loading-overlay").classList.add("hidden");
+        }
+
+        // ============ ব্যালেন্স ============
+        function updateBalance() {
+            document.getElementById("coin-balance").innerText = coins;
+            document.getElementById("balance-amount").innerText = coins;
+            updateWithdrawProgress(coins);
+        }
+
+        function updateWithdrawProgress(currentCoins) {
+            const target = CONFIG.MIN_WITHDRAW;
+            const percent = Math.min((currentCoins / target) * 100, 100);
+            document.getElementById("withdraw-progress-fill").style.width = percent + "%";
+            document.getElementById("withdraw-progress-text").innerText = Math.floor(percent) + "%";
+        }
+
+        // ============ Firestore: ইউজার লোড ============
+        async function loadUser() {
+            const { doc, getDoc, setDoc } = window.fbFns;
+            const db = window.db;
+
+            showLoading();
+            try {
+                const userRef = doc(db, "users", telegramUser.id.toString());
+                const snap = await getDoc(userRef);
+
+                if (snap.exists()) {
+                    const data = snap.data();
+                    coins = data.coins || 0;
+                    streak = data.streak || 0;
+
+                    // ব্যান চেক
+                    if (data.status === "banned") {
+                        showToast("🚫 Your account has been banned.", "error");
+                        document.body.innerHTML = "<h1 style='color:#fff;text-align:center;padding:50px;'>🚫 Account Banned</h1>";
+                        return;
+                    }
+
+                    // প্রোফাইল আপডেট
+                    if (data.name) {
+                        document.getElementById("profile-name").innerText = data.name;
+                    }
+                    if (data.photo) {
+                        document.getElementById("profile-photo").src = data.photo;
+                    }
+                } else {
+                    // নতুন ইউজার
+                    await setDoc(userRef, {
+                        name: telegramUser.first_name || "User",
+                        username: telegramUser.username || "",
+                        photo: telegramUser.photo_url || "",
+                        coins: 0,
+                        streak: 0,
+                        status: "active",
+                        joinDate: serverTimestampSafe()
+                    });
+                    coins = 0;
+                }
+
+                updateBalance();
+                await updateStreakInDB();
+            } catch (e) {
+                console.error(e);
+                showToast("⚠️ Failed to load user data", "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function serverTimestampSafe() {
+            return new Date().getTime();
+        }
+
+        // ============ স্ট্রিক ============
+        async function updateStreakInDB() {
+            const today = new Date().toDateString();
+            if (lastLogin !== today) {
+                if (lastLogin) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    if (lastLogin === yesterday.toDateString()) {
+                        streak++;
+                    } else {
+                        streak = 0;
+                    }
+                } else {
+                    streak = 1;
+                }
+                lastLogin = today;
+                localStorage.setItem("diz_last_login", lastLogin);
+
+                // ডেইলি বোনাস
+                const bonusClaimed = localStorage.getItem("diz_bonus_claimed");
+                if (bonusClaimed !== today) {
+                    coins += CONFIG.DAILY_BONUS;
+                    localStorage.setItem("diz_bonus_claimed", today);
+                    showToast(`🎁 Daily Bonus +${CONFIG.DAILY_BONUS} Coins!`);
+                    await saveCoins();
+                }
+
+                await saveStreak();
+            }
+            document.getElementById("streak-count").innerText = streak;
+        }
+
+        // ============ কয়েন সেভ ============
+        async function saveCoins() {
+            const { doc, updateDoc } = window.fbFns;
+            const db = window.db;
+            try {
+                await updateDoc(doc(db, "users", telegramUser.id.toString()), {
+                    coins: coins
+                });
+                updateBalance();
+            } catch (e) {
+                console.error("Save failed", e);
+            }
+        }
+
+        async function saveStreak() {
+            const { doc, updateDoc } = window.fbFns;
+            const db = window.db;
+            try {
+                await updateDoc(doc(db, "users", telegramUser.id.toString()), {
+                    streak: streak
+                });
+            } catch (e) {
+                console.error("Streak save failed", e);
+            }
+        }
+
+        // ============ টাস্ক ============
+        async function completeTask(button, reward) {
+            if (!button || button.disabled) return;
+
+            button.disabled = true;
+            button.innerHTML = "⏳...";
+
+            coins += reward;
+            await saveCoins();
+
+            button.innerHTML = "✅ Done";
+            button.style.opacity = ".7";
+            showToast(`+${reward} Coins Earned! 🎉`);
+        }
+
+        // ============ Rewarded Ad ============
+        function watchRewardedAd() {
+            showLoading();
+
+            // এখানে আসল Ad SDK কল করবেন
+            // উদাহরণ: AdMob, Monetag, Adsterra
+
+            setTimeout(async () => {
+                hideLoading();
+                coins += CONFIG.REWARDED_AD_COINS;
+                await saveCoins();
+                showToast(`🎬 Ad Watched! +${CONFIG.REWARDED_AD_COINS} Coins 🎉`);
+            }, 3000);
+        }
+
+        // ============ উইথড্র ============
+        document.getElementById("withdraw-btn").addEventListener("click", async function () {
+            if (coins < CONFIG.MIN_WITHDRAW) {
+                showToast(`Need ${CONFIG.MIN_WITHDRAW} coins to withdraw!`, "error");
+                return;
+            }
+
+            const { collection, addDoc, serverTimestamp } = window.fbFns;
+            const db = window.db;
+
+            try {
+                await addDoc(collection(db, "withdraws"), {
+                    uid: telegramUser.id.toString(),
+                    name: telegramUser.first_name || "User",
+                    amount: coins,
+                    method: "Bkash",
+                    number: "N/A",
+                    status: "pending",
+                    createdAt: serverTimestamp()
+                });
+
+                coins = 0;
+                await saveCoins();
+                showToast("💰 Withdraw request sent!");
+            } catch (e) {
+                console.error(e);
+                showToast("⚠️ Withdraw failed", "error");
+            }
+        });
+
+        // ============ নোটিফিকেশন ============
+        document.getElementById("notification-btn").addEventListener("click", function () {
+            showToast("🔔 No new notifications");
+            document.getElementById("notification-dot").classList.add("hidden");
+        });
+
+        // ============ এরর হ্যান্ডলিং ============
+        window.addEventListener("error", (e) => {
+            console.error(e.error);
+        });
+
+        // ============ ইনিশিয়ালাইজ ============
+        async function init() {
+            await loadUser();
+            console.log("✅ App Ready!");
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
 
 </body>
 </html>
