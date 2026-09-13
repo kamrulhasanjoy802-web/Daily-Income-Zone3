@@ -1,1544 +1,382 @@
-<!DOCTYPE html>
-<html lang="bn">
+           <!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Income Zone</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <!-- Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-        }
-
-        .dark-bg {
-            background-color: #121212;
-        }
-
-        .card-bg {
-            background-color: #1e1e1e;
-        }
-
-        .border-accent {
-            border-color: #ff8c00;
-        }
-
-        .text-accent {
-            color: #ff8c00;
-        }
-
-        .btn,
-        .btn-accent {
-            transition: all 0.2s ease-in-out;
-            transform: scale(1);
-        }
-
-        .btn:active,
-        .btn-accent:active {
-            transform: scale(0.95);
-        }
-
-        .btn-accent {
-            background-color: #ff8c00;
-            color: #121212;
-            font-weight: bold;
-        }
-
-        .btn-accent:hover {
-            background-color: #e67e00;
-        }
-
-        .input-field {
-            background-color: #2c2c2c;
-            border: 1px solid #444;
-            color: white;
-        }
-
-        .main-page {
-            display: none;
-        }
-
-        .main-page.active {
-            display: flex;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .header-title {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff8c00, #ff6a00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* ================= ADS ================= */
-
-        .ad-container {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 14px;
-            margin: 12px 0;
-            text-align: center;
-        }
-
-        .ad-label {
-            color: #777;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .ad-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff8c00, #ff6a00);
-            color: #121212;
-            font-weight: 700;
-            padding: 12px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            transition: all 0.2s;
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
-            cursor: pointer;
-            border: none;
-            width: 100%;
-            max-width: 280px;
-        }
-
-        .ad-btn:hover {
-            transform: scale(1.04);
-            box-shadow: 0 6px 25px rgba(255, 140, 0, 0.5);
-        }
-
-        .ad-btn:active {
-            transform: scale(0.95);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Income Zone</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; }
+  .dark-bg { background-color: #121212; }
+  .card-bg { background-color: #1e1e1e; }
+  .border-accent { border-color: #ff8c00; }
+  .text-accent { color: #ff8c00; }
+  .btn, .btn-accent { transition: all 0.2s ease-in-out; transform: scale(1); }
+  .btn:active, .btn-accent:active { transform: scale(0.95); }
+  .btn-accent { background-color: #ff8c00; color: #121212; font-weight: bold; }
+  .btn-accent:hover { background-color: #e67e00; }
+  .input-field { background-color: #2c2c2c; border: 1px solid #444; color: white; }
+  .main-page { display: none; }
+  .main-page.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .header-title { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #ff8c00, #ff6a00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .ad-container { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 14px; margin: 12px 0; text-align: center; }
+  .ad-container iframe { max-width: 100%; border: none; }
+  .ad-label { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .ad-btn { display: inline-block; background: linear-gradient(135deg, #ff8c00, #ff6a00); color: #121212; font-weight: 700; padding: 12px 30px; border-radius: 30px; text-decoration: none; transition: all 0.2s; font-size: 14px; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3); cursor: pointer; border: none; width: 100%; max-width: 280px; }
+  .ad-btn:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 140, 0, 0.5); }
+  .ad-btn:active { transform: scale(0.95); }
+  .ads-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .ads-btn-group .ad-btn { width: 100%; max-width: 100%; }
+</style>
 </head>
+<body class="min-h-screen flex flex-col dark-bg">
 
-<body class="min-h-screen flex flex-col justify-between">
+<!-- ===================== AUTH CONTAINER ===================== -->
+<div id="auth-section" class="main-page active flex-col items-center justify-center min-h-screen p-4">
+  <div class="card-bg rounded-2xl p-6 w-full max-w-md shadow-2xl border border-gray-800">
+    <h1 class="text-3xl font-bold text-center mb-2 text-accent"> Daily Income Zone </h1>
+    <p class="text-center text-gray-400 mb-6"> Sign in to continue </p>
 
-    <!-- ================= AUTH SECTION ================= -->
-
-    <div id="auth-section"
-         class="main-page active min-h-screen flex-col items-center justify-center p-4">
-
-        <h1 class="text-3xl font-bold text-center mb-2 text-accent">
-            Daily Income Zone
-        </h1>
-
-        <p class="text-center text-gray-400 mb-6">
-            Sign in to continue
+    <div id="auth-container">
+      <!-- LOGIN -->
+      <div id="login-view">
+        <div id="login-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
+        <input id="login-username" type="text" placeholder="Username" class="w-full p-3 rounded-lg input-field mb-3" />
+        <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4" />
+        <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-3"> Login </button>
+        <p class="text-center text-gray-400 text-sm"> New user?
+          <button onclick="showSignup()" class="text-accent font-semibold"> Create Account </button>
         </p>
 
-        <div id="auth-container"
-             class="w-full max-w-sm card-bg p-6 rounded-xl border border-gray-800">
-
-            <!-- ================= LOGIN ================= -->
-
-            <div id="login-view">
-
-                <div id="login-error"
-                     class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4">
-                </div>
-
-                <input
-                    id="login-username"
-                    type="text"
-                    placeholder="Username"
-                    class="w-full p-3 rounded-lg input-field mb-3">
-
-                <input
-                    id="login-password"
-                    type="password"
-                    placeholder="Password"
-                    class="w-full p-3 rounded-lg input-field mb-4">
-
-                <button
-                    id="login-btn"
-                    class="w-full p-3 rounded-lg btn-accent mb-3">
-                    Login
-                </button>
-
-                <p class="text-center text-gray-400 text-sm mb-4">
-                    New user?
-                    <button
-                        onclick="showSignup()"
-                        class="text-accent font-semibold">
-                        Create Account
-                    </button>
-                </p>
-
-                <!-- ADS BUTTON 1 -->
-
-                <div class="ad-container">
-
-                    <div class="ad-label">
-                        ✨ Sponsored Content
-                    </div>
-
-                    <button
-                        id="ads-btn-1"
-                        type="button"
-                        class="ad-btn">
-                        🔥 Claim Your Bonus
-                    </button>
-
-                    <p style="color:#555;font-size:10px;margin-top:6px;">
-                        Limited time offer
-                    </p>
-
-                </div>
-
-            </div>
-
-            <!-- ================= SIGNUP ================= -->
-
-            <div id="signup-view" class="hidden">
-
-                <div id="signup-error"
-                     class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4">
-                </div>
-
-                <input
-                    id="signup-username"
-                    type="text"
-                    placeholder="Choose Username"
-                    class="w-full p-3 rounded-lg input-field mb-3">
-
-                <input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Your Email"
-                    class="w-full p-3 rounded-lg input-field mb-3">
-
-                <input
-                    id="signup-password"
-                    type="password"
-                    placeholder="Password (min 6 chars)"
-                    class="w-full p-3 rounded-lg input-field mb-3">
-
-                <input
-                    id="signup-referral"
-                    type="text"
-                    placeholder="Referral Code (optional)"
-                    class="w-full p-3 rounded-lg input-field mb-4">
-
-                <button
-                    id="signup-btn"
-                    class="w-full p-3 rounded-lg btn-accent mb-3">
-                    Create Account
-                </button>
-
-                <p class="text-center text-gray-400 text-sm mb-4">
-                    Already have an account?
-                    <button
-                        onclick="showLogin()"
-                        class="text-accent font-semibold">
-                        Login
-                    </button>
-                </p>
-
-                <!-- ADS BUTTON 2 -->
-
-                <div class="ad-container">
-
-                    <div class="ad-label">
-                        🎯 Partner Offer
-                    </div>
-
-                    <button
-                        id="ads-btn-2"
-                        type="button"
-                        class="ad-btn">
-                        ⭐ Get Free Reward
-                    </button>
-
-                    <p style="color:#555;font-size:10px;margin-top:6px;">
-                        Exclusive for new users
-                    </p>
-
-                </div>
-
-            </div>
-
+        <!-- ===== ADS BUTTON 1 ===== -->
+        <div class="ad-container mt-4">
+          <div class="ad-label">✨ Sponsored Content</div>
+          <button id="ads-btn-1" class="ad-btn"> 🔥 Claim Your Bonus </button>
+          <p style="color:#555; font-size:10px; margin-top:6px;">Limited time offer</p>
         </div>
-    </div>
+      </div>
 
-    <!-- ================= DASHBOARD ================= -->
+      <!-- SIGNUP -->
+      <div id="signup-view" class="hidden">
+        <div id="signup-error" class="hidden bg-red-500/20 border border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm mb-4"></div>
+        <input id="signup-username" type="text" placeholder="Choose Username" class="w-full p-3 rounded-lg input-field mb-3" />
+        <input id="signup-email" type="email" placeholder="Your Email" class="w-full p-3 rounded-lg input-field mb-3" />
+        <input id="signup-password" type="password" placeholder="Password (min 6 chars)" class="w-full p-3 rounded-lg input-field mb-3" />
+        <input id="signup-referral" type="text" placeholder="Referral Code (optional)" class="w-full p-3 rounded-lg input-field mb-4" />
+        <button id="signup-btn" class="w-full p-3 rounded-lg btn-accent mb-3"> Create Account </button>
+        <p class="text-center text-gray-400 text-sm"> Already have an account?
+          <button onclick="showLogin()" class="text-accent font-semibold"> Login </button>
+        </p>
 
-    <div id="app-container"
-         class="main-page flex-col min-h-screen">
-
-        <header
-            class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg border-b border-gray-800">
-
-            <h1 class="text-xl font-bold header-title">
-                Daily Income Zone
-            </h1>
-
-            <div class="flex items-center space-x-3">
-
-                <span
-                    id="user-greeting"
-                    class="text-sm text-gray-300">
-
-                    Welcome,
-                    <span id="greeting-username">
-                        User
-                    </span>
-
-                </span>
-
-                <button
-                    id="logout-btn"
-                    class="bg-red-600/80 hover:bg-red-700 px-3 py-1 rounded-lg text-sm font-medium text-white">
-                    Logout
-                </button>
-
-            </div>
-
-        </header>
-
-        <main
-            class="flex-grow p-4 max-w-md mx-auto w-full">
-
-            <div class="text-center mt-6 mb-6">
-
-                <h2 class="text-2xl font-bold text-accent mb-2">
-                    Welcome to Daily Income Zone
-                </h2>
-
-                <p class="text-gray-400 text-sm">
-                    Your account dashboard is ready.
-                </p>
-
-            </div>
-
-            <!-- ADS BUTTON 3 -->
-
-            <div class="ad-container">
-
-                <div class="ad-label">
-                    📢 Advertisement 1
-                </div>
-
-                <button
-                    id="ads-btn-3"
-                    type="button"
-                    class="ad-btn">
-                    🚀 Visit Special Offer
-                </button>
-
-            </div>
-
-            <!-- ADS BUTTON 4 -->
-
-            <div class="ad-container">
-
-                <div class="ad-label">
-                    💎 Premium Sponsor
-                </div>
-
-                <button
-                    id="ads-btn-4"
-                    type="button"
-                    class="ad-btn">
-                    💰 Earn Extra Bonus
-                </button>
-
-            </div>
-
-            <!-- ADS BUTTON 5 -->
-
-            <div class="ad-container">
-
-                <div class="ad-label">
-                    🎁 Exclusive Deal
-                </div>
-
-                <button
-                    id="ads-btn-5"
-                    type="button"
-                    class="ad-btn">
-                    🎁 Claim Daily Reward
-                </button>
-
-            </div>
-
-        </main>
-
-    </div>
-
-    <!-- ================= ALERT ================= -->
-
-    <div
-        id="custom-alert"
-        class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-
-        <div
-            class="bg-gray-800 rounded-lg p-6 w-full max-w-xs text-center border border-accent">
-
-            <p
-                id="alert-message"
-                class="mb-4 font-medium text-sm">
-            </p>
-
-            <button
-                id="alert-ok-btn"
-                class="btn-accent px-8 py-2 rounded-lg text-sm">
-                OK
-            </button>
-
+        <!-- ===== ADS BUTTON 2 ===== -->
+        <div class="ad-container mt-4">
+          <div class="ad-label">🎯 Partner Offer</div>
+          <button id="ads-btn-2" class="ad-btn"> ⭐ Get Free Reward </button>
+          <p style="color:#555; font-size:10px; margin-top:6px;">Exclusive for new users</p>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- ===================== APP CONTAINER ===================== -->
+<div id="app-container" class="main-page flex-col min-h-screen">
+  <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg">
+    <h1 class="text-xl font-bold header-title"> Daily Income Zone </h1>
+    <div class="flex items-center space-x-3">
+      <span id="user-greeting" class="text-sm text-gray-300"> Welcome,
+        <span id="greeting-username">User</span>
+      </span>
+      <button id="logout-btn" class="bg-red-600/80 hover:bg-red-700 px-3 py-1 rounded-lg text-sm font-medium text-white"> Logout </button>
+    </div>
+  </header>
+
+  <main class="flex-grow p-4">
+    <div class="text-center mt-10">
+      <h2 class="text-2xl font-bold text-accent mb-3"> Welcome to Daily Income Zone </h2>
+      <p class="text-gray-400 text-sm"> Your account dashboard is ready. </p>
     </div>
 
-    <!-- ================= JAVASCRIPT ================= -->
-
-    <script>
-
-        /* =====================================================
-           FIREBASE
-        ===================================================== */
-
-        const firebaseConfig = {
-
-            apiKey: "AIzaSyBzglxyiGH4kptZtq5U45vMb5jat7XPbAw",
-
-            authDomain:
-                "daily-income-zone.firebaseapp.com",
-
-            projectId:
-                "daily-income-zone",
-
-            storageBucket:
-                "daily-income-zone.firebasestorage.app",
-
-            messagingSenderId:
-                "744535360580",
-
-            appId:
-                "1:744535360580:web:6aa14f64f1952a0b082811",
-
-            measurementId:
-                "G-RG6H88R3L9"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-
-        /* =====================================================
-           TELEGRAM WEBAPP
-        ===================================================== */
-
-        const tg =
-            window.Telegram &&
-            window.Telegram.WebApp
-                ? window.Telegram.WebApp
-                : null;
-
-        if (tg) {
-
-            tg.ready();
-            tg.expand();
-
-        }
-
-
-        /* =====================================================
-           SAFE DOM
-        ===================================================== */
-
-        function safeGet(id) {
-
-            return document.getElementById(id);
-
-        }
-
-
-        /* =====================================================
-           ALERT
-        ===================================================== */
-
-        function showAlert(msg) {
-
-            const el =
-                safeGet("alert-message");
-
-            const box =
-                safeGet("custom-alert");
-
-            const ok =
-                safeGet("alert-ok-btn");
-
-            if (el) {
-                el.textContent = msg;
-            }
-
-            if (box) {
-                box.classList.remove("hidden");
-            }
-
-            if (ok) {
-
-                ok.onclick = function () {
-
-                    if (box) {
-                        box.classList.add("hidden");
-                    }
-
-                };
-
-            }
-
-        }
-
-
-        /* =====================================================
-           ADS
-           
-           Button 1 -> 11282905
-           Button 2 -> 11551960
-           Button 3 -> 11551960
-           Button 4 -> 11282212
-           Button 5 -> 11551958
-        ===================================================== */
-
-        const adLinks = {
-
-            "ads-btn-1":
-                "https://omg10.com/4/11282905",
-
-            "ads-btn-2":
-                "https://omg10.com/4/11551960",
-
-            "ads-btn-3":
-                "https://omg10.com/4/11551960",
-
-            "ads-btn-4":
-                "https://omg10.com/4/11282212",
-
-            "ads-btn-5":
-                "https://omg10.com/4/11551958"
-
-        };
-
-
-        function openAd(url) {
-
-            if (!url) {
-                showAlert("Advertisement link unavailable.");
-                return;
-            }
-
-            /*
-             * Telegram WebApp-এর ভিতরে openLink
-             * ব্যবহার করলে সাধারণ window.open-এর
-             * তুলনায় link opening বেশি নির্ভরযোগ্য।
-             */
-
-            if (
-                window.Telegram &&
-                Telegram.WebApp &&
-                typeof Telegram.WebApp.openLink === "function"
-            ) {
-
-                Telegram.WebApp.openLink(url);
-
-            } else {
-
-                window.open(
-                    url,
-                    "_blank",
-                    "noopener,noreferrer"
-                );
-
-            }
-
-        }
-
-
-        Object.keys(adLinks).forEach(function(buttonId) {
-
-            const button =
-                safeGet(buttonId);
-
-            if (!button) return;
-
-            button.addEventListener(
-                "click",
-                function() {
-
-                    openAd(
-                        adLinks[buttonId]
-                    );
-
-                }
-            );
-
-        });
-
-
-        /* =====================================================
-           AUTH SWITCH
-        ===================================================== */
-
-        function showSignup() {
-
-            const login =
-                safeGet("login-view");
-
-            const signup =
-                safeGet("signup-view");
-
-            if (login) {
-                login.classList.add("hidden");
-            }
-
-            if (signup) {
-                signup.classList.remove("hidden");
-            }
-
-        }
-
-
-        function showLogin() {
-
-            const login =
-                safeGet("login-view");
-
-            const signup =
-                safeGet("signup-view");
-
-            if (login) {
-                login.classList.remove("hidden");
-            }
-
-            if (signup) {
-                signup.classList.add("hidden");
-            }
-
-        }
-
-
-        window.showSignup =
-            showSignup;
-
-        window.showLogin =
-            showLogin;
-
-
-        /* =====================================================
-           USER DATA
-        ===================================================== */
-
-        let currentUser = null;
-        let userData = null;
-
-
-        async function loadUserData(uid) {
-
-            try {
-
-                const doc =
-                    await db
-                        .collection("users")
-                        .doc(uid)
-                        .get();
-
-                if (doc.exists) {
-
-                    userData =
-                        doc.data();
-
-                    const greet =
-                        safeGet(
-                            "greeting-username"
-                        );
-
-                    if (greet) {
-
-                        greet.textContent =
-                            userData.username ||
-                            "User";
-
-                    }
-
-                    return true;
-
-                }
-
-                return false;
-
-            } catch (e) {
-
-                console.error(
-                    "Load user error:",
-                    e
-                );
-
-                return false;
-
-            }
-
-        }
-
-
-        /* =====================================================
-           UI AFTER LOGIN
-        ===================================================== */
-
-        function updateUIAfterLogin() {
-
-            const authSection =
-                safeGet("auth-section");
-
-            const appContainer =
-                safeGet("app-container");
-
-            if (authSection) {
-
-                authSection.classList.remove(
-                    "active"
-                );
-
-                authSection.style.display =
-                    "none";
-
-            }
-
-            if (appContainer) {
-
-                appContainer.classList.add(
-                    "active"
-                );
-
-                appContainer.style.display =
-                    "flex";
-
-            }
-
-        }
-
-
-        /* =====================================================
-           RESET AUTH
-        ===================================================== */
-
-        function resetToAuth() {
-
-            const authSection =
-                safeGet("auth-section");
-
-            const appContainer =
-                safeGet("app-container");
-
-            if (authSection) {
-
-                authSection.classList.add(
-                    "active"
-                );
-
-                authSection.style.display =
-                    "flex";
-
-            }
-
-            if (appContainer) {
-
-                appContainer.classList.remove(
-                    "active"
-                );
-
-                appContainer.style.display =
-                    "none";
-
-            }
-
-            safeGet("login-view")
-                ?.classList.remove("hidden");
-
-            safeGet("signup-view")
-                ?.classList.add("hidden");
-
-        }
-
-
-        /* =====================================================
-           REFERRAL CODE
-        ===================================================== */
-
-        function generateReferralCode() {
-
-            const chars =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-            let code = "";
-
-            for (
-                let i = 0;
-                i < 6;
-                i++
-            ) {
-
-                code +=
-                    chars.charAt(
-                        Math.floor(
-                            Math.random() *
-                            chars.length
-                        )
-                    );
-
-            }
-
-            return code;
-
-        }
-
-
-        /* =====================================================
-           SIGNUP
-        ===================================================== */
-
-        const signupBtn =
-            safeGet("signup-btn");
-
-        if (signupBtn) {
-
-            signupBtn.addEventListener(
-                "click",
-                async function() {
-
-                    signupBtn.disabled =
-                        true;
-
-                    signupBtn.textContent =
-                        "Creating...";
-
-                    const errEl =
-                        safeGet("signup-error");
-
-                    if (errEl) {
-                        errEl.classList.add(
-                            "hidden"
-                        );
-                    }
-
-                    const username =
-                        safeGet(
-                            "signup-username"
-                        )?.value.trim() || "";
-
-                    const email =
-                        safeGet(
-                            "signup-email"
-                        )?.value.trim() || "";
-
-                    const password =
-                        safeGet(
-                            "signup-password"
-                        )?.value || "";
-
-                    const referral =
-                        safeGet(
-                            "signup-referral"
-                        )?.value.trim() || "";
-
-
-                    if (username.length < 3) {
-
-                        if (errEl) {
-
-                            errEl.textContent =
-                                "Username must be at least 3 characters.";
-
-                            errEl.classList.remove(
-                                "hidden"
-                            );
-
-                        }
-
-                        signupBtn.disabled =
-                            false;
-
-                        signupBtn.textContent =
-                            "Create Account";
-
-                        return;
-
-                    }
-
-
-                    if (
-                        !email ||
-                        !email.includes("@")
-                    ) {
-
-                        if (errEl) {
-
-                            errEl.textContent =
-                                "Valid email required.";
-
-                            errEl.classList.remove(
-                                "hidden"
-                            );
-
-                        }
-
-                        signupBtn.disabled =
-                            false;
-
-                        signupBtn.textContent =
-                            "Create Account";
-
-                        return;
-
-                    }
-
-
-                    if (password.length < 6) {
-
-                        if (errEl) {
-
-                            errEl.textContent =
-                                "Password min 6 characters.";
-
-                            errEl.classList.remove(
-                                "hidden"
-                            );
-
-                        }
-
-                        signupBtn.disabled =
-                            false;
-
-                        signupBtn.textContent =
-                            "Create Account";
-
-                        return;
-
-                    }
-
-
-                    try {
-
-                        const usernameDoc =
-                            await db
-                                .collection(
-                                    "usernames"
-                                )
-                                .doc(
-                                    username.toLowerCase()
-                                )
-                                .get();
-
-
-                        if (usernameDoc.exists) {
-
-                            if (errEl) {
-
-                                errEl.textContent =
-                                    "Username already taken.";
-
-                                errEl.classList.remove(
-                                    "hidden"
-                                );
-
-                            }
-
-                            signupBtn.disabled =
-                                false;
-
-                            signupBtn.textContent =
-                                "Create Account";
-
-                            return;
-
-                        }
-
-
-                        const userCred =
-                            await auth
-                                .createUserWithEmailAndPassword(
-                                    email,
-                                    password
-                                );
-
-
-                        const user =
-                            userCred.user;
-
-
-                        await user.sendEmailVerification();
-
-
-                        const refCode =
-                            generateReferralCode();
-
-
-                        await db
-                            .collection("users")
-                            .doc(user.uid)
-                            .set({
-
-                                name:
-                                    username,
-
-                                username:
-                                    username,
-
-                                email:
-                                    email,
-
-                                balance:
-                                    0,
-
-                                referralCode:
-                                    refCode,
-
-                                isBlocked:
-                                    false,
-
-                                createdAt:
-                                    firebase.firestore
-                                        .FieldValue
-                                        .serverTimestamp()
-
-                            });
-
-
-                        await db
-                            .collection("usernames")
-                            .doc(
-                                username.toLowerCase()
-                            )
-                            .set({
-
-                                uid:
-                                    user.uid,
-
-                                email:
-                                    email,
-
-                                username:
-                                    username,
-
-                                createdAt:
-                                    firebase.firestore
-                                        .FieldValue
-                                        .serverTimestamp()
-
-                            });
-
-
-                        if (referral) {
-
-                            try {
-
-                                const snap =
-                                    await db
-                                        .collection("users")
-                                        .where(
-                                            "referralCode",
-                                            "==",
-                                            referral.toUpperCase()
-                                        )
-                                        .get();
-
-
-                                if (!snap.empty) {
-
-                                    const refDoc =
-                                        snap.docs[0];
-
-
-                                    await db
-                                        .collection(
-                                            "users"
-                                        )
-                                        .doc(user.uid)
-                                        .update({
-
-                                            referredBy:
-                                                refDoc.id
-
-                                        });
-
-
-                                    await db
-                                        .collection(
-                                            "users"
-                                        )
-                                        .doc(refDoc.id)
-                                        .update({
-
-                                            referrals:
-                                                firebase.firestore
-                                                    .FieldValue
-                                                    .arrayUnion(
-                                                        user.uid
-                                                    )
-
-                                        });
-
-                                }
-
-                            } catch (e) {
-
-                                console.warn(
-                                    "Referral error:",
-                                    e
-                                );
-
-                            }
-
-                        }
-
-
-                        await auth.signOut();
-
-
-                        showAlert(
-                            "📧 Verification email sent! Please check your inbox and login."
-                        );
-
-
-                        showLogin();
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "Signup error:",
-                            error
-                        );
-
-                        if (errEl) {
-
-                            errEl.textContent =
-                                error.message ||
-                                "Signup failed.";
-
-                            errEl.classList.remove(
-                                "hidden"
-                            );
-
-                        }
-
-                    }
-
-
-                    signupBtn.disabled =
-                        false;
-
-                    signupBtn.textContent =
-                        "Create Account";
-
-                }
-            );
-
-        }
-
-
-        /* =====================================================
-           LOGIN
-        ===================================================== */
-
-        const loginBtn =
-            safeGet("login-btn");
-
-
-        if (loginBtn) {
-
-            loginBtn.addEventListener(
-                "click",
-                async function() {
-
-                    loginBtn.disabled =
-                        true;
-
-                    loginBtn.textContent =
-                        "Logging in...";
-
-
-                    const errEl =
-                        safeGet("login-error");
-
-
-                    if (errEl) {
-
-                        errEl.classList.add(
-                            "hidden"
-                        );
-
-                    }
-
-
-                    const username =
-                        safeGet(
-                            "login-username"
-                        )?.value.trim() || "";
-
-
-                    const password =
-                        safeGet(
-                            "login-password"
-                        )?.value || "";
-
-
-                    if (
-                        !username ||
-                        !password
-                    ) {
-
-                        if (errEl) {
-
-                            errEl.textContent =
-                                "Please enter username and password.";
-
-                            errEl.classList.remove(
-                                "hidden"
-                            );
-
-                        }
-
-                        loginBtn.disabled =
-                            false;
-
-                        loginBtn.textContent =
-                            "Login";
-
-                        return;
-
-                    }
-
-
-                    try {
-
-                        const unameDoc =
-                            await db
-                                .collection(
-                                    "usernames"
-                                )
-                                .doc(
-                                    username.toLowerCase()
-                                )
-                                .get();
-
-
-                        if (!unameDoc.exists) {
-
-                            if (errEl) {
-
-                                errEl.textContent =
-                                    "Username not found.";
-
-                                errEl.classList.remove(
-                                    "hidden"
-                                );
-
-                            }
-
-                            loginBtn.disabled =
-                                false;
-
-                            loginBtn.textContent =
-                                "Login";
-
-                            return;
-
-                        }
-
-
-                        const email =
-                            unameDoc.data().email;
-
-
-                        const userCred =
-                            await auth
-                                .signInWithEmailAndPassword(
-                                    email,
-                                    password
-                                );
-
-
-                        const user =
-                            userCred.user;
-
-
-                        const userDoc =
-                            await db
-                                .collection("users")
-                                .doc(user.uid)
-                                .get();
-
-
-                        if (
-                            userDoc.exists &&
-                            userDoc.data().isBlocked
-                        ) {
-
-                            await auth.signOut();
-
-
-                            if (errEl) {
-
-                                errEl.textContent =
-                                    "Account blocked. Contact support.";
-
-                                errEl.classList.remove(
-                                    "hidden"
-                                );
-
-                            }
-
-                            loginBtn.disabled =
-                                false;
-
-                            loginBtn.textContent =
-                                "Login";
-
-                            return;
-
-                        }
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "Login error:",
-                            error
-                        );
-
-                        if (errEl) {
-
-                            errEl.textContent =
-                                error.message ||
-                                "Login failed.";
-
-                            errEl.classList.remove(
-                                "hidden"
-                            );
-
-                        }
-
-                    }
-
-
-                    loginBtn.disabled =
-                        false;
-
-                    loginBtn.textContent =
-                        "Login";
-
-                }
-            );
-
-        }
-
-
-        /* =====================================================
-           LOGOUT
-        ===================================================== */
-
-        const logoutBtn =
-            safeGet("logout-btn");
-
-
-        if (logoutBtn) {
-
-            logoutBtn.addEventListener(
-                "click",
-                async function() {
-
-                    try {
-
-                        await auth.signOut();
-
-                    } catch (e) {
-
-                        console.error(e);
-
-                    }
-
-                    currentUser =
-                        null;
-
-                    userData =
-                        null;
-
-                    resetToAuth();
-
-                }
-            );
-
-        }
-
-
-        /* =====================================================
-           AUTH STATE
-        ===================================================== */
-
-        auth.onAuthStateChanged(
-            async function(user) {
-
-                if (user) {
-
-                    currentUser =
-                        user;
-
-
-                    const ok =
-                        await loadUserData(
-                            user.uid
-                        );
-
-
-                    if (
-                        ok &&
-                        userData
-                    ) {
-
-                        updateUIAfterLogin();
-
-
-                        const greet =
-                            safeGet(
-                                "greeting-username"
-                            );
-
-
-                        if (greet) {
-
-                            greet.textContent =
-                                userData.username ||
-                                "User";
-
-                        }
-
-                    } else {
-
-                        resetToAuth();
-
-                    }
-
-                } else {
-
-                    currentUser =
-                        null;
-
-                    userData =
-                        null;
-
-                    resetToAuth();
-
-                }
-
-            }
-        );
-
-
-        /* =====================================================
-           INIT
-        ===================================================== */
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            function() {
-
-                resetToAuth();
-
-            }
-        );
-
-
-        /* =====================================================
-           ENTER KEY - LOGIN
-        ===================================================== */
-
-        const loginPassword =
-            safeGet("login-password");
-
-
-        if (loginPassword) {
-
-            loginPassword.addEventListener(
-                "keydown",
-                function(e) {
-
-                    if (
-                        e.key === "Enter" &&
-                        loginBtn
-                    ) {
-
-                        loginBtn.click();
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        /* =====================================================
-           ENTER KEY - SIGNUP
-        ===================================================== */
-
-        const signupPassword =
-            safeGet("signup-password");
-
-
-        if (signupPassword) {
-
-            signupPassword.addEventListener(
-                "keydown",
-                function(e) {
-
-                    if (
-                        e.key === "Enter" &&
-                        signupBtn
-                    ) {
-
-                        signupBtn.click();
-
-                    }
-
-                }
-            );
-
-        }
-
-    </script>
-
+    <!-- ===== ADS BUTTONS 3, 4, 5 (Dashboard) ===== -->
+    <div class="ad-container mt-6">
+      <div class="ad-label">📢 Advertisement</div>
+      <div class="ads-btn-group">
+        <button id="ads-btn-3" class="ad-btn"> 🚀 Offer 1 - Visit Now </button>
+        <button id="ads-btn-4" class="ad-btn"> 💎 Offer 2 - Claim Bonus </button>
+        <button id="ads-btn-5" class="ad-btn"> 🎁 Offer 3 - Get Reward </button>
+      </div>
+      <p style="color:#555; font-size:10px; margin-top:8px;">Sponsored Links</p>
+    </div>
+  </main>
+</div>
+
+<!-- ===================== CUSTOM ALERT ===================== -->
+<div id="custom-alert" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+  <div class="bg-gray-800 rounded-lg p-6 w-full max-w-xs text-center border border-accent">
+    <p id="alert-message" class="mb-4 font-medium text-sm"></p>
+    <button id="alert-ok-btn" class="btn-accent px-8 py-2 rounded-lg text-sm"> OK </button>
+  </div>
+</div>
+
+<!-- ===================== FIREBASE + LOGIC ===================== -->
+<script>
+// ===== FIREBASE CONFIG =====
+const firebaseConfig = {
+  apiKey: "AIzaSyBzglxyiGH4kptZtq5U45vMb5jat7XPbAw",
+  authDomain: "daily-income-zone.firebaseapp.com",
+  projectId: "daily-income-zone",
+  storageBucket: "daily-income-zone.firebasestorage.app",
+  messagingSenderId: "744535360580",
+  appId: "1:744535360580:web:6aa14f64f1952a0b082811",
+  measurementId: "G-RG6H88R3L9"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ===== TELEGRAM =====
+if (window.Telegram && Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+}
+
+// ===== HELPERS =====
+function safeGet(id) { return document.getElementById(id); }
+function showAlert(msg) {
+  const el = safeGet('alert-message');
+  const box = safeGet('custom-alert');
+  const ok = safeGet('alert-ok-btn');
+  if (el) el.textContent = msg;
+  if (box) box.classList.remove('hidden');
+  if (ok) ok.onclick = () => box && box.classList.add('hidden');
+}
+
+// ===== ADS BUTTONS HANDLERS (omg10.com) =====
+const adsBtn1 = safeGet('ads-btn-1');
+if (adsBtn1) adsBtn1.addEventListener('click', () => window.open('https://omg10.com/4/11282905', '_blank'));
+
+const adsBtn2 = safeGet('ads-btn-2');
+if (adsBtn2) adsBtn2.addEventListener('click', () => window.open('https://omg10.com/4/11551960', '_blank'));
+
+const adsBtn3 = safeGet('ads-btn-3');
+if (adsBtn3) adsBtn3.addEventListener('click', () => window.open('https://omg10.com/4/11551960', '_blank'));
+
+const adsBtn4 = safeGet('ads-btn-4');
+if (adsBtn4) adsBtn4.addEventListener('click', () => window.open('https://omg10.com/4/11282212', '_blank'));
+
+const adsBtn5 = safeGet('ads-btn-5');
+if (adsBtn5) adsBtn5.addEventListener('click', () => window.open('https://omg10.com/4/11551958', '_blank'));
+
+// ===== AUTH UI =====
+function showSignup() {
+  safeGet('login-view').classList.add('hidden');
+  safeGet('signup-view').classList.remove('hidden');
+}
+function showLogin() {
+  safeGet('login-view').classList.remove('hidden');
+  safeGet('signup-view').classList.add('hidden');
+}
+window.showSignup = showSignup;
+window.showLogin = showLogin;
+
+// ===== USER DATA =====
+let currentUser = null;
+let userData = null;
+async function loadUserData(uid) {
+  try {
+    const doc = await db.collection("users").doc(uid).get();
+    if (doc.exists) {
+      userData = doc.data();
+      const greet = safeGet('greeting-username');
+      if (greet) greet.textContent = userData?.username || 'User';
+      return true;
+    }
+    return false;
+  } catch (e) { console.error(e); return false; }
+}
+
+// ===== UI UPDATE =====
+function updateUIAfterLogin() {
+  const authSection = safeGet('auth-section');
+  const appContainer = safeGet('app-container');
+  if (authSection) { authSection.classList.remove('active'); authSection.style.display = 'none'; }
+  if (appContainer) { appContainer.classList.add('active'); appContainer.style.display = 'flex'; }
+}
+function resetToAuth() {
+  const authSection = safeGet('auth-section');
+  const appContainer = safeGet('app-container');
+  if (authSection) { authSection.classList.add('active'); authSection.style.display = 'flex'; }
+  if (appContainer) { appContainer.classList.remove('active'); appContainer.style.display = 'none'; }
+  safeGet('login-view')?.classList.remove('hidden');
+  safeGet('signup-view')?.classList.add('hidden');
+}
+
+// ===== SIGNUP =====
+const signupBtn = safeGet('signup-btn');
+if (signupBtn) {
+  signupBtn.addEventListener('click', async function () {
+    signupBtn.disabled = true;
+    signupBtn.textContent = 'Creating...';
+    const errEl = safeGet('signup-error');
+    if (errEl) errEl.classList.add('hidden');
+
+    const username = safeGet('signup-username')?.value.trim() || '';
+    const email = safeGet('signup-email')?.value.trim() || '';
+    const password = safeGet('signup-password')?.value || '';
+    const referral = safeGet('signup-referral')?.value.trim() || '';
+
+    if (username.length < 3) {
+      if (errEl) { errEl.textContent = 'Username must be at least 3 characters.'; errEl.classList.remove('hidden'); }
+      signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
+    }
+    if (!email || !email.includes('@')) {
+      if (errEl) { errEl.textContent = 'Valid email required.'; errEl.classList.remove('hidden'); }
+      signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
+    }
+    if (password.length < 6) {
+      if (errEl) { errEl.textContent = 'Password min 6 characters.'; errEl.classList.remove('hidden'); }
+      signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
+    }
+
+    try {
+      const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+      if (usernameDoc.exists) {
+        if (errEl) { errEl.textContent = 'Username already taken.'; errEl.classList.remove('hidden'); }
+        signupBtn.disabled = false; signupBtn.textContent = 'Create Account'; return;
+      }
+
+      const userCred = await auth.createUserWithEmailAndPassword(email, password);
+      const user = userCred.user;
+      await user.sendEmailVerification();
+
+      const refCode = generateReferralCode();
+      await db.collection("users").doc(user.uid).set({
+        name: username, username: username, email: email,
+        balance: 0, referralCode: refCode, isBlocked: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection("usernames").doc(username.toLowerCase()).set({
+        uid: user.uid, email: email, username: username,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (referral) {
+        try {
+          const snap = await db.collection('users').where('referralCode', '==', referral.toUpperCase()).get();
+          if (!snap.empty) {
+            const refDoc = snap.docs[0];
+            await db.collection("users").doc(user.uid).update({ referredBy: refDoc.id });
+            await db.collection("users").doc(refDoc.id).update({
+              referrals: firebase.firestore.FieldValue.arrayUnion(user.uid)
+            });
+          }
+        } catch (e) { console.warn('Referral error:', e); }
+      }
+
+      await auth.signOut();
+      showAlert('📧 Verification email sent! Please check your inbox and login.');
+      showLogin();
+    } catch (error) {
+      if (errEl) { errEl.textContent = error.message || 'Signup failed.'; errEl.classList.remove('hidden'); }
+    }
+    signupBtn.disabled = false;
+    signupBtn.textContent = 'Create Account';
+  });
+}
+
+// ===== REFERRAL CODE =====
+function generateReferralCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  return code;
+}
+
+// ===== LOGIN =====
+const loginBtn = safeGet('login-btn');
+if (loginBtn) {
+  loginBtn.addEventListener('click', async function () {
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Logging in...';
+    const errEl = safeGet('login-error');
+    if (errEl) errEl.classList.add('hidden');
+
+    const username = safeGet('login-username')?.value.trim() || '';
+    const password = safeGet('login-password')?.value || '';
+
+    if (!username || !password) {
+      if (errEl) { errEl.textContent = 'Please enter username and password.'; errEl.classList.remove('hidden'); }
+      loginBtn.disabled = false; loginBtn.textContent = 'Login'; return;
+    }
+
+    try {
+      const unameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+      if (!unameDoc.exists) {
+        if (errEl) { errEl.textContent = 'Username not found.'; errEl.classList.remove('hidden'); }
+        loginBtn.disabled = false; loginBtn.textContent = 'Login'; return;
+      }
+
+      const email = unameDoc.data().email;
+      const userCred = await auth.signInWithEmailAndPassword(email, password);
+      const user = userCred.user;
+      const userDoc = await db.collection("users").doc(user.uid).get();
+
+      if (userDoc.exists && userDoc.data().isBlocked) {
+        await auth.signOut();
+        if (errEl) { errEl.textContent = 'Account blocked. Contact support.'; errEl.classList.remove('hidden'); }
+        loginBtn.disabled = false; loginBtn.textContent = 'Login'; return;
+      }
+    } catch (error) {
+      if (errEl) { errEl.textContent = error.message || 'Login failed.'; errEl.classList.remove('hidden'); }
+    }
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Login';
+  });
+}
+
+// ===== LOGOUT =====
+const logoutBtn = safeGet('logout-btn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async function () {
+    await auth.signOut();
+    currentUser = null;
+    userData = null;
+    resetToAuth();
+  });
+}
+
+// ===== AUTH STATE =====
+auth.onAuthStateChanged(async function (user) {
+  if (user) {
+    currentUser = user;
+    const ok = await loadUserData(user.uid);
+    if (ok && userData) {
+      updateUIAfterLogin();
+      const greet = safeGet('greeting-username');
+      if (greet) greet.textContent = userData?.username || 'User';
+    } else {
+      resetToAuth();
+    }
+  } else {
+    currentUser = null;
+    userData = null;
+    resetToAuth();
+  }
+});
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', function () { resetToAuth(); });
+
+// ===== ENTER KEY =====
+const loginPassword = safeGet('login-password');
+if (loginPassword) loginPassword.addEventListener('keydown', e => e.key === 'Enter' && loginBtn && loginBtn.click());
+
+const signupPassword = safeGet('signup-password');
+if (signupPassword) signupPassword.addEventListener('keydown', e => e.key === 'Enter' && signupBtn && signupBtn.click());
+</script>
 </body>
-</html>
+</html>         
