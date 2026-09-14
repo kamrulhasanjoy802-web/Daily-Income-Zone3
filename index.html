@@ -80,7 +80,7 @@
             transform: none;
         }
 
-        /* নতুন Adsterra বাটন স্টাইল */
+        /* Adsterra বাটন */
         .btn-adsterra {
             background: linear-gradient(135deg, #10b981, #059669);
             color: #fff;
@@ -100,7 +100,6 @@
         }
         .btn-adsterra:hover { transform: translateY(-2px); }
         .btn-adsterra:active { transform: scale(.98); }
-
         .btn-adsterra.blue {
             background: linear-gradient(135deg, #3b82f6, #2563eb);
         }
@@ -258,6 +257,69 @@
             margin-bottom: 8px;
             color: #9ca3af;
         }
+
+        /* ============================================ */
+        /* 🔥 Ad Overlay (Mini App এর ভেতরে খুলবে) */
+        /* ============================================ */
+        #ad-overlay {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+        }
+        #ad-overlay.show { display: flex; }
+
+        #ad-overlay-header {
+            background: #1b1e24;
+            color: #fff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            flex-shrink: 0;
+        }
+
+        #ad-overlay-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        #ad-close-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #ad-close-btn:hover { background: #dc2626; }
+        #ad-close-btn:active { transform: scale(.96); }
+
+        #ad-iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        #ad-overlay-footer {
+            background: #1b1e24;
+            color: #fff;
+            padding: 10px 16px;
+            text-align: center;
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,.1);
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -270,6 +332,22 @@
 
     <!-- টোস্ট -->
     <div id="toast-container"></div>
+
+    <!-- ============================================ -->
+    <!-- 🔥 Ad Overlay (Mini App এর ভেতরে খুলবে) -->
+    <!-- ============================================ -->
+    <div id="ad-overlay">
+        <div id="ad-overlay-header">
+            <div id="ad-overlay-title">📢 Advertisement</div>
+            <button id="ad-close-btn" onclick="closeAd()">
+                ✖ Close
+            </button>
+        </div>
+        <iframe id="ad-iframe" src="about:blank" allowfullscreen></iframe>
+        <div id="ad-overlay-footer">
+            ⏱️ আপনি যেকোনো সময় ✖ Close বাটনে ক্লিক করে Ad বন্ধ করতে পারবেন
+        </div>
+    </div>
 
     <div class="container">
 
@@ -294,7 +372,7 @@
             </button>
         </div>
 
-        <!-- Adsterra Ad Section (নতুন) -->
+        <!-- Adsterra Ad Section -->
         <div class="adsterra-section">
             <div class="ad-icon">🔥</div>
             <h2>Watch Ads — Adsterra</h2>
@@ -327,12 +405,12 @@
         // ============ Adsterra Ad Links ============
         const ADSTERRA_LINKS = {
             ad1: {
-                id: "31141293",
-                url: "https://www.profitableratecpmnetwork.com/fnz7twhk5?key=6deeed292613c558b5e06cf51d42608c"
+                id: "31234845",
+                url: "https://www.profitableratecpmnetwork.com/cv3am0gd15?key=f804e610fff1927d0304edf99fc12030"
             },
             ad2: {
-                id: "31141284",
-                url: "https://www.profitableratecpmnetwork.com/nn2wfsupzg?key=eb79cc4ec894bbf43ee32e541f3b17f2"
+                id: "31234848",
+                url: "https://www.profitableratecpmnetwork.com/ykiamdjnp?key=e6b0760687d7fc12cafeb945c034fba4"
             }
         };
 
@@ -380,10 +458,36 @@
         }
 
         // ==========================================
+        // 🔥 Ad Overlay — Mini App এর ভেতরে খুলবে
+        // ==========================================
+        function openAdOverlay(title, url) {
+            const overlay = document.getElementById("ad-overlay");
+            const iframe = document.getElementById("ad-iframe");
+            const titleEl = document.getElementById("ad-overlay-title");
+
+            titleEl.textContent = "📢 " + title;
+            iframe.src = url;
+            overlay.classList.add("show");
+
+            log("🔥 Ad Overlay খোলা হয়েছে: " + title, "info");
+        }
+
+        function closeAd() {
+            const overlay = document.getElementById("ad-overlay");
+            const iframe = document.getElementById("ad-iframe");
+
+            overlay.classList.remove("show");
+            iframe.src = "about:blank";
+
+            log("✅ Ad বন্ধ করা হয়েছে", "info");
+            showToast("✅ Ad closed", "success");
+        }
+
+        // ==========================================
         // 🎬 Monetag Watch Ad
         // ==========================================
         function watchAd() {
-            log("▶️ Monetag Watch Ad বাটনে ক্লিক করা হয়েছে", "info");
+            log("▶️ Monetag Watch Ad ক্লিক করা হয়েছে", "info");
 
             if (typeof show_11341986 !== "function") {
                 log("❌ show_11341986 ফাংশন পাওয়া যায়নি!", "error");
@@ -397,84 +501,36 @@
             show_11341986()
                 .then(() => {
                     hideLoading();
-                    log("🎬 Monetag Ad সফলভাবে দেখা হয়েছে!", "info");
+                    log("🎬 Monetag Ad সফল!", "info");
                     showToast("🎬 You have seen a Monetag ad!", "success");
-                    alert("You have seen an ad!");
                 })
                 .catch((error) => {
                     hideLoading();
                     log("❌ Monetag Ad Error: " + (error?.message || error), "error");
-                    console.log("Ad Error:", error);
-                    showToast("❌ Ad failed: " + (error?.message || error), "error");
+                    showToast("❌ Ad failed!", "error");
                 });
         }
 
         // ==========================================
-        // 🔥 Adsterra Ad #1
+        // 🔥 Adsterra Ad #1 (Mini App এর ভেতরে)
         // ==========================================
         function watchAdsterra1() {
             log("🔥 Adsterra Watch Ads #1 ক্লিক করা হয়েছে", "info");
             log("📤 Link: " + ADSTERRA_LINKS.ad1.url, "info");
-            showLoading("Adsterra Ad #1 লোড হচ্ছে...");
 
-            try {
-                // নতুন ট্যাবে Adsterra লিংক খুলুন
-                const adWindow = window.open(ADSTERRA_LINKS.ad1.url, "_blank");
-
-                if (!adWindow || adWindow.closed || typeof adWindow.closed === "undefined") {
-                    log("⚠️ Popup blocked! Telegram-এ popup কাজ নাও করতে পারে", "warn");
-                    showToast("⚠️ Popup blocked! আবার চেষ্টা করুন।", "error");
-                    hideLoading();
-                    return;
-                }
-
-                log("✅ Adsterra Ad #1 সফলভাবে খোলা হয়েছে", "info");
-                showToast("🎬 Adsterra Ad #1 opened!", "success");
-
-                // ২ সেকেন্ড পর লোডিং বন্ধ
-                setTimeout(() => {
-                    hideLoading();
-                }, 2000);
-
-            } catch (error) {
-                hideLoading();
-                log("❌ Adsterra Ad #1 Error: " + error.message, "error");
-                showToast("❌ Ad #1 failed!", "error");
-            }
+            openAdOverlay("Adsterra Ad #1", ADSTERRA_LINKS.ad1.url);
+            showToast("🔥 Adsterra Ad #1 opened!", "success");
         }
 
         // ==========================================
-        // 🔥 Adsterra Ad #2
+        // 🔥 Adsterra Ad #2 (Mini App এর ভেতরে)
         // ==========================================
         function watchAdsterra2() {
             log("🔥 Adsterra Watch Ads #2 ক্লিক করা হয়েছে", "info");
             log("📤 Link: " + ADSTERRA_LINKS.ad2.url, "info");
-            showLoading("Adsterra Ad #2 লোড হচ্ছে...");
 
-            try {
-                // নতুন ট্যাবে Adsterra লিংক খুলুন
-                const adWindow = window.open(ADSTERRA_LINKS.ad2.url, "_blank");
-
-                if (!adWindow || adWindow.closed || typeof adWindow.closed === "undefined") {
-                    log("⚠️ Popup blocked! Telegram-এ popup কাজ নাও করতে পারে", "warn");
-                    showToast("⚠️ Popup blocked! আবার চেষ্টা করুন।", "error");
-                    hideLoading();
-                    return;
-                }
-
-                log("✅ Adsterra Ad #2 সফলভাবে খোলা হয়েছে", "info");
-                showToast("🎬 Adsterra Ad #2 opened!", "success");
-
-                // ২ সেকেন্ড পর লোডিং বন্ধ
-                setTimeout(() => {
-                    hideLoading();
-                }, 2000);
-
-            } catch (error) {
-                hideLoading();
-                log("❌ Adsterra Ad #2 Error: " + error.message, "error");
-                showToast("❌ Ad #2 failed!", "error");
-            }
+            openAdOverlay("Adsterra Ad #2", ADSTERRA_LINKS.ad2.url);
+            showToast("🔥 Adsterra Ad #2 opened!", "success");
         }
 
         // ============ SDK Load চেক ============
@@ -483,7 +539,6 @@
 
             if (typeof show_11341986 === "function") {
                 log("✅ Monetag SDK লোড হয়েছে!", "info");
-                log("✅ show_11341986 ফাংশন Ready", "info");
                 updateStatus("✅ SDK Ready", "ready");
                 watchBtn.disabled = false;
                 watchBtn.innerHTML = "▶️ Watch Ad";
@@ -523,7 +578,7 @@
                 attempts++;
                 if (checkSDK()) {
                     clearInterval(checkInterval);
-                    showToast("✅ Monetag SDK Ready!", "success");
+                    showToast("✅ Ad SDK Ready!", "success");
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
                     log("❌ ১০ সেকেন্ডেও Monetag SDK লোড হয়নি!", "error");
@@ -531,7 +586,6 @@
 
                     const watchBtn = document.getElementById("watch-btn");
                     watchBtn.innerHTML = "❌ Monetag SDK Not Loaded";
-                    showToast("❌ Monetag SDK লোড হয়নি!", "error");
                 }
             }, 500);
         }
