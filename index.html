@@ -6,9 +6,7 @@
     <title>Daily Income Zone</title>
     <meta name="theme-color" content="#ff9800">
 
-    <!-- ============================================ -->
-    <!-- 🔥 Monetag SDK — Zone ID: 11341986 -->
-    <!-- ============================================ -->
+    <!-- Monetag SDK -->
     <script src="//libtl.com/sdk.js"
             data-zone="11341986"
             data-sdk="show_11341986"></script>
@@ -82,6 +80,31 @@
             transform: none;
         }
 
+        /* নতুন Adsterra বাটন স্টাইল */
+        .btn-adsterra {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .25s;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-adsterra:hover { transform: translateY(-2px); }
+        .btn-adsterra:active { transform: scale(.98); }
+
+        .btn-adsterra.blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
         .header {
             display: flex;
             align-items: center;
@@ -112,6 +135,28 @@
             color: #fff;
             box-shadow: 0 15px 35px rgba(124, 58, 237, .35);
             margin-bottom: 16px;
+        }
+
+        .adsterra-section {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            border-radius: 24px;
+            padding: 24px 22px;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 15px 35px rgba(30, 64, 175, .35);
+            margin-bottom: 16px;
+        }
+
+        .adsterra-section h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .adsterra-section p {
+            font-size: 13px;
+            opacity: .9;
+            margin-bottom: 18px;
         }
 
         .ad-icon {
@@ -239,13 +284,30 @@
             </div>
         </div>
 
-        <!-- Ad Section -->
+        <!-- Monetag Ad Section -->
         <div class="ad-section">
             <div class="ad-icon">🎬</div>
             <h2>Watch Rewarded Ad</h2>
-            <p>Click the button below to watch an ad</p>
+            <p>Click the button below to watch a Monetag ad</p>
             <button onclick="watchAd()" class="btn-primary" id="watch-btn" disabled>
                 ⏳ Loading SDK...
+            </button>
+        </div>
+
+        <!-- Adsterra Ad Section (নতুন) -->
+        <div class="adsterra-section">
+            <div class="ad-icon">🔥</div>
+            <h2>Watch Ads — Adsterra</h2>
+            <p>Click any button below to watch an ad</p>
+
+            <!-- Adsterra Ad 1 -->
+            <button onclick="watchAdsterra1()" class="btn-adsterra" id="adsterra-btn-1">
+                🎬 Watch Ads #1
+            </button>
+
+            <!-- Adsterra Ad 2 -->
+            <button onclick="watchAdsterra2()" class="btn-adsterra blue" id="adsterra-btn-2">
+                🎬 Watch Ads #2
             </button>
         </div>
 
@@ -261,6 +323,18 @@
 
     <script>
         "use strict";
+
+        // ============ Adsterra Ad Links ============
+        const ADSTERRA_LINKS = {
+            ad1: {
+                id: "31141293",
+                url: "https://www.profitableratecpmnetwork.com/fnz7twhk5?key=6deeed292613c558b5e06cf51d42608c"
+            },
+            ad2: {
+                id: "31141284",
+                url: "https://www.profitableratecpmnetwork.com/nn2wfsupzg?key=eb79cc4ec894bbf43ee32e541f3b17f2"
+            }
+        };
 
         // ============ লগ ফাংশন ============
         function log(message, type = "info") {
@@ -306,10 +380,10 @@
         }
 
         // ==========================================
-        // 🎬 Watch Ad — Monetag থেকে পাওয়া কোড
+        // 🎬 Monetag Watch Ad
         // ==========================================
         function watchAd() {
-            log("▶️ Watch Ad বাটনে ক্লিক করা হয়েছে", "info");
+            log("▶️ Monetag Watch Ad বাটনে ক্লিক করা হয়েছে", "info");
 
             if (typeof show_11341986 !== "function") {
                 log("❌ show_11341986 ফাংশন পাওয়া যায়নি!", "error");
@@ -318,25 +392,89 @@
             }
 
             log("🎬 Monetag Ad কল করা হচ্ছে...", "info");
-            showLoading("Ad লোড হচ্ছে...");
+            showLoading("Monetag Ad লোড হচ্ছে...");
 
-            // ===== Monetag থেকে পাওয়া কোড =====
             show_11341986()
                 .then(() => {
-                    // Ad সফলভাবে দেখা হয়েছে
                     hideLoading();
-                    log("🎬 Ad সফলভাবে দেখা হয়েছে!", "info");
-                    showToast("🎬 You have seen an ad!", "success");
+                    log("🎬 Monetag Ad সফলভাবে দেখা হয়েছে!", "info");
+                    showToast("🎬 You have seen a Monetag ad!", "success");
                     alert("You have seen an ad!");
                 })
                 .catch((error) => {
-                    // Ad দেখতে সমস্যা হয়েছে
                     hideLoading();
-                    log("❌ Ad Error: " + (error?.message || error), "error");
+                    log("❌ Monetag Ad Error: " + (error?.message || error), "error");
                     console.log("Ad Error:", error);
                     showToast("❌ Ad failed: " + (error?.message || error), "error");
                 });
-            // =====================================
+        }
+
+        // ==========================================
+        // 🔥 Adsterra Ad #1
+        // ==========================================
+        function watchAdsterra1() {
+            log("🔥 Adsterra Watch Ads #1 ক্লিক করা হয়েছে", "info");
+            log("📤 Link: " + ADSTERRA_LINKS.ad1.url, "info");
+            showLoading("Adsterra Ad #1 লোড হচ্ছে...");
+
+            try {
+                // নতুন ট্যাবে Adsterra লিংক খুলুন
+                const adWindow = window.open(ADSTERRA_LINKS.ad1.url, "_blank");
+
+                if (!adWindow || adWindow.closed || typeof adWindow.closed === "undefined") {
+                    log("⚠️ Popup blocked! Telegram-এ popup কাজ নাও করতে পারে", "warn");
+                    showToast("⚠️ Popup blocked! আবার চেষ্টা করুন।", "error");
+                    hideLoading();
+                    return;
+                }
+
+                log("✅ Adsterra Ad #1 সফলভাবে খোলা হয়েছে", "info");
+                showToast("🎬 Adsterra Ad #1 opened!", "success");
+
+                // ২ সেকেন্ড পর লোডিং বন্ধ
+                setTimeout(() => {
+                    hideLoading();
+                }, 2000);
+
+            } catch (error) {
+                hideLoading();
+                log("❌ Adsterra Ad #1 Error: " + error.message, "error");
+                showToast("❌ Ad #1 failed!", "error");
+            }
+        }
+
+        // ==========================================
+        // 🔥 Adsterra Ad #2
+        // ==========================================
+        function watchAdsterra2() {
+            log("🔥 Adsterra Watch Ads #2 ক্লিক করা হয়েছে", "info");
+            log("📤 Link: " + ADSTERRA_LINKS.ad2.url, "info");
+            showLoading("Adsterra Ad #2 লোড হচ্ছে...");
+
+            try {
+                // নতুন ট্যাবে Adsterra লিংক খুলুন
+                const adWindow = window.open(ADSTERRA_LINKS.ad2.url, "_blank");
+
+                if (!adWindow || adWindow.closed || typeof adWindow.closed === "undefined") {
+                    log("⚠️ Popup blocked! Telegram-এ popup কাজ নাও করতে পারে", "warn");
+                    showToast("⚠️ Popup blocked! আবার চেষ্টা করুন।", "error");
+                    hideLoading();
+                    return;
+                }
+
+                log("✅ Adsterra Ad #2 সফলভাবে খোলা হয়েছে", "info");
+                showToast("🎬 Adsterra Ad #2 opened!", "success");
+
+                // ২ সেকেন্ড পর লোডিং বন্ধ
+                setTimeout(() => {
+                    hideLoading();
+                }, 2000);
+
+            } catch (error) {
+                hideLoading();
+                log("❌ Adsterra Ad #2 Error: " + error.message, "error");
+                showToast("❌ Ad #2 failed!", "error");
+            }
         }
 
         // ============ SDK Load চেক ============
@@ -374,24 +512,26 @@
         // ============ Init ============
         function init() {
             log("🚀 App চালু হচ্ছে...", "info");
+            log("🔥 Adsterra Ad #1 ID: " + ADSTERRA_LINKS.ad1.id, "info");
+            log("🔥 Adsterra Ad #2 ID: " + ADSTERRA_LINKS.ad2.id, "info");
             initTelegram();
 
             let attempts = 0;
-            const maxAttempts = 20; // 20 × 500ms = 10 সেকেন্ড
+            const maxAttempts = 20;
 
             const checkInterval = setInterval(() => {
                 attempts++;
                 if (checkSDK()) {
                     clearInterval(checkInterval);
-                    showToast("✅ Ad SDK Ready!", "success");
+                    showToast("✅ Monetag SDK Ready!", "success");
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    log("❌ ১০ সেকেন্ডেও SDK লোড হয়নি!", "error");
-                    updateStatus("❌ SDK Load Failed", "error");
+                    log("❌ ১০ সেকেন্ডেও Monetag SDK লোড হয়নি!", "error");
+                    updateStatus("❌ Monetag SDK Failed", "error");
 
                     const watchBtn = document.getElementById("watch-btn");
-                    watchBtn.innerHTML = "❌ SDK Not Loaded";
-                    showToast("❌ Ad SDK লোড হয়নি!", "error");
+                    watchBtn.innerHTML = "❌ Monetag SDK Not Loaded";
+                    showToast("❌ Monetag SDK লোড হয়নি!", "error");
                 }
             }, 500);
         }
