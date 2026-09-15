@@ -100,8 +100,15 @@
         }
         .btn-adsterra:hover { transform: translateY(-2px); }
         .btn-adsterra:active { transform: scale(.98); }
+
         .btn-adsterra.blue {
             background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        .btn-adsterra.purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        .btn-adsterra.pink {
+            background: linear-gradient(135deg, #ec4899, #db2777);
         }
 
         .header {
@@ -257,69 +264,6 @@
             margin-bottom: 8px;
             color: #9ca3af;
         }
-
-        /* ============================================ */
-        /* 🔥 Ad Overlay (Mini App এর ভেতরে খুলবে) */
-        /* ============================================ */
-        #ad-overlay {
-            position: fixed;
-            inset: 0;
-            background: #ffffff;
-            z-index: 99999;
-            display: none;
-            flex-direction: column;
-        }
-        #ad-overlay.show { display: flex; }
-
-        #ad-overlay-header {
-            background: #1b1e24;
-            color: #fff;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,.1);
-            flex-shrink: 0;
-        }
-
-        #ad-overlay-title {
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        #ad-close-btn {
-            background: #ef4444;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: .2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        #ad-close-btn:hover { background: #dc2626; }
-        #ad-close-btn:active { transform: scale(.96); }
-
-        #ad-iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: #fff;
-        }
-
-        #ad-overlay-footer {
-            background: #1b1e24;
-            color: #fff;
-            padding: 10px 16px;
-            text-align: center;
-            font-size: 13px;
-            border-top: 1px solid rgba(255,255,255,.1);
-            flex-shrink: 0;
-        }
     </style>
 </head>
 <body>
@@ -332,22 +276,6 @@
 
     <!-- টোস্ট -->
     <div id="toast-container"></div>
-
-    <!-- ============================================ -->
-    <!-- 🔥 Ad Overlay (Mini App এর ভেতরে খুলবে) -->
-    <!-- ============================================ -->
-    <div id="ad-overlay">
-        <div id="ad-overlay-header">
-            <div id="ad-overlay-title">📢 Advertisement</div>
-            <button id="ad-close-btn" onclick="closeAd()">
-                ✖ Close
-            </button>
-        </div>
-        <iframe id="ad-iframe" src="about:blank" allowfullscreen></iframe>
-        <div id="ad-overlay-footer">
-            ⏱️ আপনি যেকোনো সময় ✖ Close বাটনে ক্লিক করে Ad বন্ধ করতে পারবেন
-        </div>
-    </div>
 
     <div class="container">
 
@@ -378,14 +306,20 @@
             <h2>Watch Ads — Adsterra</h2>
             <p>Click any button below to watch an ad</p>
 
-            <!-- Adsterra Ad 1 -->
-            <button onclick="watchAdsterra1()" class="btn-adsterra" id="adsterra-btn-1">
+            <button onclick="watchAdsterra1()" class="btn-adsterra">
                 🎬 Watch Ads #1
             </button>
 
-            <!-- Adsterra Ad 2 -->
-            <button onclick="watchAdsterra2()" class="btn-adsterra blue" id="adsterra-btn-2">
+            <button onclick="watchAdsterra2()" class="btn-adsterra blue">
                 🎬 Watch Ads #2
+            </button>
+
+            <button onclick="watchAdsterra3()" class="btn-adsterra purple">
+                🎬 Watch Ads #3
+            </button>
+
+            <button onclick="watchAdsterra4()" class="btn-adsterra pink">
+                🎬 Watch Ads #4
             </button>
         </div>
 
@@ -402,7 +336,7 @@
     <script>
         "use strict";
 
-        // ============ Adsterra Ad Links ============
+        // ============ Adsterra Ad Links (৪টি) ============
         const ADSTERRA_LINKS = {
             ad1: {
                 id: "31234845",
@@ -411,6 +345,14 @@
             ad2: {
                 id: "31234848",
                 url: "https://www.profitableratecpmnetwork.com/ykiamdjnp?key=e6b0760687d7fc12cafeb945c034fba4"
+            },
+            ad3: {
+                id: "31247436",
+                url: "https://www.profitableratecpmnetwork.com/d4jctn1gx?key=b2afed700e622656b71af7b02f629332"
+            },
+            ad4: {
+                id: "31247430",
+                url: "https://www.profitableratecpmnetwork.com/ma4h2h65?key=2db22409fb4290d5e09569716e9101eb"
             }
         };
 
@@ -458,29 +400,33 @@
         }
 
         // ==========================================
-        // 🔥 Ad Overlay — Mini App এর ভেতরে খুলবে
+        // 🚀 Universal Ad Opener — Telegram openLink
         // ==========================================
-        function openAdOverlay(title, url) {
-            const overlay = document.getElementById("ad-overlay");
-            const iframe = document.getElementById("ad-iframe");
-            const titleEl = document.getElementById("ad-overlay-title");
+        function openAdLink(adName, url) {
+            log(`🔥 ${adName} ক্লিক করা হয়েছে`, "info");
+            log(`📤 Link: ${url}`, "info");
 
-            titleEl.textContent = "📢 " + title;
-            iframe.src = url;
-            overlay.classList.add("show");
+            showToast(`🎬 Opening ${adName}...`, "success");
 
-            log("🔥 Ad Overlay খোলা হয়েছে: " + title, "info");
-        }
-
-        function closeAd() {
-            const overlay = document.getElementById("ad-overlay");
-            const iframe = document.getElementById("ad-iframe");
-
-            overlay.classList.remove("show");
-            iframe.src = "about:blank";
-
-            log("✅ Ad বন্ধ করা হয়েছে", "info");
-            showToast("✅ Ad closed", "success");
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    // ✅ Telegram Mini App-এর নিজস্ব ব্রাউজারে খুলবে (INSTANT!)
+                    window.Telegram.WebApp.openLink(url);
+                    log(`✅ Telegram openLink দিয়ে ${adName} খোলা হয়েছে`, "info");
+                } else {
+                    // ব্রাউজার fallback
+                    const newWindow = window.open(url, "_blank");
+                    if (!newWindow || newWindow.closed) {
+                        // Popup blocked হলে direct redirect
+                        window.location.href = url;
+                    }
+                    log(`✅ Browser এ ${adName} খোলা হয়েছে`, "info");
+                }
+            } catch (error) {
+                log(`❌ ${adName} Error: ${error.message}`, "error");
+                // Final fallback
+                window.location.href = url;
+            }
         }
 
         // ==========================================
@@ -512,25 +458,22 @@
         }
 
         // ==========================================
-        // 🔥 Adsterra Ad #1 (Mini App এর ভেতরে)
+        // 🔥 Adsterra Ad Functions (৪টি)
         // ==========================================
         function watchAdsterra1() {
-            log("🔥 Adsterra Watch Ads #1 ক্লিক করা হয়েছে", "info");
-            log("📤 Link: " + ADSTERRA_LINKS.ad1.url, "info");
-
-            openAdOverlay("Adsterra Ad #1", ADSTERRA_LINKS.ad1.url);
-            showToast("🔥 Adsterra Ad #1 opened!", "success");
+            openAdLink("Adsterra #1", ADSTERRA_LINKS.ad1.url);
         }
 
-        // ==========================================
-        // 🔥 Adsterra Ad #2 (Mini App এর ভেতরে)
-        // ==========================================
         function watchAdsterra2() {
-            log("🔥 Adsterra Watch Ads #2 ক্লিক করা হয়েছে", "info");
-            log("📤 Link: " + ADSTERRA_LINKS.ad2.url, "info");
+            openAdLink("Adsterra #2", ADSTERRA_LINKS.ad2.url);
+        }
 
-            openAdOverlay("Adsterra Ad #2", ADSTERRA_LINKS.ad2.url);
-            showToast("🔥 Adsterra Ad #2 opened!", "success");
+        function watchAdsterra3() {
+            openAdLink("Adsterra #3", ADSTERRA_LINKS.ad3.url);
+        }
+
+        function watchAdsterra4() {
+            openAdLink("Adsterra #4", ADSTERRA_LINKS.ad4.url);
         }
 
         // ============ SDK Load চেক ============
@@ -569,6 +512,8 @@
             log("🚀 App চালু হচ্ছে...", "info");
             log("🔥 Adsterra Ad #1 ID: " + ADSTERRA_LINKS.ad1.id, "info");
             log("🔥 Adsterra Ad #2 ID: " + ADSTERRA_LINKS.ad2.id, "info");
+            log("🔥 Adsterra Ad #3 ID: " + ADSTERRA_LINKS.ad3.id, "info");
+            log("🔥 Adsterra Ad #4 ID: " + ADSTERRA_LINKS.ad4.id, "info");
             initTelegram();
 
             let attempts = 0;
