@@ -6,10 +6,8 @@
     <title>Daily Income Zone</title>
     <meta name="theme-color" content="#ff9800">
 
-    <!-- Monetag SDK -->
-    <script src="//libtl.com/sdk.js"
-            data-zone="11341986"
-            data-sdk="show_11341986"></script>
+    <!-- GigaPub SDK -->
+    <script src="https://ad.gigapub.tech/script?id=8239"></script>
 
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -80,37 +78,6 @@
             transform: none;
         }
 
-        /* Adsterra বাটন */
-        .btn-adsterra {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            padding: 16px 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: .25s;
-            font-size: 16px;
-            width: 100%;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-adsterra:hover { transform: translateY(-2px); }
-        .btn-adsterra:active { transform: scale(.98); }
-
-        .btn-adsterra.blue {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-        }
-        .btn-adsterra.purple {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        }
-        .btn-adsterra.pink {
-            background: linear-gradient(135deg, #ec4899, #db2777);
-        }
-
         .header {
             display: flex;
             align-items: center;
@@ -141,28 +108,6 @@
             color: #fff;
             box-shadow: 0 15px 35px rgba(124, 58, 237, .35);
             margin-bottom: 16px;
-        }
-
-        .adsterra-section {
-            background: linear-gradient(135deg, #1e3a8a, #1e40af);
-            border-radius: 24px;
-            padding: 24px 22px;
-            text-align: center;
-            color: #fff;
-            box-shadow: 0 15px 35px rgba(30, 64, 175, .35);
-            margin-bottom: 16px;
-        }
-
-        .adsterra-section h2 {
-            font-size: 20px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .adsterra-section p {
-            font-size: 13px;
-            opacity: .9;
-            margin-bottom: 18px;
         }
 
         .ad-icon {
@@ -290,36 +235,13 @@
             </div>
         </div>
 
-        <!-- Monetag Ad Section -->
+        <!-- GigaPub Ad Section -->
         <div class="ad-section">
             <div class="ad-icon">🎬</div>
             <h2>Watch Rewarded Ad</h2>
-            <p>Click the button below to watch a Monetag ad</p>
+            <p>Click the button below to watch an ad</p>
             <button onclick="watchAd()" class="btn-primary" id="watch-btn" disabled>
                 ⏳ Loading SDK...
-            </button>
-        </div>
-
-        <!-- Adsterra Ad Section -->
-        <div class="adsterra-section">
-            <div class="ad-icon">🔥</div>
-            <h2>Watch Ads — Adsterra</h2>
-            <p>Click any button below to watch an ad</p>
-
-            <button onclick="watchAdsterra1()" class="btn-adsterra">
-                🎬 Watch Ads #1
-            </button>
-
-            <button onclick="watchAdsterra2()" class="btn-adsterra blue">
-                🎬 Watch Ads #2
-            </button>
-
-            <button onclick="watchAdsterra3()" class="btn-adsterra purple">
-                🎬 Watch Ads #3
-            </button>
-
-            <button onclick="watchAdsterra4()" class="btn-adsterra pink">
-                🎬 Watch Ads #4
             </button>
         </div>
 
@@ -335,26 +257,6 @@
 
     <script>
         "use strict";
-
-        // ============ Adsterra Ad Links (৪টি) ============
-        const ADSTERRA_LINKS = {
-            ad1: {
-                id: "31234845",
-                url: "https://www.profitableratecpmnetwork.com/cv3am0gd15?key=f804e610fff1927d0304edf99fc12030"
-            },
-            ad2: {
-                id: "31234848",
-                url: "https://www.profitableratecpmnetwork.com/ykiamdjnp?key=e6b0760687d7fc12cafeb945c034fba4"
-            },
-            ad3: {
-                id: "31247436",
-                url: "https://www.profitableratecpmnetwork.com/d4jctn1gx?key=b2afed700e622656b71af7b02f629332"
-            },
-            ad4: {
-                id: "31247430",
-                url: "https://www.profitableratecpmnetwork.com/ma4h2h65?key=2db22409fb4290d5e09569716e9101eb"
-            }
-        };
 
         // ============ লগ ফাংশন ============
         function log(message, type = "info") {
@@ -400,88 +302,49 @@
         }
 
         // ==========================================
-        // 🚀 Universal Ad Opener — Telegram openLink
-        // ==========================================
-        function openAdLink(adName, url) {
-            log(`🔥 ${adName} ক্লিক করা হয়েছে`, "info");
-            log(`📤 Link: ${url}`, "info");
-
-            showToast(`🎬 Opening ${adName}...`, "success");
-
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    // ✅ Telegram Mini App-এর নিজস্ব ব্রাউজারে খুলবে (INSTANT!)
-                    window.Telegram.WebApp.openLink(url);
-                    log(`✅ Telegram openLink দিয়ে ${adName} খোলা হয়েছে`, "info");
-                } else {
-                    // ব্রাউজার fallback
-                    const newWindow = window.open(url, "_blank");
-                    if (!newWindow || newWindow.closed) {
-                        // Popup blocked হলে direct redirect
-                        window.location.href = url;
-                    }
-                    log(`✅ Browser এ ${adName} খোলা হয়েছে`, "info");
-                }
-            } catch (error) {
-                log(`❌ ${adName} Error: ${error.message}`, "error");
-                // Final fallback
-                window.location.href = url;
-            }
-        }
-
-        // ==========================================
-        // 🎬 Monetag Watch Ad
+        // 🎬 Watch Ad — GigaPub
         // ==========================================
         function watchAd() {
-            log("▶️ Monetag Watch Ad ক্লিক করা হয়েছে", "info");
+            log("▶️ Watch Ad বাটনে ক্লিক করা হয়েছে", "info");
 
-            if (typeof show_11341986 !== "function") {
-                log("❌ show_11341986 ফাংশন পাওয়া যায়নি!", "error");
+            // চেক SDK লোড হয়েছে কিনা
+            if (typeof window.showGiga !== "function") {
+                log("❌ window.showGiga ফাংশন পাওয়া যায়নি!", "error");
                 alert("Ad is not ready yet. Please try again.");
                 return;
             }
 
-            log("🎬 Monetag Ad কল করা হচ্ছে...", "info");
-            showLoading("Monetag Ad লোড হচ্ছে...");
+            log("🎬 GigaPub Ad কল করা হচ্ছে...", "info");
+            showLoading("Ad লোড হচ্ছে...");
 
-            show_11341986()
+            // ===== GigaPub Ad Call =====
+            window.showGiga()
                 .then(() => {
+                    // ✅ Ad সফলভাবে দেখা হয়েছে
                     hideLoading();
-                    log("🎬 Monetag Ad সফল!", "info");
-                    showToast("🎬 You have seen a Monetag ad!", "success");
+                    log("🎬 Ad সফলভাবে দেখা হয়েছে!", "info");
+                    showToast("🎬 You have seen an ad!", "success");
+                    
+                    // 🎁 এখানে আপনার reward logic বসান
+                    // যেমন: coins += 50; updateBalance();
                 })
-                .catch((error) => {
+                .catch((e) => {
+                    // ❌ Ad দেখতে সমস্যা
                     hideLoading();
-                    log("❌ Monetag Ad Error: " + (error?.message || error), "error");
-                    showToast("❌ Ad failed!", "error");
+                    log("❌ Ad Error: " + (e?.message || e), "error");
+                    console.log("Ad Error:", e);
+                    showToast("❌ Ad failed: " + (e?.message || e), "error");
                 });
-        }
-
-        // ==========================================
-        // 🔥 Adsterra Ad Functions (৪টি)
-        // ==========================================
-        function watchAdsterra1() {
-            openAdLink("Adsterra #1", ADSTERRA_LINKS.ad1.url);
-        }
-
-        function watchAdsterra2() {
-            openAdLink("Adsterra #2", ADSTERRA_LINKS.ad2.url);
-        }
-
-        function watchAdsterra3() {
-            openAdLink("Adsterra #3", ADSTERRA_LINKS.ad3.url);
-        }
-
-        function watchAdsterra4() {
-            openAdLink("Adsterra #4", ADSTERRA_LINKS.ad4.url);
+            // ==========================
         }
 
         // ============ SDK Load চেক ============
         function checkSDK() {
             const watchBtn = document.getElementById("watch-btn");
 
-            if (typeof show_11341986 === "function") {
-                log("✅ Monetag SDK লোড হয়েছে!", "info");
+            if (typeof window.showGiga === "function") {
+                log("✅ GigaPub SDK লোড হয়েছে!", "info");
+                log("✅ window.showGiga ফাংশন Ready", "info");
                 updateStatus("✅ SDK Ready", "ready");
                 watchBtn.disabled = false;
                 watchBtn.innerHTML = "▶️ Watch Ad";
@@ -510,10 +373,7 @@
         // ============ Init ============
         function init() {
             log("🚀 App চালু হচ্ছে...", "info");
-            log("🔥 Adsterra Ad #1 ID: " + ADSTERRA_LINKS.ad1.id, "info");
-            log("🔥 Adsterra Ad #2 ID: " + ADSTERRA_LINKS.ad2.id, "info");
-            log("🔥 Adsterra Ad #3 ID: " + ADSTERRA_LINKS.ad3.id, "info");
-            log("🔥 Adsterra Ad #4 ID: " + ADSTERRA_LINKS.ad4.id, "info");
+            log("🔥 GigaPub Zone ID: 8239", "info");
             initTelegram();
 
             let attempts = 0;
@@ -526,11 +386,12 @@
                     showToast("✅ Ad SDK Ready!", "success");
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    log("❌ ১০ সেকেন্ডেও Monetag SDK লোড হয়নি!", "error");
-                    updateStatus("❌ Monetag SDK Failed", "error");
+                    log("❌ ১০ সেকেন্ডেও GigaPub SDK লোড হয়নি!", "error");
+                    updateStatus("❌ SDK Load Failed", "error");
 
                     const watchBtn = document.getElementById("watch-btn");
-                    watchBtn.innerHTML = "❌ Monetag SDK Not Loaded";
+                    watchBtn.innerHTML = "❌ SDK Not Loaded";
+                    showToast("❌ Ad SDK লোড হয়নি!", "error");
                 }
             }, 500);
         }
