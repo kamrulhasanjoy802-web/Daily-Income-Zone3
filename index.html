@@ -6,8 +6,8 @@
     <title>Daily Income Zone</title>
     <meta name="theme-color" content="#ff9800">
 
-    <!-- GigaPub SDK -->
-    <script src="https://ad.gigapub.tech/script?id=8239"></script>
+    <!-- AdsGram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -39,10 +39,7 @@
             padding: 16px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
+        .container { width: 100%; max-width: 480px; }
 
         .card {
             background: var(--card);
@@ -72,11 +69,7 @@
         }
         .btn-primary:hover { transform: translateY(-2px); }
         .btn-primary:active { transform: scale(.98); }
-        .btn-primary:disabled {
-            opacity: .6;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
         .header {
             display: flex;
@@ -85,17 +78,9 @@
             margin-bottom: 16px;
         }
 
-        .header h1 {
-            font-size: 20px;
-            font-weight: 700;
-        }
+        .header h1 { font-size: 20px; font-weight: 700; }
 
-        .status {
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
+        .status { font-size: 13px; color: var(--muted); margin-top: 4px; }
         .status.ready { color: var(--success); }
         .status.loading { color: #f59e0b; }
         .status.error { color: var(--danger); }
@@ -121,17 +106,8 @@
             50% { transform: translateY(-10px); }
         }
 
-        .ad-section h2 {
-            font-size: 22px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .ad-section p {
-            font-size: 14px;
-            opacity: .9;
-            margin-bottom: 20px;
-        }
+        .ad-section h2 { font-size: 22px; margin-bottom: 8px; font-weight: 700; }
+        .ad-section p { font-size: 14px; opacity: .9; margin-bottom: 20px; }
 
         #toast-container {
             position: fixed;
@@ -181,11 +157,7 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .loading-text {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .loading-text { color: #fff; font-size: 14px; font-weight: 600; }
 
         .log-box {
             background: #0a0c10;
@@ -203,12 +175,7 @@
         .log-box .info { color: #3b82f6; }
         .log-box .warn { color: #f59e0b; }
 
-        .log-title {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #9ca3af;
-        }
+        .log-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #9ca3af; }
     </style>
 </head>
 <body>
@@ -235,7 +202,7 @@
             </div>
         </div>
 
-        <!-- GigaPub Ad Section -->
+        <!-- AdsGram Ad Section -->
         <div class="ad-section">
             <div class="ad-icon">🎬</div>
             <h2>Watch Rewarded Ad</h2>
@@ -258,7 +225,14 @@
     <script>
         "use strict";
 
-        // ============ লগ ফাংশন ============
+        // ============================================
+        // 🔥 AdsGram Block ID
+        // ============================================
+        const ADSGRAM_BLOCK_ID = "int-50596";
+
+        let AdController = null;
+
+        // ============ লগ ============
         function log(message, type = "info") {
             const logBox = document.getElementById("log-box");
             const p = document.createElement("p");
@@ -302,55 +276,58 @@
         }
 
         // ==========================================
-        // 🎬 Watch Ad — GigaPub
+        // 🎬 Watch Ad — AdsGram Interstitial
         // ==========================================
         function watchAd() {
-            log("▶️ Watch Ad বাটনে ক্লিক করা হয়েছে", "info");
-
-            // চেক SDK লোড হয়েছে কিনা
-            if (typeof window.showGiga !== "function") {
-                log("❌ window.showGiga ফাংশন পাওয়া যায়নি!", "error");
+            if (!AdController) {
+                log("❌ AdController নেই", "error");
                 alert("Ad is not ready yet. Please try again.");
                 return;
             }
 
-            log("🎬 GigaPub Ad কল করা হচ্ছে...", "info");
+            log("▶️ AdsGram Ad show() কল...", "info");
             showLoading("Ad লোড হচ্ছে...");
 
-            // ===== GigaPub Ad Call =====
-            window.showGiga()
-                .then(() => {
-                    // ✅ Ad সফলভাবে দেখা হয়েছে
+            AdController.show()
+                .then((result) => {
                     hideLoading();
-                    log("🎬 Ad সফলভাবে দেখা হয়েছে!", "info");
-                    showToast("🎬 You have seen an ad!", "success");
-                    
-                    // 🎁 এখানে আপনার reward logic বসান
-                    // যেমন: coins += 50; updateBalance();
+                    log("✅ Ad done — user watched or closed", "info");
+                    log("📊 Result: " + JSON.stringify(result), "info");
+                    showToast("🎬 Ad finished or closed!", "success");
+                    // ⚠️ Interstitial — reward logic নেই
                 })
-                .catch((e) => {
-                    // ❌ Ad দেখতে সমস্যা
+                .catch((result) => {
                     hideLoading();
-                    log("❌ Ad Error: " + (e?.message || e), "error");
-                    console.log("Ad Error:", e);
-                    showToast("❌ Ad failed: " + (e?.message || e), "error");
+                    const errMsg = result?.description || result?.error || "Unknown error";
+                    log("❌ Ad error: " + errMsg, "error");
+                    console.log("AdsGram Error:", result);
+                    showToast("❌ Ad error: " + errMsg, "error");
+                })
+                .finally(() => {
+                    hideLoading();
+                    log("🏁 Ad process সম্পূর্ণ", "info");
                 });
-            // ==========================
         }
 
-        // ============ SDK Load চেক ============
-        function checkSDK() {
-            const watchBtn = document.getElementById("watch-btn");
+        // ============ AdsGram Init ============
+        function initAdsGram() {
+            try {
+                if (typeof window.Adsgram === "undefined") {
+                    log("❌ Adsgram SDK লোড হয়নি", "error");
+                    return false;
+                }
 
-            if (typeof window.showGiga === "function") {
-                log("✅ GigaPub SDK লোড হয়েছে!", "info");
-                log("✅ window.showGiga ফাংশন Ready", "info");
-                updateStatus("✅ SDK Ready", "ready");
-                watchBtn.disabled = false;
-                watchBtn.innerHTML = "▶️ Watch Ad";
+                AdController = window.Adsgram.init({
+                    blockId: ADSGRAM_BLOCK_ID
+                });
+
+                log("✅ AdsGram initialized", "info");
+                log("📦 Block ID: " + ADSGRAM_BLOCK_ID, "info");
                 return true;
+            } catch (e) {
+                log("❌ AdsGram init error: " + e.message, "error");
+                return false;
             }
-            return false;
         }
 
         // ============ Telegram Init ============
@@ -366,14 +343,13 @@
                     log("👤 User: " + (user.first_name || "Unknown"), "info");
                 }
             } else {
-                log("⚠️ Telegram SDK নেই (ব্রাউজারে চলছে)", "warn");
+                log("⚠️ Telegram SDK নেই", "warn");
             }
         }
 
         // ============ Init ============
         function init() {
             log("🚀 App চালু হচ্ছে...", "info");
-            log("🔥 GigaPub Zone ID: 8239", "info");
             initTelegram();
 
             let attempts = 0;
@@ -381,29 +357,37 @@
 
             const checkInterval = setInterval(() => {
                 attempts++;
-                if (checkSDK()) {
+
+                if (typeof window.Adsgram !== "undefined") {
                     clearInterval(checkInterval);
-                    showToast("✅ Ad SDK Ready!", "success");
+                    log("✅ Adsgram SDK লোড হয়েছে", "info");
+
+                    const ok = initAdsGram();
+                    const watchBtn = document.getElementById("watch-btn");
+
+                    if (ok) {
+                        updateStatus("✅ SDK Ready", "ready");
+                        watchBtn.disabled = false;
+                        watchBtn.innerHTML = "▶️ Watch Ad";
+                        showToast("✅ Ad SDK Ready!", "success");
+                    } else {
+                        updateStatus("⚠️ Init Failed", "error");
+                        watchBtn.innerHTML = "⚠️ Init Failed";
+                    }
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    log("❌ ১০ সেকেন্ডেও GigaPub SDK লোড হয়নি!", "error");
+                    log("❌ ১০ সেকেন্ডেও SDK লোড হয়নি!", "error");
                     updateStatus("❌ SDK Load Failed", "error");
-
-                    const watchBtn = document.getElementById("watch-btn");
-                    watchBtn.innerHTML = "❌ SDK Not Loaded";
-                    showToast("❌ Ad SDK লোড হয়নি!", "error");
+                    document.getElementById("watch-btn").innerHTML = "❌ SDK Not Loaded";
                 }
             }, 500);
         }
 
-        // ============ পেজ লোড ============
         document.addEventListener("DOMContentLoaded", init);
 
-        // ============ গ্লোবাল এরর ============
         window.addEventListener("error", (e) => {
             log("❌ Global Error: " + e.message, "error");
         });
-
     </script>
 
 </body>
