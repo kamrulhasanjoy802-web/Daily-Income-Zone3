@@ -6,9 +6,6 @@
     <title>Daily Income Zone</title>
     <meta name="theme-color" content="#ff9800">
 
-    <!-- AdsGram SDK -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -80,18 +77,15 @@
 
         .header h1 { font-size: 20px; font-weight: 700; }
 
-        .status { font-size: 13px; color: var(--muted); margin-top: 4px; }
-        .status.ready { color: var(--success); }
-        .status.loading { color: #f59e0b; }
-        .status.error { color: var(--danger); }
+        .status { font-size: 13px; color: var(--success); margin-top: 4px; }
 
         .ad-section {
-            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
             border-radius: 24px;
             padding: 30px 22px;
             text-align: center;
             color: #fff;
-            box-shadow: 0 15px 35px rgba(124, 58, 237, .35);
+            box-shadow: 0 15px 35px rgba(30, 64, 175, .35);
             margin-bottom: 16px;
         }
 
@@ -108,6 +102,29 @@
 
         .ad-section h2 { font-size: 22px; margin-bottom: 8px; font-weight: 700; }
         .ad-section p { font-size: 14px; opacity: .9; margin-bottom: 20px; }
+
+        .btn-adsterra {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .25s;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-adsterra:hover { transform: translateY(-2px); }
+        .btn-adsterra:active { transform: scale(.98); }
+
+        .btn-adsterra.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .btn-adsterra.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
 
         #toast-container {
             position: fixed;
@@ -133,32 +150,6 @@
         .toast-error { background: var(--danger); }
         .toast-info { background: #3b82f6; }
 
-        #loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            flex-direction: column;
-            gap: 16px;
-        }
-        #loading-overlay.show { display: flex; }
-
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #444;
-            border-top: 4px solid #ff9800;
-            border-radius: 50%;
-            animation: spin .8s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .loading-text { color: #fff; font-size: 14px; font-weight: 600; }
-
         .log-box {
             background: #0a0c10;
             border-radius: 12px;
@@ -171,20 +162,13 @@
         }
 
         .log-box p { margin: 4px 0; word-break: break-all; }
-        .log-box .error { color: #ef4444; }
         .log-box .info { color: #3b82f6; }
-        .log-box .warn { color: #f59e0b; }
+        .log-box .error { color: #ef4444; }
 
         .log-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #9ca3af; }
     </style>
 </head>
 <body>
-
-    <!-- লোডিং -->
-    <div id="loading-overlay">
-        <div class="loader"></div>
-        <div class="loading-text" id="loading-text">Ad লোড হচ্ছে...</div>
-    </div>
 
     <!-- টোস্ট -->
     <div id="toast-container"></div>
@@ -196,19 +180,28 @@
             <div class="header">
                 <div>
                     <h1>💰 Daily Income Zone</h1>
-                    <p class="status loading" id="sdk-status">⏳ SDK লোড হচ্ছে...</p>
+                    <p class="status" id="sdk-status">✅ App Ready</p>
                 </div>
                 <div style="font-size: 36px;">🎬</div>
             </div>
         </div>
 
-        <!-- AdsGram Ad Section -->
+        <!-- Adsterra Section -->
         <div class="ad-section">
-            <div class="ad-icon">🎬</div>
-            <h2>Watch Rewarded Ad</h2>
-            <p>Click the button below to watch an ad</p>
-            <button onclick="watchAd()" class="btn-primary" id="watch-btn" disabled>
-                ⏳ Loading SDK...
+            <div class="ad-icon">🔥</div>
+            <h2>Watch Ads</h2>
+            <p>Click any button below to watch an ad</p>
+
+            <button onclick="watchAd1()" class="btn-adsterra">
+                🎬 Watch Ads #1
+            </button>
+
+            <button onclick="watchAd2()" class="btn-adsterra blue">
+                🎬 Watch Ads #2
+            </button>
+
+            <button onclick="watchAd3()" class="btn-adsterra purple">
+                🎬 Watch Ads #3
             </button>
         </div>
 
@@ -226,11 +219,22 @@
         "use strict";
 
         // ============================================
-        // 🔥 AdsGram Block ID
+        // 🔥 Adsterra Ad Links (৩টি)
         // ============================================
-        const ADSGRAM_BLOCK_ID = "int-50596";
-
-        let AdController = null;
+        const ADSTERRA_LINKS = {
+            ad1: {
+                id: "31251544",
+                url: "https://www.profitableratecpmnetwork.com/m8rza4zqka?key=59d89a9e957a328dafc854210ff100d1"
+            },
+            ad2: {
+                id: "31249862",
+                url: "https://www.profitableratecpmnetwork.com/d5y37cxc6?key=1c9fee3a57ed6ebb649607fee9dffb4f"
+            },
+            ad3: {
+                id: "31247436",
+                url: "https://www.profitableratecpmnetwork.com/d4jctn1gx?key=b2afed700e622656b71af7b02f629332"
+            }
+        };
 
         // ============ লগ ============
         function log(message, type = "info") {
@@ -259,75 +263,47 @@
             }, 3000);
         }
 
-        // ============ লোডিং ============
-        function showLoading(text = "Ad লোড হচ্ছে...") {
-            document.getElementById("loading-text").textContent = text;
-            document.getElementById("loading-overlay").classList.add("show");
-        }
-        function hideLoading() {
-            document.getElementById("loading-overlay").classList.remove("show");
-        }
-
-        // ============ SDK Status ============
-        function updateStatus(text, className) {
-            const status = document.getElementById("sdk-status");
-            status.textContent = text;
-            status.className = "status " + className;
-        }
-
         // ==========================================
-        // 🎬 Watch Ad — AdsGram Interstitial
+        // 🔥 Ad Open Function — Telegram Mini App এ খুলবে
         // ==========================================
-        function watchAd() {
-            if (!AdController) {
-                log("❌ AdController নেই", "error");
-                alert("Ad is not ready yet. Please try again.");
-                return;
-            }
+        function openAdLink(adName, url) {
+            log(`🔥 ${adName} ক্লিক করা হয়েছে`, "info");
+            log(`📤 Link: ${url}`, "info");
 
-            log("▶️ AdsGram Ad show() কল...", "info");
-            showLoading("Ad লোড হচ্ছে...");
+            showToast(`🎬 Opening ${adName}...`, "success");
 
-            AdController.show()
-                .then((result) => {
-                    hideLoading();
-                    log("✅ Ad done — user watched or closed", "info");
-                    log("📊 Result: " + JSON.stringify(result), "info");
-                    showToast("🎬 Ad finished or closed!", "success");
-                    // ⚠️ Interstitial — reward logic নেই
-                })
-                .catch((result) => {
-                    hideLoading();
-                    const errMsg = result?.description || result?.error || "Unknown error";
-                    log("❌ Ad error: " + errMsg, "error");
-                    console.log("AdsGram Error:", result);
-                    showToast("❌ Ad error: " + errMsg, "error");
-                })
-                .finally(() => {
-                    hideLoading();
-                    log("🏁 Ad process সম্পূর্ণ", "info");
-                });
-        }
-
-        // ============ AdsGram Init ============
-        function initAdsGram() {
             try {
-                if (typeof window.Adsgram === "undefined") {
-                    log("❌ Adsgram SDK লোড হয়নি", "error");
-                    return false;
+                if (window.Telegram && window.Telegram.WebApp) {
+                    // ✅ Telegram Mini App-এর ভেতরে Ad খুলবে
+                    window.Telegram.WebApp.openLink(url);
+                    log(`✅ Telegram openLink দিয়ে ${adName} খোলা হয়েছে`, "info");
+                } else {
+                    // ব্রাউজার fallback
+                    const newWindow = window.open(url, "_blank");
+                    if (!newWindow || newWindow.closed) {
+                        window.location.href = url;
+                    }
+                    log(`✅ Browser এ ${adName} খোলা হয়েছে`, "info");
                 }
-
-                AdController = window.Adsgram.init({
-                    blockId: ADSGRAM_BLOCK_ID
-                });
-
-                log("✅ AdsGram initialized", "info");
-                log("📦 Block ID: " + ADSGRAM_BLOCK_ID, "info");
-                return true;
-            } catch (e) {
-                log("❌ AdsGram init error: " + e.message, "error");
-                return false;
+            } catch (error) {
+                log(`❌ ${adName} Error: ${error.message}`, "error");
+                window.location.href = url;
             }
+        }
+
+        // ==========================================
+        // 🔥 Adsterra Ad Functions (৩টি)
+        // ==========================================
+        function watchAd1() {
+            openAdLink("Adsterra #1", ADSTERRA_LINKS.ad1.url);
+        }
+
+        function watchAd2() {
+            openAdLink("Adsterra #2", ADSTERRA_LINKS.ad2.url);
+        }
+
+        function watchAd3() {
+            openAdLink("Adsterra #3", ADSTERRA_LINKS.ad3.url);
         }
 
         // ============ Telegram Init ============
@@ -343,44 +319,18 @@
                     log("👤 User: " + (user.first_name || "Unknown"), "info");
                 }
             } else {
-                log("⚠️ Telegram SDK নেই", "warn");
+                log("⚠️ Telegram SDK নেই (ব্রাউজারে চলছে)", "info");
             }
         }
 
         // ============ Init ============
         function init() {
             log("🚀 App চালু হচ্ছে...", "info");
+            log("🔥 Adsterra Ad #1 ID: " + ADSTERRA_LINKS.ad1.id, "info");
+            log("🔥 Adsterra Ad #2 ID: " + ADSTERRA_LINKS.ad2.id, "info");
+            log("🔥 Adsterra Ad #3 ID: " + ADSTERRA_LINKS.ad3.id, "info");
             initTelegram();
-
-            let attempts = 0;
-            const maxAttempts = 20;
-
-            const checkInterval = setInterval(() => {
-                attempts++;
-
-                if (typeof window.Adsgram !== "undefined") {
-                    clearInterval(checkInterval);
-                    log("✅ Adsgram SDK লোড হয়েছে", "info");
-
-                    const ok = initAdsGram();
-                    const watchBtn = document.getElementById("watch-btn");
-
-                    if (ok) {
-                        updateStatus("✅ SDK Ready", "ready");
-                        watchBtn.disabled = false;
-                        watchBtn.innerHTML = "▶️ Watch Ad";
-                        showToast("✅ Ad SDK Ready!", "success");
-                    } else {
-                        updateStatus("⚠️ Init Failed", "error");
-                        watchBtn.innerHTML = "⚠️ Init Failed";
-                    }
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(checkInterval);
-                    log("❌ ১০ সেকেন্ডেও SDK লোড হয়নি!", "error");
-                    updateStatus("❌ SDK Load Failed", "error");
-                    document.getElementById("watch-btn").innerHTML = "❌ SDK Not Loaded";
-                }
-            }, 500);
+            showToast("✅ App Ready!", "success");
         }
 
         document.addEventListener("DOMContentLoaded", init);
@@ -388,6 +338,7 @@
         window.addEventListener("error", (e) => {
             log("❌ Global Error: " + e.message, "error");
         });
+
     </script>
 
 </body>
